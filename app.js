@@ -1,0 +1,1607 @@
+﻿const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+const exercises = [
+  {
+    id: "bench",
+    name: "Press banca",
+    muscle: "Pecho",
+    equipment: "Barra",
+    type: "push",
+    cues: ["Escapulas juntas y bajas.", "Baja la barra controlada al esternon.", "Empuja el suelo con los pies."],
+    description: "Movimiento principal de empuje horizontal para pecho, deltoide anterior y triceps.",
+  },
+  {
+    id: "incline-db",
+    name: "Press inclinado mancuernas",
+    muscle: "Pecho",
+    equipment: "Mancuernas",
+    type: "push",
+    cues: ["Banco entre 25 y 35 grados.", "Codos ligeramente por debajo de los hombros.", "Junta las mancuernas sin chocarlas."],
+    description: "Variante estable para enfatizar la porcion clavicular del pecho.",
+  },
+  {
+    id: "dip",
+    name: "Fondos",
+    muscle: "Triceps",
+    equipment: "Paralelas",
+    type: "push",
+    cues: ["Inclina el torso si buscas pecho.", "Bloquea suave arriba.", "Manten hombros lejos de las orejas."],
+    description: "Ejercicio de peso corporal con alta transferencia a fuerza de empuje.",
+  },
+  {
+    id: "lat-pulldown",
+    name: "Jalon al pecho",
+    muscle: "Espalda",
+    equipment: "Polea",
+    type: "pull",
+    cues: ["Inicia con depresion escapular.", "Lleva la barra al pecho alto.", "Evita tirar con la zona lumbar."],
+    description: "Patron vertical para dorsales, redondo mayor y biceps.",
+  },
+  {
+    id: "row",
+    name: "Remo sentado",
+    muscle: "Espalda",
+    equipment: "Polea",
+    type: "pull",
+    cues: ["Pecho alto.", "Codos hacia atras y cerca del cuerpo.", "Pausa un segundo al contraer."],
+    description: "Remo horizontal facil de progresar y muy util para volumen de espalda.",
+  },
+  {
+    id: "curl",
+    name: "Curl barra",
+    muscle: "Biceps",
+    equipment: "Barra",
+    type: "pull",
+    cues: ["Codos quietos.", "Sube sin balanceo.", "Controla la bajada completa."],
+    description: "Aislamiento clasico de biceps con buena carga progresiva.",
+  },
+  {
+    id: "squat",
+    name: "Sentadilla",
+    muscle: "Pierna",
+    equipment: "Barra",
+    type: "legs",
+    cues: ["Respira y bloquea el tronco.", "Rodillas siguen la linea de los pies.", "Manten el medio pie firme."],
+    description: "Patron dominante de rodilla para fuerza global y masa muscular.",
+  },
+  {
+    id: "rdl",
+    name: "Peso muerto rumano",
+    muscle: "Femoral",
+    equipment: "Barra",
+    type: "legs",
+    cues: ["Cadera atras.", "Barra pegada al cuerpo.", "Espalda neutra durante todo el recorrido."],
+    description: "Bisagra de cadera para isquios, gluteo y erectores.",
+  },
+  {
+    id: "leg-ext",
+    name: "Extension de cuadriceps",
+    muscle: "Pierna",
+    equipment: "Maquina",
+    type: "legs",
+    cues: ["Ajusta el eje a la rodilla.", "Pausa arriba.", "No rebotes abajo."],
+    description: "Aislamiento de cuadriceps ideal para controlar volumen sin fatiga sistemica alta.",
+  },
+  {
+    id: "lateral-raise",
+    name: "Elevacion lateral",
+    muscle: "Hombro",
+    equipment: "Mancuernas",
+    type: "push",
+    cues: ["Ligera inclinacion hacia delante.", "Sube hasta linea de hombro.", "Conduce con el codo."],
+    description: "Aislamiento del deltoide medio para anchura visual del torso.",
+  },
+  {
+    id: "pull-up",
+    name: "Dominada",
+    muscle: "Espalda",
+    equipment: "Barra fija",
+    type: "pull",
+    cues: ["Cuerpo firme.", "Barbilla sobre la barra.", "Baja hasta extension controlada."],
+    description: "Movimiento vertical de alto valor para fuerza relativa.",
+  },
+  {
+    id: "hip-thrust",
+    name: "Hip thrust",
+    muscle: "Gluteo",
+    equipment: "Barra",
+    type: "legs",
+    cues: ["Menton ligeramente recogido.", "Pausa arriba.", "Costillas abajo al bloquear."],
+    description: "Extension de cadera enfocada en gluteo con gran potencial de carga.",
+  },
+];
+
+exercises.push(
+  { id: "overhead-press", name: "Press militar", muscle: "Hombro", equipment: "Barra", type: "push", cues: ["Gluteos apretados.", "Barra cerca de la cara.", "Bloquea arriba sin arquear."], description: "Empuje vertical basico para hombros y triceps." },
+  { id: "pec-deck", name: "Contractora", muscle: "Pecho", equipment: "Maquina", type: "push", cues: ["Antebrazos firmes.", "Pausa al cerrar.", "No adelantes la cabeza."], description: "Aislamiento estable para pecho con tension constante." },
+  { id: "triceps-pushdown", name: "Extension triceps polea", muscle: "Triceps", equipment: "Polea", type: "push", cues: ["Codos pegados.", "Extiende hasta bloquear suave.", "Sube controlado."], description: "Aislamiento de triceps facil de dosificar." },
+  { id: "face-pull", name: "Face pull", muscle: "Hombro", equipment: "Polea", type: "pull", cues: ["Tira hacia la frente.", "Abre codos.", "Pausa atras."], description: "Trabajo de deltoide posterior y rotadores externos." },
+  { id: "deadlift", name: "Peso muerto", muscle: "Espalda", equipment: "Barra", type: "pull", cues: ["Barra sobre medio pie.", "Dorsales tensos.", "Empuja el suelo."], description: "Bisagra pesada para fuerza total." },
+  { id: "tbar-row", name: "Remo T", muscle: "Espalda", equipment: "Maquina", type: "pull", cues: ["Pecho apoyado si es posible.", "Codos atras.", "No rebotes."], description: "Remo pesado para densidad de espalda." },
+  { id: "hammer-curl", name: "Curl martillo", muscle: "Biceps", equipment: "Mancuernas", type: "pull", cues: ["Muneca neutra.", "Codos estables.", "Bajada lenta."], description: "Biceps y braquial con agarre neutro." },
+  { id: "leg-press", name: "Prensa", muscle: "Pierna", equipment: "Maquina", type: "legs", cues: ["Espalda pegada.", "Rodillas siguen pies.", "No bloquees agresivo."], description: "Dominante de rodilla con carga alta y buena estabilidad." },
+  { id: "lunge", name: "Zancada", muscle: "Pierna", equipment: "Mancuernas", type: "legs", cues: ["Paso firme.", "Torso alto.", "Empuja con la pierna delantera."], description: "Unilateral para cuadriceps, gluteo y estabilidad." },
+  { id: "leg-curl", name: "Curl femoral", muscle: "Femoral", equipment: "Maquina", type: "legs", cues: ["Cadera pegada.", "Pausa al flexionar.", "Controla la extension."], description: "Aislamiento directo de isquiosurales." },
+  { id: "calf-raise", name: "Elevacion gemelo", muscle: "Gemelo", equipment: "Maquina", type: "legs", cues: ["Estira abajo.", "Sube completo.", "Pausa arriba."], description: "Trabajo de gemelo con recorrido completo." },
+  { id: "plank", name: "Plancha", muscle: "Core", equipment: "Peso corporal", type: "legs", cues: ["Costillas abajo.", "Gluteos activos.", "Respira sin perder posicion."], description: "Anti-extension basica para core." },
+  { id: "push-up", name: "Flexion", muscle: "Pecho", equipment: "Peso corporal", type: "push", cues: ["Cuerpo en bloque.", "Pecho al suelo.", "Codos a 45 grados."], description: "Empuje horizontal de peso corporal." },
+  { id: "cable-fly", name: "Cruce poleas", muscle: "Pecho", equipment: "Polea", type: "push", cues: ["Paso estable.", "Abrazo amplio.", "Pausa al cerrar."], description: "Aislamiento de pecho con tension continua." },
+  { id: "seated-db-press", name: "Press hombro mancuernas", muscle: "Hombro", equipment: "Mancuernas", type: "push", cues: ["Banco firme.", "Mancuernas sobre codos.", "Recorrido controlado."], description: "Empuje vertical con libertad escapular." },
+  { id: "wide-pulldown", name: "Jalon agarre amplio", muscle: "Espalda", equipment: "Polea", type: "pull", cues: ["Pecho alto.", "Codos hacia costillas.", "No tires tras nuca."], description: "Variante para dorsales con agarre amplio." },
+  { id: "single-row", name: "Remo una mano", muscle: "Espalda", equipment: "Mancuerna", type: "pull", cues: ["Apoyo estable.", "Codo hacia cadera.", "No gires el tronco."], description: "Remo unilateral para equilibrar lados." },
+  { id: "glute-bridge", name: "Puente gluteo", muscle: "Gluteo", equipment: "Peso corporal", type: "legs", cues: ["Pies cerca de gluteos.", "Pausa arriba.", "Pelvis neutra."], description: "Extension de cadera accesible y progresable." }
+);
+
+const routineTemplates = [
+  {
+    id: "push",
+    name: "Empuje A",
+    focus: "Pecho, hombro y triceps",
+    days: "2 dias por semana",
+    difficulty: "Intermedio",
+    bars: [86, 66, 42],
+    exerciseIds: ["bench", "incline-db", "dip", "lateral-raise"],
+  },
+  {
+    id: "pull",
+    name: "Tiron A",
+    focus: "Espalda y biceps",
+    days: "2 dias por semana",
+    difficulty: "Intermedio",
+    bars: [72, 82, 55],
+    exerciseIds: ["lat-pulldown", "row", "pull-up", "curl"],
+  },
+  {
+    id: "legs",
+    name: "Legs A",
+    focus: "Cuadriceps, femoral y gluteo",
+    days: "1 dia por semana",
+    difficulty: "Avanzado",
+    bars: [94, 74, 62],
+    exerciseIds: ["squat", "rdl", "leg-ext", "hip-thrust"],
+  },
+  {
+    id: "power",
+    name: "Torso fuerza",
+    focus: "Fuerza maxima y marcas",
+    days: "1 dia por semana",
+    difficulty: "Avanzado",
+    bars: [96, 58, 48],
+    exerciseIds: ["bench", "pull-up", "row", "lateral-raise"],
+  },
+  {
+    id: "hypertrophy",
+    name: "Hipertrofia mixta",
+    focus: "Volumen controlado",
+    days: "3 dias por semana",
+    difficulty: "Principiante",
+    bars: [64, 78, 70],
+    exerciseIds: ["incline-db", "lat-pulldown", "leg-ext", "curl"],
+  },
+  {
+    id: "fullbody",
+    name: "Cuerpo completo",
+    focus: "Consistencia total",
+    days: "3 dias por semana",
+    difficulty: "Principiante",
+    bars: [74, 68, 76],
+    exerciseIds: ["squat", "bench", "row", "rdl"],
+  },
+];
+
+const progressData = {
+  volume: [22400, 24750, 23820, 26800, 30340, 31800, 34820],
+  orm: [98, 101, 102, 105, 108, 110, 112],
+  sets: [44, 47, 45, 52, 58, 61, 64],
+};
+
+const muscleGroups = [
+  ["Pecho", "Pecho", "front"],
+  ["Biceps", "Biceps", "front"],
+  ["Triceps", "Triceps", "back"],
+  ["Espalda", "Espalda", "back"],
+  ["Hombros", "Hombro", "front"],
+  ["Abdominales", "Core", "front"],
+  ["Cuadriceps", "Pierna", "front"],
+  ["Isquiotibiales", "Femoral", "back"],
+  ["Gluteos", "Gluteo", "back"],
+  ["Gemelos", "Gemelo", "back"],
+];
+
+const feed = [
+  ["MR", "Marta completo Tiron A", "9.430 kg - 58 min", "Marca"],
+  ["AL", "Alex supero el reto semanal", "14 entrenos este mes", "Reto"],
+  ["JS", "Jose guardo una rutina nueva", "Torso fuerza", "Rutina"],
+  ["FG", "Fernando marco mejor banca", "100 x 5", "Marca"],
+];
+
+const foodDb = [
+  ["pechuga de pollo", ["pollo", "pechuga", "chicken"], 165, 31, 0, 3.6],
+  ["arroz cocido", ["arroz", "rice"], 130, 2.7, 28, 0.3],
+  ["pasta cocida", ["pasta", "macarrones", "espagueti"], 158, 5.8, 31, 0.9],
+  ["avena", ["oats", "copos de avena"], 389, 16.9, 66, 6.9],
+  ["huevo", ["huevos", "egg"], 143, 12.6, 0.7, 9.5, 50],
+  ["claras de huevo", ["claras", "clara"], 52, 10.9, 0.7, 0.2],
+  ["leche semidesnatada", ["leche", "milk"], 47, 3.4, 4.8, 1.6],
+  ["yogur griego", ["yogur", "yogurt griego"], 97, 9, 3.9, 5],
+  ["proteina whey", ["whey", "proteina", "proteina"], 400, 80, 8, 6],
+  ["platano", ["platano", "banana"], 89, 1.1, 23, 0.3, 120],
+  ["manzana", ["apple"], 52, 0.3, 14, 0.2, 180],
+  ["aguacate", ["avocado"], 160, 2, 8.5, 14.7],
+  ["aceite de oliva", ["aceite", "aove"], 884, 0, 0, 100, 10],
+  ["pan integral", ["pan", "tostada integral"], 247, 13, 41, 4.2],
+  ["patata cocida", ["patata", "papa"], 87, 1.9, 20, 0.1],
+  ["boniato", ["batata"], 86, 1.6, 20, 0.1],
+  ["ternera magra", ["ternera", "carne"], 170, 26, 0, 7],
+  ["salmon", ["salmon"], 208, 20, 0, 13],
+  ["atun natural", ["atun", "atun"], 116, 26, 0, 1],
+  ["brocoli", ["brocoli"], 35, 2.4, 7.2, 0.4],
+  ["ensalada", ["lechuga", "verdura"], 20, 1.2, 3.5, 0.2],
+  ["garbanzos cocidos", ["garbanzos"], 164, 8.9, 27, 2.6],
+  ["lentejas cocidas", ["lentejas"], 116, 9, 20, 0.4],
+  ["almendras", ["almendra"], 579, 21, 22, 50],
+  ["mantequilla cacahuete", ["crema cacahuete", "cacahuete"], 588, 25, 20, 50],
+  ["queso fresco batido", ["queso fresco", "quark"], 62, 8.5, 4, 0.2],
+  ["pizza", ["porcion pizza", "porcion pizza"], 266, 11, 33, 10],
+  ["hamburguesa", ["burger"], 254, 17, 24, 10],
+];
+
+let mealLog = loadMealLog();
+
+const state = {
+  view: "dashboard",
+  currentTemplate: "push",
+  libraryFilter: "Todos",
+  selectedExercise: exercises[0],
+  activeWorkout: loadWorkout(),
+  timer: { remaining: 90, running: false, handle: null },
+};
+
+function loadWorkout() {
+  const stored = localStorage.getItem("liftlab-workout");
+  if (stored) {
+    try {
+      return migrateWorkout(JSON.parse(stored));
+    } catch {
+      localStorage.removeItem("liftlab-workout");
+    }
+  }
+  return createWorkout("push");
+}
+
+function migrateWorkout(workout) {
+  const names = {
+    "Push A": "Empuje A",
+    "Pull A": "Tiron A",
+    "Upper Power": "Torso fuerza",
+    "Hypertrophy Mix": "Hipertrofia mixta",
+    "Full Body": "Cuerpo completo",
+  };
+  if (workout?.name && names[workout.name]) workout.name = names[workout.name];
+  if (workout?.name?.startsWith("IA ·")) workout.name = workout.name.replace("IA ·", "IA -");
+  return workout;
+}
+
+function createWorkout(templateId) {
+  const template = routineTemplates.find((item) => item.id === templateId) || routineTemplates[0];
+  return {
+    name: template.name,
+    exercises: template.exerciseIds.map((id, index) => ({
+      id,
+      sets: [
+        { weight: index === 0 ? 80 : 32, reps: index === 0 ? 6 : 10, rpe: 8, type: index === 0 ? "Top" : "Normal", done: false },
+        { weight: index === 0 ? 75 : 30, reps: index === 0 ? 8 : 12, rpe: 7, type: "Back", done: false },
+        { weight: index === 0 ? 72.5 : 28, reps: index === 0 ? 8 : 12, rpe: 7, type: "Back", done: false },
+      ],
+    })),
+  };
+}
+
+function saveWorkout() {
+  localStorage.setItem("liftlab-workout", JSON.stringify(state.activeWorkout));
+}
+
+function showToast(message) {
+  const toast = $("#toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(showToast.handle);
+  showToast.handle = setTimeout(() => toast.classList.remove("show"), 2200);
+}
+
+function setView(view) {
+  state.view = view;
+  $$(".view").forEach((panel) => panel.classList.toggle("active", panel.id === `${view}-view`));
+  $$(".nav-item, .mobile-tab").forEach((button) => button.classList.toggle("active", button.dataset.view === view));
+  const titles = {
+    dashboard: "Inicio",
+    ai: "Entrenador IA",
+    nutrition: "Nutricion",
+    workout: "Entrenar",
+    routines: "Rutinas",
+    library: "Ejercicios",
+    progress: "Progreso",
+    community: "Comunidad",
+    profile: "Perfil",
+  };
+  $("#view-title").textContent = titles[view];
+  if (view === "progress") drawProgressChart();
+}
+
+function renderDate() {
+  $("#today-label").textContent = new Intl.DateTimeFormat("es-ES", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(new Date());
+}
+
+function renderPhonePreview() {
+  const container = $("#phone-preview");
+  const workout = createWorkout(state.currentTemplate);
+  container.innerHTML = workout.exercises
+    .map((item) => {
+      const exercise = findExercise(item.id);
+      return `
+        <div class="preview-row">
+          <span class="thumb ${exercise.type}">${exercise.name.slice(0, 1)}</span>
+          <div><strong>${exercise.name}</strong><small>${item.sets.length} series - ${exercise.equipment}</small></div>
+          <span class="pill">${exercise.muscle}</span>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function renderWeekPlan() {
+  const days = [
+    ["Lun", "Empuje A", "Completado", true],
+    ["Mar", "Tiron A", "Completado", true],
+    ["Mie", "Movilidad", "28 min", true],
+    ["Jue", "Legs A", "Hoy", false],
+    ["Vie", "Torso fuerza", "Programado", false],
+  ];
+  $("#week-plan").innerHTML = days
+    .map(([day, title, status, done]) => `
+      <article class="week-day ${done ? "done" : ""}">
+        <strong>${day}</strong>
+        <p>${title}</p>
+        <small>${status}</small>
+      </article>
+    `)
+    .join("");
+}
+
+function renderFeed(target = "#recent-feed") {
+  $(target).innerHTML = feed
+    .map(([avatar, title, subtitle, tag]) => `
+      <article class="feed-item">
+        <span class="thumb">${avatar}</span>
+        <div><strong>${title}</strong><small>${subtitle}</small></div>
+        <span class="pill">${tag}</span>
+      </article>
+    `)
+    .join("");
+}
+
+function findExercise(id) {
+  return exercises.find((item) => item.id === id) || exercises[0];
+}
+
+function posterSrc(exercise, frame = 0) {
+  return `assets/exercises/${exercise.id}-${frame}.svg`;
+}
+
+function posterDataUri(exercise, frame = 0) {
+  const palette = {
+    push: ["#d95b43", "#f3b59f", "#1f1f21"],
+    pull: ["#3b74c5", "#a8c6f3", "#181d27"],
+    legs: ["#e0a636", "#f0d798", "#202018"],
+  }[exercise.type] || ["#1f8a70", "#9edbc9", "#17201d"];
+  const phase = frame === 0 ? 0 : frame === 1 ? 1 : 0.5;
+  const scene = exerciseScene(exercise.id, palette, phase);
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420">
+      <defs>
+        <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stop-color="${palette[1]}"/>
+          <stop offset="1" stop-color="#f8f5ed"/>
+        </linearGradient>
+        <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="16" stdDeviation="14" flood-opacity=".22"/>
+        </filter>
+      </defs>
+      <rect width="640" height="420" rx="28" fill="url(#bg)"/>
+      <path d="M0 332 C126 286 216 348 338 300 C468 250 552 292 640 248 L640 420 L0 420 Z" fill="${palette[0]}" opacity=".16"/>
+      <g stroke="#ffffff" stroke-opacity=".45" stroke-width="2">
+        <path d="M72 70h496M72 140h496M72 210h496M72 280h496"/>
+        <path d="M120 42v310M240 42v310M360 42v310M480 42v310"/>
+      </g>
+      <g filter="url(#shadow)">${scene}</g>
+      <g>
+        <rect x="28" y="28" width="236" height="66" rx="18" fill="#ffffff" opacity=".86"/>
+        <text x="48" y="56" font-family="Arial, sans-serif" font-size="22" font-weight="800" fill="#17191c">${escapeSvg(exercise.name)}</text>
+        <text x="48" y="78" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="${palette[0]}">${escapeSvg(exercise.muscle)} - ${escapeSvg(exercise.equipment)}</text>
+      </g>
+    </svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function exerciseScene(id, palette, phase) {
+  const [accent, , ink] = palette;
+  const y = (a, b) => a + (b - a) * phase;
+  const common = `stroke="${ink}" stroke-linecap="round" stroke-linejoin="round" fill="none"`;
+  const head = (cx, cy, r = 24) => `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${ink}"/>`;
+  const bar = (x1, yy, x2, width = 12) => `<path d="M${x1} ${yy}H${x2}" stroke="${accent}" stroke-width="${width}" stroke-linecap="round"/>`;
+  const plates = (x1, yy, x2, yy2 = yy) => `<rect x="${x1}" y="${yy - 42}" width="28" height="84" rx="8" fill="${accent}"/><rect x="${x2}" y="${yy2 - 42}" width="28" height="84" rx="8" fill="${accent}"/>`;
+  const cable = (x1, y1, x2, y2) => `<path d="M${x1} ${y1}L${x2} ${y2}" stroke="${accent}" stroke-width="6" stroke-dasharray="8 8" stroke-linecap="round"/>`;
+  const bench = `<path d="M185 300H455" stroke="${ink}" stroke-width="18" stroke-linecap="round"/><path d="M225 268H405" stroke="${ink}" stroke-width="16" stroke-linecap="round"/>`;
+  const dumbbell = (x, yy) => `<path d="M${x - 34} ${yy}h68" stroke="${accent}" stroke-width="10" stroke-linecap="round"/><rect x="${x - 45}" y="${yy - 22}" width="15" height="44" rx="5" fill="${accent}"/><rect x="${x + 30}" y="${yy - 22}" width="15" height="44" rx="5" fill="${accent}"/>`;
+  const scenes = {
+    bench: () => {
+      const barY = y(210, 142);
+      return `${bench}${head(320, 246)}<g ${common} stroke-width="18"><path d="M286 256L230 ${barY}"/><path d="M354 256L410 ${barY}"/></g>${bar(184, barY, 456, 12)}${plates(154, barY, 458)}`;
+    },
+    "incline-db": () => {
+      const handY = y(220, 132);
+      return `<path d="M205 314L425 228" stroke="${ink}" stroke-width="18" stroke-linecap="round"/>${head(318, 226)}<g ${common} stroke-width="17"><path d="M288 238L246 ${handY}"/><path d="M348 226L408 ${handY}"/></g>${dumbbell(238, handY)}${dumbbell(420, handY)}`;
+    },
+    dip: () => {
+      const shoulderY = y(200, 150);
+      return `<path d="M190 112v220M450 112v220" stroke="${accent}" stroke-width="14" stroke-linecap="round"/><path d="M190 160h120M330 160h120" stroke="${accent}" stroke-width="12" stroke-linecap="round"/>${head(320, shoulderY - 42)}<g ${common} stroke-width="18"><path d="M320 ${shoulderY}v86M292 ${shoulderY + 4}L210 166M348 ${shoulderY + 4}L430 166M320 ${shoulderY + 86}l-42 66M320 ${shoulderY + 86}l42 66"/></g>`;
+    },
+    "lat-pulldown": () => {
+      const handY = y(116, 176);
+      return `<path d="M170 82h300" stroke="${accent}" stroke-width="14" stroke-linecap="round"/>${cable(320, 82, 320, handY)}${head(320, 216)}<g ${common} stroke-width="18"><path d="M320 240v88M290 246L230 ${handY}M350 246L410 ${handY}M320 328l-48 46M320 328l48 46"/></g>`;
+    },
+    row: () => {
+      const handX = y(418, 334);
+      return `<path d="M170 276h320" stroke="${ink}" stroke-width="18" stroke-linecap="round"/><path d="M178 318h108M420 318h60" stroke="${accent}" stroke-width="14" stroke-linecap="round"/>${cable(520, 202, handX, 226)}${head(282, 190)}<g ${common} stroke-width="18"><path d="M282 214l-22 74M272 232L${handX} 226M260 288h112M282 288l-38 68M330 288l42 68"/></g>`;
+    },
+    curl: () => {
+      const barY = y(280, 190);
+      return `${head(320, 116)}<g ${common} stroke-width="18"><path d="M320 142v116M290 168L250 ${barY}M350 168L390 ${barY}M320 258l-52 92M320 258l52 92"/></g>${bar(238, barY, 402, 11)}${plates(214, barY, 410)}`;
+    },
+    squat: () => {
+      const hipY = y(184, 238);
+      const kneeY = y(278, 292);
+      return `${bar(190, 124, 450, 13)}${plates(158, 124, 454)}${head(320, 84)}<g ${common} stroke-width="20"><path d="M320 108v${hipY - 108}M320 ${hipY}L266 ${kneeY}L232 360M320 ${hipY}L386 ${kneeY}L426 360M284 130L220 124M356 130L420 124"/></g>`;
+    },
+    rdl: () => {
+      const hipY = y(172, 216);
+      const barY = y(236, 294);
+      return `${head(306, 104)}<g ${common} stroke-width="18"><path d="M306 128L360 ${hipY}M360 ${hipY}L318 354M360 ${hipY}L420 354M342 ${hipY - 4}L252 ${barY}M376 ${hipY - 4}L430 ${barY}"/></g>${bar(190, barY, 478, 13)}${plates(158, barY, 482)}`;
+    },
+    "leg-ext": () => {
+      const footX = y(430, 512);
+      return `<path d="M196 238h152v70H196z" fill="${ink}" opacity=".9"/><path d="M286 186h96v56h-96z" fill="${ink}" opacity=".9"/>${head(278, 162)}<g ${common} stroke-width="18"><path d="M288 186l62 58M326 280L${footX} 280M${footX} 280l38 0"/></g><circle cx="${footX + 46}" cy="280" r="28" fill="${accent}"/>`;
+    },
+    "lateral-raise": () => {
+      const handY = y(238, 154);
+      return `${head(320, 120)}<g ${common} stroke-width="18"><path d="M320 144v120M320 172L218 ${handY}M320 172L422 ${handY}M320 264l-48 92M320 264l48 92"/></g>${dumbbell(206, handY)}${dumbbell(434, handY)}`;
+    },
+    "pull-up": () => {
+      const bodyY = y(222, 154);
+      return `<path d="M162 82h316" stroke="${accent}" stroke-width="14" stroke-linecap="round"/>${head(320, bodyY - 50)}<g ${common} stroke-width="18"><path d="M320 ${bodyY - 26}v104M294 ${bodyY}L220 84M346 ${bodyY}L420 84M320 ${bodyY + 78}l-54 74M320 ${bodyY + 78}l54 74"/></g>`;
+    },
+    "hip-thrust": () => {
+      const hipY = y(264, 206);
+      return `<path d="M154 282h138" stroke="${ink}" stroke-width="22" stroke-linecap="round"/><path d="M422 322H522" stroke="${ink}" stroke-width="18" stroke-linecap="round"/>${head(236, 222)}<g ${common} stroke-width="18"><path d="M260 238L350 ${hipY}L456 316M350 ${hipY}L306 318M350 ${hipY}L392 318"/></g>${bar(268, hipY - 8, 432, 13)}${plates(244, hipY - 8, 436)}`;
+    },
+    "overhead-press": () => {
+      const barY = y(206, 82);
+      return `${head(320, 148)}<g ${common} stroke-width="18"><path d="M320 172v112M292 190L250 ${barY}M348 190L390 ${barY}M320 284l-52 80M320 284l52 80"/></g>${bar(202, barY, 438, 12)}${plates(170, barY, 442)}`;
+    },
+    "pec-deck": () => {
+      const handX = y(220, 290);
+      return `<path d="M178 130h284v210H178z" fill="${ink}" opacity=".12" stroke="${accent}" stroke-width="8"/><path d="M230 150v160M410 150v160" stroke="${accent}" stroke-width="12"/>${head(320, 154)}<g ${common} stroke-width="18"><path d="M320 178v112M300 204L${handX} 220M340 204L${640 - handX} 220M320 290l-48 72M320 290l48 72"/></g>`;
+    },
+    "triceps-pushdown": () => {
+      const handY = y(166, 256);
+      return `${cable(320, 70, 320, handY)}${bar(270, handY, 370, 10)}${head(320, 136)}<g ${common} stroke-width="18"><path d="M320 160v104M288 184L272 ${handY}M352 184L368 ${handY}M320 264l-52 86M320 264l52 86"/></g>`;
+    },
+    "face-pull": () => {
+      const handX = y(420, 344);
+      return `${cable(520, 156, handX, 156)}${head(300, 152)}<g ${common} stroke-width="18"><path d="M300 176v106M286 198L${handX} 156M314 198L${handX} 188M300 282l-50 82M300 282l54 82"/></g><circle cx="520" cy="156" r="22" fill="${accent}"/>`;
+    },
+    deadlift: () => {
+      const hipY = y(178, 232);
+      const barY = y(302, 226);
+      return `${bar(170, barY, 470, 14)}${plates(136, barY, 474)}${head(314, 110)}<g ${common} stroke-width="18"><path d="M314 134L358 ${hipY}M358 ${hipY}L302 356M358 ${hipY}L418 356M338 ${hipY}L278 ${barY}M376 ${hipY}L420 ${barY}"/></g>`;
+    },
+    "tbar-row": () => {
+      const handY = y(250, 194);
+      return `<path d="M210 326L512 180" stroke="${accent}" stroke-width="14" stroke-linecap="round"/>${plates(490, 180, 542)}${head(282, 154)}<g ${common} stroke-width="18"><path d="M282 178L350 238M350 238l-52 108M350 238l62 96M320 214L396 ${handY}M338 226L410 ${handY}"/></g>`;
+    },
+    "hammer-curl": () => {
+      const handY = y(274, 190);
+      return `${head(320, 116)}<g ${common} stroke-width="18"><path d="M320 142v116M290 170L250 ${handY}M350 170L390 ${handY}M320 258l-52 92M320 258l52 92"/></g>${dumbbell(246, handY)}${dumbbell(394, handY)}`;
+    },
+    "leg-press": () => {
+      const sledX = y(430, 506);
+      return `<path d="M180 312h170L476 122" stroke="${ink}" stroke-width="18" stroke-linecap="round"/><path d="M478 90l86 86" stroke="${accent}" stroke-width="18"/><path d="M${sledX} 106l74 74" stroke="${accent}" stroke-width="12"/>${head(246, 242)}<g ${common} stroke-width="18"><path d="M270 260l72 36M342 296L${sledX} 156M342 296L${sledX - 40} 196"/></g>`;
+    },
+    lunge: () => {
+      const backKnee = y(286, 320);
+      return `${head(320, 110)}<g ${common} stroke-width="18"><path d="M320 134v102M320 236L250 296L202 356M320 236L414 ${backKnee}L482 350M288 164L238 214M352 164L402 214"/></g>${dumbbell(234, 214)}${dumbbell(406, 214)}`;
+    },
+    "leg-curl": () => {
+      const footX = y(470, 384);
+      return `<path d="M168 230h286" stroke="${ink}" stroke-width="22" stroke-linecap="round"/><path d="M210 290h250" stroke="${ink}" stroke-width="18" stroke-linecap="round"/>${head(210, 196)}<g ${common} stroke-width="18"><path d="M238 214h150M388 214L${footX} 284"/></g><circle cx="${footX + 30}" cy="284" r="28" fill="${accent}"/>`;
+    },
+    "calf-raise": () => {
+      const heelY = y(350, 322);
+      return `<path d="M212 104h216v36H212z" fill="${accent}"/>${head(320, 86)}<g ${common} stroke-width="18"><path d="M320 110v142M320 252l-46 98M320 252l48 ${heelY - 252}M286 146L232 112M354 146L408 112"/></g><path d="M240 360h90M354 ${heelY}h92" stroke="${ink}" stroke-width="12" stroke-linecap="round"/>`;
+    },
+    plank: () => `<path d="M170 304H496" stroke="${accent}" stroke-width="10" stroke-linecap="round"/>${head(190, 230)}<g ${common} stroke-width="18"><path d="M214 246L352 260L486 300M300 258L244 304M384 274L344 304"/></g>`,
+    "push-up": () => {
+      const chestY = y(244, 296);
+      return `${head(210, chestY - 42)}<g ${common} stroke-width="18"><path d="M232 ${chestY - 24}L390 ${chestY}L500 314M300 ${chestY - 8}L250 320M384 ${chestY}L340 322"/></g><path d="M164 322h390" stroke="${accent}" stroke-width="10" stroke-linecap="round"/>`;
+    },
+    "cable-fly": () => {
+      const handX = y(218, 314);
+      return `<path d="M104 78v270M536 78v270" stroke="${accent}" stroke-width="12"/><path d="M104 104L${handX} 210M536 104L${640 - handX} 210" stroke="${accent}" stroke-width="6" stroke-dasharray="8 8"/>${head(320, 142)}<g ${common} stroke-width="18"><path d="M320 166v120M296 198L${handX} 210M344 198L${640 - handX} 210M320 286l-52 76M320 286l52 76"/></g>`;
+    },
+    "seated-db-press": () => {
+      const handY = y(190, 88);
+      return `<path d="M232 302h176v34H232z" fill="${ink}"/><path d="M270 202h100v104H270z" fill="${ink}" opacity=".24"/>${head(320, 146)}<g ${common} stroke-width="18"><path d="M320 170v96M292 188L254 ${handY}M348 188L386 ${handY}M320 266l-42 72M320 266l42 72"/></g>${dumbbell(246, handY)}${dumbbell(394, handY)}`;
+    },
+    "wide-pulldown": () => {
+      const handY = y(110, 172);
+      return `<path d="M126 80h388" stroke="${accent}" stroke-width="14" stroke-linecap="round"/>${cable(320, 80, 320, handY)}${head(320, 214)}<g ${common} stroke-width="18"><path d="M320 238v90M286 246L184 ${handY}M354 246L456 ${handY}M320 328l-48 46M320 328l48 46"/></g>`;
+    },
+    "single-row": () => {
+      const handY = y(282, 210);
+      return `<path d="M210 286h210" stroke="${ink}" stroke-width="18"/><path d="M250 320h120" stroke="${ink}" stroke-width="14"/>${head(304, 150)}<g ${common} stroke-width="18"><path d="M304 174L370 238M370 238l-38 106M370 238l64 92M316 192L246 286M360 230L452 ${handY}"/></g>${dumbbell(460, handY)}`;
+    },
+    "glute-bridge": () => {
+      const hipY = y(280, 224);
+      return `<path d="M150 326h360" stroke="${accent}" stroke-width="10" stroke-linecap="round"/>${head(196, 260)}<g ${common} stroke-width="18"><path d="M220 276L338 ${hipY}L454 316M338 ${hipY}L300 318M338 ${hipY}L390 318"/></g>`;
+    },
+  };
+  return (scenes[id] || scenes.bench)();
+}
+
+function escapeSvg(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function renderWorkoutLog() {
+  $("#active-workout-name").textContent = state.activeWorkout.name;
+  $("#exercise-log").innerHTML = state.activeWorkout.exercises
+    .map((entry, exerciseIndex) => {
+      const exercise = findExercise(entry.id);
+      return `
+        <article class="log-exercise" data-exercise-index="${exerciseIndex}">
+          <div class="log-head">
+            <div>
+              <strong>${exercise.name}</strong>
+              <small>${exercise.muscle} - ${exercise.equipment}</small>
+            </div>
+            <button class="text-button" data-demo="${exercise.id}">Ver tecnica</button>
+          </div>
+          <div class="set-grid">
+            ${entry.sets
+              .map((set, setIndex) => `
+                <div class="set-row" data-set-index="${setIndex}">
+                  <strong>${setIndex + 1}</strong>
+                  <label>Peso<input data-field="weight" type="number" min="0" step="0.5" value="${set.weight}"></label>
+                  <label>Reps<input data-field="reps" type="number" min="1" step="1" value="${set.reps}"></label>
+                  <label>RPE<input data-field="rpe" type="number" min="1" max="10" step="0.5" value="${set.rpe}"></label>
+                  <label>Tipo<input data-field="type" value="${set.type}"></label>
+                  <button class="check-set ${set.done ? "done" : ""}" data-check-set aria-label="Completar serie">${set.done ? "✓" : ""}</button>
+                </div>
+              `)
+              .join("")}
+          </div>
+          <button class="text-button" data-add-set="${exerciseIndex}">Anadir serie</button>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function renderRoutines() {
+  $("#routines-grid").innerHTML = routineTemplates
+    .map((routine) => `
+      <article class="routine-card">
+        <div>
+          <strong>${routine.name}</strong>
+          <small>${routine.focus}</small>
+        </div>
+        <div class="routine-meta">
+          <span class="pill">${routine.days}</span>
+          <span class="pill">${routine.difficulty}</span>
+        </div>
+        <div class="mini-bars">
+          ${routine.bars.map((bar) => `<span style="--bar:${bar}%"></span>`).join("")}
+        </div>
+        <button class="primary-button" data-load-template="${routine.id}">Usar rutina</button>
+      </article>
+    `)
+    .join("");
+}
+
+function renderFilters() {
+  const muscles = ["Todos", ...new Set(exercises.map((item) => item.muscle))];
+  $("#muscle-filter").innerHTML = muscles
+    .map((muscle) => `<button class="${state.libraryFilter === muscle ? "active" : ""}" data-muscle="${muscle}">${muscle}</button>`)
+    .join("");
+}
+
+function renderLibrary() {
+  const query = $("#exercise-search")?.value?.trim().toLowerCase() || "";
+  const filtered = exercises.filter((exercise) => {
+    const matchesFilter = state.libraryFilter === "Todos" || exercise.muscle === state.libraryFilter;
+    const haystack = `${exercise.name} ${exercise.muscle} ${exercise.equipment}`.toLowerCase();
+    return matchesFilter && haystack.includes(query);
+  });
+  $("#exercise-count-label").textContent = `${filtered.length} ejercicios`;
+  $("#exercise-library").innerHTML = filtered
+    .map((exercise) => `
+      <article class="exercise-card">
+        <button class="exercise-visual media-card" data-open-exercise="${exercise.id}" aria-label="Abrir guia de ${exercise.name}">
+          <img src="${posterSrc(exercise, 1)}" alt="Foto de ${exercise.name}" loading="lazy">
+          <span class="play-dot"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></svg></span>
+        </button>
+        <div>
+          <strong>${exercise.name}</strong>
+          <small>${exercise.muscle} - ${exercise.equipment}</small>
+        </div>
+        <button class="ghost-button" data-open-exercise-button="${exercise.id}">Abrir guia</button>
+      </article>
+    `)
+    .join("");
+}
+
+function renderCues() {
+  $("#cue-list").innerHTML = state.selectedExercise.cues.map((cue) => `<div class="cue">${cue}</div>`).join("");
+}
+
+function drawExercise(canvas, exercise, phase) {
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const width = canvas.width;
+  const height = canvas.height;
+  const styles = getComputedStyle(document.body);
+  const ink = styles.getPropertyValue("--ink").trim();
+  const accent = styles.getPropertyValue("--accent").trim();
+  const coral = styles.getPropertyValue("--coral").trim();
+  const blue = styles.getPropertyValue("--blue").trim();
+  const amber = styles.getPropertyValue("--amber").trim();
+
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = styles.getPropertyValue("--surface-strong").trim();
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.strokeStyle = styles.getPropertyValue("--line").trim();
+  ctx.lineWidth = 2;
+  for (let x = 40; x < width; x += 56) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, height);
+    ctx.stroke();
+  }
+  for (let y = 38; y < height; y += 50) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
+    ctx.stroke();
+  }
+
+  const t = (Math.sin(phase) + 1) / 2;
+  const color = exercise.type === "push" ? coral : exercise.type === "pull" ? blue : amber;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+
+  if (exercise.type === "legs") {
+    const hipY = 122 + t * 52;
+    const kneeY = 205 - t * 15;
+    drawJoint(ctx, width / 2, 72, 24, ink);
+    stroke(ctx, ink, 14, [[width / 2, 96], [width / 2 - 8, hipY], [width / 2 + 38, kneeY], [width / 2 + 70, 278]]);
+    stroke(ctx, ink, 14, [[width / 2, hipY], [width / 2 - 46, kneeY], [width / 2 - 78, 278]]);
+    stroke(ctx, color, 9, [[width / 2 - 82, 106], [width / 2 + 88, 106]]);
+    drawPlate(ctx, width / 2 - 104, 106, color);
+    drawPlate(ctx, width / 2 + 104, 106, color);
+  } else if (exercise.type === "pull") {
+    const handY = 82 + t * 42;
+    stroke(ctx, color, 9, [[width / 2 - 128, 70], [width / 2 + 128, 70]]);
+    drawJoint(ctx, width / 2, 154 + t * 22, 24, ink);
+    stroke(ctx, ink, 13, [[width / 2, 176 + t * 22], [width / 2, 254]]);
+    stroke(ctx, ink, 11, [[width / 2 - 18, 198], [width / 2 - 76, handY], [width / 2 - 104, 72]]);
+    stroke(ctx, ink, 11, [[width / 2 + 18, 198], [width / 2 + 76, handY], [width / 2 + 104, 72]]);
+    stroke(ctx, ink, 12, [[width / 2, 254], [width / 2 - 50, 304]]);
+    stroke(ctx, ink, 12, [[width / 2, 254], [width / 2 + 50, 304]]);
+  } else {
+    const barY = 100 + t * 54;
+    stroke(ctx, ink, 18, [[130, 242], [390, 242]]);
+    stroke(ctx, ink, 12, [[180, 210], [342, 210]]);
+    drawJoint(ctx, width / 2, 176, 22, ink);
+    stroke(ctx, ink, 12, [[width / 2 - 34, 198], [width / 2 - 80, barY]]);
+    stroke(ctx, ink, 12, [[width / 2 + 34, 198], [width / 2 + 80, barY]]);
+    stroke(ctx, color, 8, [[width / 2 - 130, barY], [width / 2 + 130, barY]]);
+    drawPlate(ctx, width / 2 - 154, barY, color);
+    drawPlate(ctx, width / 2 + 154, barY, color);
+  }
+
+  ctx.fillStyle = ink;
+  ctx.font = "700 22px system-ui, sans-serif";
+  ctx.fillText(exercise.name, 24, 34);
+  ctx.fillStyle = accent;
+  ctx.font = "700 14px system-ui, sans-serif";
+  ctx.fillText(`${exercise.muscle} - ${exercise.equipment}`, 24, 58);
+}
+
+function stroke(ctx, color, width, points) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  points.forEach(([x, y], index) => (index ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+  ctx.stroke();
+}
+
+function drawJoint(ctx, x, y, radius, color) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawPlate(ctx, x, y, color) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.roundRect(x - 14, y - 34, 28, 68, 8);
+  ctx.fill();
+}
+
+function animateExercise() {
+  const phase = performance.now() / 650;
+  drawExercise($("#exercise-canvas"), state.selectedExercise, phase);
+  const dialogVideo = $("#dialog-video-frame");
+  if ($("#exercise-dialog").open && dialogVideo) {
+    const frame = String(Math.floor(performance.now() / 650) % 3);
+    if (dialogVideo.dataset.frame !== frame) {
+      dialogVideo.src = posterSrc(state.selectedExercise, Number(frame));
+      dialogVideo.dataset.frame = frame;
+    }
+  }
+  requestAnimationFrame(animateExercise);
+}
+
+function drawProgressChart() {
+  const canvas = $("#progress-chart");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const mode = $("#chart-mode").value;
+  const data = progressData[mode];
+  const styles = getComputedStyle(document.body);
+  const ink = styles.getPropertyValue("--ink").trim();
+  const muted = styles.getPropertyValue("--muted").trim();
+  const accent = styles.getPropertyValue("--accent").trim();
+  const line = styles.getPropertyValue("--line").trim();
+  const width = canvas.width;
+  const height = canvas.height;
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = styles.getPropertyValue("--surface-strong").trim();
+  ctx.fillRect(0, 0, width, height);
+
+  const padding = 54;
+  const max = Math.max(...data) * 1.12;
+  const min = Math.min(...data) * 0.88;
+  ctx.strokeStyle = line;
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 5; i++) {
+    const y = padding + ((height - padding * 2) / 4) * i;
+    stroke(ctx, line, 1, [[padding, y], [width - padding, y]]);
+  }
+
+  const points = data.map((value, index) => {
+    const x = padding + ((width - padding * 2) / (data.length - 1)) * index;
+    const y = height - padding - ((value - min) / (max - min)) * (height - padding * 2);
+    return [x, y, value];
+  });
+
+  ctx.beginPath();
+  points.forEach(([x, y], index) => (index ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 5;
+  ctx.stroke();
+
+  points.forEach(([x, y, value], index) => {
+    ctx.fillStyle = accent;
+    ctx.beginPath();
+    ctx.arc(x, y, 7, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = index === points.length - 1 ? ink : muted;
+    ctx.font = "700 18px system-ui, sans-serif";
+    ctx.fillText(formatMetric(value, mode), x - 24, y - 16);
+  });
+
+  ctx.fillStyle = muted;
+  ctx.font = "700 14px system-ui, sans-serif";
+  ["S1", "S2", "S3", "S4", "S5", "S6", "S7"].forEach((label, index) => {
+    ctx.fillText(label, points[index][0] - 10, height - 22);
+  });
+}
+
+function formatMetric(value, mode) {
+  if (mode === "volume") return `${Math.round(value / 1000)}k`;
+  if (mode === "orm") return `${value}kg`;
+  return `${value}`;
+}
+
+function renderCalculator() {
+  const weight = Number($("#calc-weight").value || 0);
+  const reps = Number($("#calc-reps").value || 1);
+  const result = Math.round(weight * (1 + reps / 30));
+  $("#calc-result").textContent = `${result} kg`;
+}
+
+function renderMilestones() {
+  const items = [
+    ["Press banca", "100 x 5 registrado hace 2 dias"],
+    ["Sentadilla", "Volumen semanal +12%"],
+    ["Dominada", "Primera serie con lastre"],
+  ];
+  $("#milestones").innerHTML = items.map(([title, text]) => `<article class="milestone"><strong>${title}</strong><br><small>${text}</small></article>`).join("");
+}
+
+function renderCommunity() {
+  $("#leaderboard").innerHTML = [
+    ["1", "Marta R.", "128.400 lb"],
+    ["2", "Fernando", "121.900 lb"],
+    ["3", "Alex L.", "109.200 lb"],
+    ["4", "Jose S.", "96.850 lb"],
+  ]
+    .map(([rank, name, score]) => `
+      <div class="leader-row">
+        <strong>${rank}</strong>
+        <span>${name}</span>
+        <small>${score}</small>
+      </div>
+    `)
+    .join("");
+  renderFeed("#community-feed");
+}
+
+function renderMeasures() {
+  const measures = [
+    ["Peso", "82,4 kg"],
+    ["Cintura", "82 cm"],
+    ["Pecho", "106 cm"],
+    ["Brazo", "39 cm"],
+    ["Sueno", "7 h 12 min"],
+    ["Pasos", "9.840"],
+  ];
+  $("#measure-grid").innerHTML = measures.map(([name, value]) => `<div class="measure-item"><span>${name}</span><strong>${value}</strong></div>`).join("");
+}
+
+function collectTrainingContext() {
+  const sets = state.activeWorkout.exercises.flatMap((entry) =>
+    entry.sets.map((set) => ({ ...set, exercise: findExercise(entry.id) }))
+  );
+  const completed = sets.filter((set) => set.done);
+  const volume = sets.reduce((total, set) => total + Number(set.weight || 0) * Number(set.reps || 0), 0);
+  const hardSets = sets.filter((set) => Number(set.rpe || 0) >= 8).length;
+  return {
+    goal: $("#ai-goal")?.value || "hypertrophy",
+    time: Number($("#ai-time")?.value || 60),
+    recovery: Number($("#ai-recovery")?.value || 82),
+    soreness: $("#ai-soreness")?.value || "none",
+    sets,
+    completed,
+    volume,
+    hardSets,
+    workoutName: state.activeWorkout.name,
+  };
+}
+
+function runAIAgents() {
+  const ctx = collectTrainingContext();
+  const readiness = ctx.recovery >= 78 ? "Alta" : ctx.recovery >= 58 ? "Media" : "Baja";
+  const deload = ctx.recovery < 55 || ctx.hardSets > 8;
+  const goalText = {
+    hypertrophy: "hipertrofia",
+    strength: "fuerza",
+    fatloss: "perdida de grasa",
+    recomp: "recomposicion",
+  }[ctx.goal];
+  const sorenessMap = {
+    none: "sin restricciones",
+    shoulder: "evitar presses pesados y priorizar rangos sin dolor",
+    back: "evitar bisagras pesadas y usar maquinas o apoyos",
+    knee: "evitar flexion profunda cargada y priorizar control",
+  };
+  const agents = [
+    {
+      name: "Entrenador",
+      score: `${readiness}`,
+      text: `Sesion recomendada para ${goalText}: ${ctx.time} min con ${deload ? "volumen reducido" : "progresion normal"}. Contexto: ${sorenessMap[ctx.soreness]}.`,
+    },
+    {
+      name: "Progresion",
+      score: deload ? "Deload" : "+2,5%",
+      text: deload
+        ? "Manten el peso y baja 1 serie por ejercicio. El objetivo de hoy es calidad, no record."
+        : "Sube 2,5 kg en el primer basico si completas todas las series con RPE 8 o menos.",
+    },
+    {
+      name: "Tecnica",
+      score: "3 cues",
+      text: ctx.soreness === "shoulder"
+        ? "Reduce rango si molesta, codos 30-45 grados, escapulas estables y sin rebote."
+        : "Graba la serie top, revisa recorrido completo, velocidad estable y control excentrico.",
+    },
+    {
+      name: "Recuperacion",
+      score: `${ctx.recovery}%`,
+      text: ctx.recovery >= 78
+        ? "Puedes entrenar fuerte, pero deja 1 repeticion en recamara en accesorios."
+        : "Prioriza sueno, descansos largos y evita llegar al fallo en mas de una serie.",
+    },
+    {
+      name: "Nutricion",
+      score: ctx.goal === "fatloss" ? "Deficit" : "Proteina",
+      text: ctx.goal === "fatloss"
+        ? "Manten proteina alta y deja carbohidratos alrededor del entreno para rendir."
+        : "Apunta a 1,8-2,2 g/kg de proteina y carbohidratos antes de la sesion.",
+    },
+    {
+      name: "Riesgo",
+      score: deload ? "Alerta" : "OK",
+      text: deload
+        ? "Senal de fatiga: hoy conviene recortar volumen y no perseguir marcas."
+        : "Riesgo bajo. Calienta progresivo y respeta el temporizador.",
+    },
+  ];
+  $("#ai-agent-grid").innerHTML = agents
+    .map((agent) => `
+      <article class="ai-agent-card">
+        <div><strong>${agent.name}</strong><span>${agent.score}</span></div>
+        <p>${agent.text}</p>
+      </article>
+    `)
+    .join("");
+  renderAIPlan(ctx, deload);
+  addAIMessage("Entrenador", agents[0].text);
+}
+
+function renderAIPlan(ctx, deload = false) {
+  const base = ctx.goal === "strength" ? "power" : ctx.soreness === "knee" ? "push" : ctx.soreness === "back" ? "push" : "push";
+  const template = routineTemplates.find((routine) => routine.id === base) || routineTemplates[0];
+  const exerciseIds = template.exerciseIds.map((id) => {
+    if (ctx.soreness === "shoulder" && ["bench", "incline-db", "dip"].includes(id)) return "row";
+    if (ctx.soreness === "back" && ["rdl", "deadlift"].includes(id)) return "leg-ext";
+    if (ctx.soreness === "knee" && ["squat", "leg-press", "lunge"].includes(id)) return "hip-thrust";
+    return id;
+  });
+  const sets = deload ? "2-3" : ctx.goal === "strength" ? "3-5" : "3-4";
+  const reps = ctx.goal === "strength" ? "3-6" : ctx.goal === "fatloss" ? "10-15" : "8-12";
+  $("#ai-plan").innerHTML = exerciseIds
+    .map((id, index) => {
+      const exercise = findExercise(id);
+      return `
+        <div class="ai-plan-row">
+          <span>${index + 1}</span>
+          <img src="${posterSrc(exercise, 1)}" alt="${exercise.name}">
+          <div>
+            <strong>${exercise.name}</strong>
+            <small>${sets} series - ${reps} reps - RPE ${deload ? "6-7" : "7-9"}</small>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function applyAIPlan() {
+  const ctx = collectTrainingContext();
+  const ids = [...$("#ai-plan").querySelectorAll(".ai-plan-row strong")]
+    .map((node) => exercises.find((exercise) => exercise.name === node.textContent)?.id)
+    .filter(Boolean);
+  if (!ids.length) {
+    runAIAgents();
+    return;
+  }
+  state.activeWorkout = {
+    name: `IA - ${ctx.time} min`,
+    exercises: ids.map((id) => ({
+      id,
+      sets: [
+        { weight: 30, reps: ctx.goal === "strength" ? 5 : 10, rpe: 7, type: "IA", done: false },
+        { weight: 30, reps: ctx.goal === "strength" ? 5 : 10, rpe: 7, type: "IA", done: false },
+        { weight: 30, reps: ctx.goal === "strength" ? 5 : 10, rpe: 8, type: "IA", done: false },
+      ],
+    })),
+  };
+  saveWorkout();
+  renderWorkoutLog();
+  showToast("Plan IA cargado en Entrenar.");
+  setView("workout");
+}
+
+function addAIMessage(author, text) {
+  const chat = $("#ai-chat");
+  if (!chat) return;
+  chat.insertAdjacentHTML("beforeend", `<div class="ai-message ${author === "Tu" ? "user" : ""}"><strong>${author}</strong><p>${text}</p></div>`);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function answerAIQuestion(question) {
+  const ctx = collectTrainingContext();
+  const q = question.toLowerCase();
+  if (q.includes("dolor") || q.includes("hombro") || q.includes("rodilla") || q.includes("espalda")) {
+    return "Reduce rango, baja carga un 10-20% y cambia a variante estable. Si el dolor es punzante o cambia tu tecnica, corta esa serie.";
+  }
+  if (q.includes("peso") || q.includes("subo") || q.includes("progres")) {
+    return ctx.recovery >= 75
+      ? "Si: sube poco, 2-2,5 kg en basicos o una repeticion por serie en accesorios. Si pasas de RPE 9, vuelve al peso anterior."
+      : "Hoy no subiria peso. Manten carga, mejora tecnica y busca repetir rendimiento con menos fatiga.";
+  }
+  if (q.includes("comer") || q.includes("prote") || q.includes("nutri")) {
+    return "Base simple: proteina alta, sal e hidratacion antes de entrenar, carbohidrato facil 60-120 min antes si la sesion es dura.";
+  }
+  return "Para hoy prioriza adherencia: elige 4 ejercicios, deja 1-2 repeticiones en recamara y registra todo. Manana ajusto progresion con lo que completes.";
+}
+
+function loadMealLog() {
+  try {
+    return JSON.parse(localStorage.getItem("liftlab-meals") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveMealLog() {
+  localStorage.setItem("liftlab-meals", JSON.stringify(mealLog));
+}
+
+function normalizeText(value) {
+  return String(value)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9,.+\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function findFood(fragment) {
+  const text = normalizeText(fragment);
+  return foodDb.find(([name, aliases]) => [name, ...aliases].some((alias) => text.includes(normalizeText(alias))));
+}
+
+function parseAmount(fragment, food) {
+  const text = normalizeText(fragment).replace(",", ".");
+  const unitWeight = food?.[6] || 100;
+  const gramMatch = text.match(/(\d+(?:\.\d+)?)\s*(g|gr|gramos|ml|mililitros)\b/);
+  if (gramMatch) return Number(gramMatch[1]);
+  const kgMatch = text.match(/(\d+(?:\.\d+)?)\s*(kg|kilo|kilos)\b/);
+  if (kgMatch) return Number(kgMatch[1]) * 1000;
+  const spoonMatch = text.match(/(\d+(?:\.\d+)?)\s*(cucharada|cucharadas|tbsp)\b/);
+  if (spoonMatch) return Number(spoonMatch[1]) * 10;
+  const cupMatch = text.match(/(\d+(?:\.\d+)?)\s*(taza|tazas)\b/);
+  if (cupMatch) return Number(cupMatch[1]) * 240;
+  const unitMatch = text.match(/(\d+(?:\.\d+)?)\s*(unidad|unidades|huevo|huevos|platano|banana|manzana)\b/);
+  if (unitMatch) return Number(unitMatch[1]) * unitWeight;
+  const leading = text.match(/^(\d+(?:\.\d+)?)/);
+  if (leading && food?.[6]) return Number(leading[1]) * unitWeight;
+  return 100;
+}
+
+function parseMeal(text) {
+  const parts = text
+    .split(/,|\+|\by\b/gi)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const items = parts.map((part) => {
+    const food = findFood(part);
+    if (!food) {
+      return { raw: part, name: part, grams: 0, kcal: 0, protein: 0, carbs: 0, fat: 0, matched: false };
+    }
+    const grams = parseAmount(part, food);
+    const factor = grams / 100;
+    return {
+      raw: part,
+      name: food[0],
+      grams,
+      kcal: Math.round(food[2] * factor),
+      protein: round1(food[3] * factor),
+      carbs: round1(food[4] * factor),
+      fat: round1(food[5] * factor),
+      matched: true,
+    };
+  });
+  return {
+    items,
+    totals: sumNutrition(items),
+  };
+}
+
+function sumNutrition(items) {
+  return items.reduce(
+    (total, item) => ({
+      kcal: total.kcal + item.kcal,
+      protein: round1(total.protein + item.protein),
+      carbs: round1(total.carbs + item.carbs),
+      fat: round1(total.fat + item.fat),
+    }),
+    { kcal: 0, protein: 0, carbs: 0, fat: 0 }
+  );
+}
+
+function round1(value) {
+  return Math.round(Number(value || 0) * 10) / 10;
+}
+
+function getNutritionTargets() {
+  const weight = Number($("#nutri-weight")?.value || 82);
+  const height = Number($("#nutri-height")?.value || 178);
+  const age = Number($("#nutri-age")?.value || 35);
+  const sex = $("#nutri-sex")?.value || "male";
+  const activity = Number($("#nutri-activity")?.value || 1.55);
+  const goal = $("#nutri-goal")?.value || "maintain";
+  const bmr = sex === "male" ? 10 * weight + 6.25 * height - 5 * age + 5 : 10 * weight + 6.25 * height - 5 * age - 161;
+  const adjustment = goal === "cut" ? -400 : goal === "bulk" ? 250 : 0;
+  const kcal = Math.max(1400, Math.round(bmr * activity + adjustment));
+  const protein = Math.round(weight * (goal === "cut" ? 2.2 : 2));
+  const fat = Math.round(weight * 0.8);
+  const carbs = Math.max(50, Math.round((kcal - protein * 4 - fat * 9) / 4));
+  return { kcal, protein, carbs, fat, bmr: Math.round(bmr), goal };
+}
+
+function todayMeals() {
+  const today = new Date().toISOString().slice(0, 10);
+  return mealLog.filter((meal) => meal.date === today);
+}
+
+function renderNutrition() {
+  const targets = getNutritionTargets();
+  const meals = todayMeals();
+  const totals = sumNutrition(meals.map((meal) => meal.totals));
+  $("#nutrition-date").textContent = new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "short" }).format(new Date());
+  $("#macro-rings").innerHTML = [
+    ["Kcal", totals.kcal, targets.kcal],
+    ["Proteina", totals.protein, targets.protein, "g"],
+    ["Carbos", totals.carbs, targets.carbs, "g"],
+    ["Grasas", totals.fat, targets.fat, "g"],
+  ]
+    .map(([label, value, target, unit = ""]) => {
+      const pct = Math.min(100, Math.round((Number(value) / Number(target)) * 100) || 0);
+      return `<div class="macro-card"><span>${label}</span><strong>${value}${unit}</strong><small>${target}${unit} objetivo</small><div class="macro-bar"><i style="width:${pct}%"></i></div></div>`;
+    })
+    .join("");
+  $("#daily-summary").innerHTML = `
+    <div><span>Consumido</span><strong>${totals.kcal} kcal</strong></div>
+    <div><span>Restante</span><strong>${Math.max(0, targets.kcal - totals.kcal)} kcal</strong></div>
+    <div><span>Proteina</span><strong>${totals.protein} / ${targets.protein} g</strong></div>
+  `;
+  $("#meal-log").innerHTML = meals.length
+    ? meals
+        .map((meal, index) => `
+          <article class="meal-entry">
+            <div><strong>${meal.slot}</strong><small>${meal.items.map((item) => item.name).join(", ")}</small></div>
+            <span>${meal.totals.kcal} kcal</span>
+            <button class="icon-button" data-delete-meal="${index}" aria-label="Eliminar comida"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+          </article>
+        `)
+        .join("")
+    : `<p class="subtle">Aun no hay comidas registradas hoy.</p>`;
+  renderNutritionCoach(totals, targets);
+}
+
+function renderNutritionCoach(totals, targets) {
+  const remaining = targets.kcal - totals.kcal;
+  const proteinLeft = targets.protein - totals.protein;
+  const messages = [
+    remaining > 500 ? `Te quedan ${remaining} kcal. Prioriza una comida con proteina y carbohidrato si vas a entrenar.` : `Vas cerca del objetivo. Manten comidas simples para no pasarte.`,
+    proteinLeft > 25 ? `Faltan ${Math.round(proteinLeft)} g de proteina. Buena opcion: pollo, yogur griego, whey o atun.` : "Proteina bien encaminada.",
+    totals.fat > targets.fat ? "Grasas por encima del objetivo: el resto del dia usa carnes magras y evita aceite/frutos secos." : "Grasas bajo control.",
+  ];
+  $("#nutrition-coach").innerHTML = messages.map((msg) => `<div class="coach-note">${msg}</div>`).join("");
+}
+
+function previewMeal() {
+  const parsed = parseMeal($("#meal-input").value);
+  $("#meal-preview").innerHTML = parsed.items.length
+    ? `
+      <div class="meal-total"><strong>${parsed.totals.kcal} kcal</strong><span>${parsed.totals.protein}p - ${parsed.totals.carbs}c - ${parsed.totals.fat}g</span></div>
+      ${parsed.items.map((item) => `<div class="meal-item ${item.matched ? "" : "unmatched"}"><span>${item.name}</span><small>${item.grams ? `${Math.round(item.grams)}g` : "sin coincidencia"} - ${item.kcal} kcal</small></div>`).join("")}
+    `
+    : "";
+  return parsed;
+}
+
+function addMeal() {
+  const parsed = previewMeal();
+  if (!parsed.items.length || parsed.totals.kcal === 0) {
+    showToast("Escribe una comida reconocible con cantidades.");
+    return;
+  }
+  mealLog.push({
+    date: new Date().toISOString().slice(0, 10),
+    slot: $("#meal-slot").value,
+    text: $("#meal-input").value,
+    ...parsed,
+  });
+  saveMealLog();
+  $("#meal-input").value = "";
+  $("#meal-preview").innerHTML = "";
+  renderNutrition();
+  showToast("Comida guardada.");
+}
+
+function renderFoodSearch() {
+  const query = normalizeText($("#food-search").value);
+  const matches = foodDb
+    .filter(([name, aliases]) => !query || [name, ...aliases].some((alias) => normalizeText(alias).includes(query)))
+    .slice(0, 8);
+  $("#food-results").innerHTML = matches
+    .map(([name, , kcal, protein, carbs, fat]) => `<button type="button" data-food-name="${name}"><strong>${name}</strong><small>${kcal} kcal - ${protein}p ${carbs}c ${fat}g /100g</small></button>`)
+    .join("");
+}
+
+function openExercise(id) {
+  const exercise = findExercise(id);
+  state.selectedExercise = exercise;
+  $("#dialog-title").textContent = exercise.name;
+  $("#dialog-muscle").textContent = exercise.muscle;
+  $("#dialog-description").textContent = exercise.description;
+  $("#dialog-video-frame").src = posterSrc(exercise, 0);
+  $("#dialog-video-frame").dataset.frame = "0";
+  $("#dialog-video-frame").alt = `Video animado de ${exercise.name}`;
+  $("#dialog-photos").innerHTML = [0, 1, 2]
+    .map((frame) => `<img src="${posterSrc(exercise, frame)}" alt="Foto ${frame + 1} de ${exercise.name}">`)
+    .join("");
+  $("#dialog-muscles").innerHTML = `
+    <img src="${muscleDataUri(exercise.muscle, "front")}" alt="Musculos frontales trabajados por ${exercise.name}">
+    <img src="${muscleDataUri(exercise.muscle, "back")}" alt="Musculos posteriores trabajados por ${exercise.name}">
+  `;
+  renderCues();
+  $("#exercise-dialog").showModal();
+}
+
+function renderMuscleAtlas() {
+  $("#muscle-atlas").innerHTML = muscleGroups
+    .map(([name, filter, side]) => {
+      const count = exercises.filter((exercise) => exercise.muscle === filter).length;
+      return `
+      <button class="muscle-card" data-muscle="${filter}">
+        <img src="${muscleDataUri(name, side)}" alt="${name}">
+        <strong>${name}</strong>
+        <small>${count} ejercicios</small>
+      </button>
+    `;
+    })
+    .join("");
+}
+
+function muscleDataUri(muscle, side = "front") {
+  const active = "#ff3b30";
+  const base = "#f0f0f0";
+  const shadow = "#b8b8b8";
+  const mark = (name) => muscle === name ? active : base;
+  const isBack = side === "back";
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="360" height="420" viewBox="0 0 360 420">
+      <rect width="360" height="420" rx="24" fill="#050505"/>
+      <g transform="translate(75 28)">
+        <ellipse cx="105" cy="34" rx="26" ry="31" fill="${base}"/>
+        <path d="M78 68c14 16 40 16 54 0l16 42H62z" fill="${shadow}"/>
+        <path d="M60 102c-28 16-42 50-48 86l32 7c6-30 14-50 28-62z" fill="${mark(isBack ? "Espalda" : "Pecho")}"/>
+        <path d="M150 102c28 16 42 50 48 86l-32 7c-6-30-14-50-28-62z" fill="${mark(isBack ? "Espalda" : "Pecho")}"/>
+        <path d="M72 96h66c18 38 18 90 0 132H72c-18-42-18-94 0-132z" fill="${mark(isBack ? "Espalda" : "Pecho")}"/>
+        <path d="M88 112c10 40 10 78 0 112M122 112c-10 40-10 78 0 112" stroke="#050505" stroke-opacity=".35" stroke-width="4"/>
+        <path d="M48 186c-9 34-12 68-8 100l30 1c2-33 5-63 14-90z" fill="${mark("Biceps")}"/>
+        <path d="M162 186c9 34 12 68 8 100l-30 1c-2-33-5-63-14-90z" fill="${mark("Triceps")}"/>
+        <path d="M74 230h30v124H56c0-42 7-84 18-124z" fill="${mark("Cuadriceps")}"/>
+        <path d="M106 230h30c11 40 18 82 18 124h-48z" fill="${mark(isBack ? "Isquiotibiales" : "Cuadriceps")}"/>
+        <path d="M75 230c20 18 40 18 60 0l-8 54H83z" fill="${mark("Gluteos")}" opacity="${isBack ? "1" : ".28"}"/>
+        <path d="M82 106h46v118H82z" fill="${mark("Abdominales")}" opacity="${!isBack && muscle === "Abdominales" ? "1" : "0"}"/>
+        <path d="M48 96c16-18 34-26 54-26s38 8 60 26l-18 42c-16-18-28-26-42-26s-26 8-38 26z" fill="${mark("Hombros")}" opacity=".96"/>
+        <path d="M58 354h42l-4 42H60zM110 354h42l-2 42h-36z" fill="${muscle === "Gemelo" || muscle === "Gemelos" ? active : base}"/>
+      </g>
+      <text x="180" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="800" fill="#fff">${escapeSvg(muscle)}</text>
+    </svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function addExerciseToWorkout(id) {
+  state.activeWorkout.exercises.push({
+    id,
+    sets: [{ weight: 20, reps: 10, rpe: 7, type: "Normal", done: false }],
+  });
+  saveWorkout();
+  renderWorkoutLog();
+  showToast("Ejercicio anadido al entreno.");
+}
+
+function loadTemplate(id) {
+  state.currentTemplate = id;
+  state.activeWorkout = createWorkout(id);
+  saveWorkout();
+  renderPhonePreview();
+  renderWorkoutLog();
+  showToast("Rutina cargada.");
+  setView("workout");
+}
+
+function startTimer(seconds = 90) {
+  clearInterval(state.timer.handle);
+  state.timer.remaining = seconds;
+  state.timer.running = true;
+  updateTimerText();
+  state.timer.handle = setInterval(() => {
+    state.timer.remaining -= 1;
+    updateTimerText();
+    if (state.timer.remaining <= 0) {
+      clearInterval(state.timer.handle);
+      state.timer.running = false;
+      showToast("Descanso completado.");
+    }
+  }, 1000);
+}
+
+function updateTimerText() {
+  const minutes = String(Math.floor(state.timer.remaining / 60)).padStart(2, "0");
+  const seconds = String(state.timer.remaining % 60).padStart(2, "0");
+  $("#rest-timer").textContent = `${minutes}:${seconds}`;
+}
+
+function bindEvents() {
+  $$(".nav-item, .mobile-tab").forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
+  $$("[data-view-shortcut]").forEach((button) => button.addEventListener("click", () => setView(button.dataset.viewShortcut)));
+  document.addEventListener("click", (event) => {
+    const templateButton = event.target.closest("[data-load-template]");
+    if (templateButton) loadTemplate(templateButton.dataset.loadTemplate);
+
+    const openButton = event.target.closest("[data-open-exercise]");
+    if (openButton) openExercise(openButton.dataset.openExercise);
+
+    const openButtonText = event.target.closest("[data-open-exercise-button]");
+    if (openButtonText) openExercise(openButtonText.dataset.openExerciseButton);
+
+    const muscleCard = event.target.closest(".muscle-card");
+    if (muscleCard) {
+      state.libraryFilter = muscleCard.dataset.muscle;
+      renderFilters();
+      renderLibrary();
+      $(".section-title").scrollIntoView({ behavior: "smooth", block: "start" });
+      showToast(`Filtrando ${state.libraryFilter}.`);
+    }
+
+    const demoButton = event.target.closest("[data-demo]");
+    if (demoButton) {
+      state.selectedExercise = findExercise(demoButton.dataset.demo);
+      renderCues();
+      showToast(`${state.selectedExercise.name}: guia cargada.`);
+    }
+
+    const addSetButton = event.target.closest("[data-add-set]");
+    if (addSetButton) {
+      const index = Number(addSetButton.dataset.addSet);
+      state.activeWorkout.exercises[index].sets.push({ weight: 20, reps: 10, rpe: 7, type: "Normal", done: false });
+      saveWorkout();
+      renderWorkoutLog();
+    }
+  });
+
+  $("#exercise-log").addEventListener("input", (event) => {
+    const input = event.target;
+    const row = input.closest(".set-row");
+    const exerciseNode = input.closest(".log-exercise");
+    if (!row || !exerciseNode) return;
+    const exerciseIndex = Number(exerciseNode.dataset.exerciseIndex);
+    const setIndex = Number(row.dataset.setIndex);
+    const field = input.dataset.field;
+    const value = field === "type" ? input.value : Number(input.value);
+    state.activeWorkout.exercises[exerciseIndex].sets[setIndex][field] = value;
+    saveWorkout();
+  });
+
+  $("#exercise-log").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-check-set]");
+    if (!button) return;
+    const row = button.closest(".set-row");
+    const exerciseNode = button.closest(".log-exercise");
+    const exerciseIndex = Number(exerciseNode.dataset.exerciseIndex);
+    const setIndex = Number(row.dataset.setIndex);
+    const set = state.activeWorkout.exercises[exerciseIndex].sets[setIndex];
+    set.done = !set.done;
+    saveWorkout();
+    button.classList.toggle("done", set.done);
+    button.textContent = set.done ? "✓" : "";
+    if (set.done) startTimer(90);
+  });
+
+  $("#timer-btn").addEventListener("click", () => startTimer(90));
+  $("#finish-workout-btn").addEventListener("click", () => {
+    const completed = state.activeWorkout.exercises.flatMap((item) => item.sets).filter((set) => set.done).length;
+    showToast(`Entreno guardado con ${completed} series completadas.`);
+  });
+  $("#add-exercise-btn").addEventListener("click", () => setView("library"));
+  $("#swap-demo").addEventListener("click", () => {
+    const index = exercises.findIndex((item) => item.id === state.selectedExercise.id);
+    state.selectedExercise = exercises[(index + 1) % exercises.length];
+    renderCues();
+  });
+  $("#close-dialog").addEventListener("click", () => $("#exercise-dialog").close());
+  $("#add-to-workout").addEventListener("click", () => {
+    addExerciseToWorkout(state.selectedExercise.id);
+    $("#exercise-dialog").close();
+  });
+  $("#start-from-dialog").addEventListener("click", () => {
+    addExerciseToWorkout(state.selectedExercise.id);
+    $("#exercise-dialog").close();
+    setView("workout");
+  });
+  $("#exercise-search").addEventListener("input", renderLibrary);
+  $("#muscle-filter").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-muscle]");
+    if (!button) return;
+    state.libraryFilter = button.dataset.muscle;
+    renderFilters();
+    renderLibrary();
+  });
+  $("#chart-mode").addEventListener("change", drawProgressChart);
+  $("#calc-weight").addEventListener("input", renderCalculator);
+  $("#calc-reps").addEventListener("input", renderCalculator);
+  $("#theme-toggle").addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    drawProgressChart();
+  });
+  $("#device-toggle").addEventListener("click", () => {
+    document.body.classList.toggle("device-mobile");
+    updateDeviceToggleLabel();
+    drawProgressChart();
+  });
+  $("#add-friend-btn").addEventListener("click", () => showToast("Solicitud de seguimiento preparada."));
+  $("#random-measure").addEventListener("click", () => {
+    renderMeasures();
+    showToast("Medidas actualizadas.");
+  });
+  $("#run-ai-agents").addEventListener("click", runAIAgents);
+  $("#apply-ai-plan").addEventListener("click", applyAIPlan);
+  $("#ai-recovery").addEventListener("input", () => {
+    $("#ai-recovery-label").textContent = `${$("#ai-recovery").value}%`;
+  });
+  ["#ai-goal", "#ai-time", "#ai-soreness"].forEach((selector) => {
+    $(selector).addEventListener("change", runAIAgents);
+  });
+  $("#ai-chat-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const input = $("#ai-chat-input");
+    const value = input.value.trim();
+    if (!value) return;
+    addAIMessage("Tu", value);
+    addAIMessage("Entrenador", answerAIQuestion(value));
+    input.value = "";
+  });
+  $$(".ai-prompts [data-ai-prompt]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const value = button.dataset.aiPrompt;
+      addAIMessage("Tu", value);
+      addAIMessage("Entrenador", answerAIQuestion(value));
+    });
+  });
+  $("#meal-input").addEventListener("input", previewMeal);
+  $("#analyze-meal").addEventListener("click", previewMeal);
+  $("#add-meal").addEventListener("click", addMeal);
+  $("#recalc-nutrition").addEventListener("click", renderNutrition);
+  $("#clear-meals").addEventListener("click", () => {
+    const today = new Date().toISOString().slice(0, 10);
+    mealLog = mealLog.filter((meal) => meal.date !== today);
+    saveMealLog();
+    renderNutrition();
+    showToast("Dia nutricional limpiado.");
+  });
+  ["#nutri-weight", "#nutri-height", "#nutri-age", "#nutri-sex", "#nutri-activity", "#nutri-goal"].forEach((selector) => {
+    $(selector).addEventListener("change", renderNutrition);
+  });
+  $$("#meal-log").forEach((log) => {
+    log.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-delete-meal]");
+      if (!button) return;
+      const today = new Date().toISOString().slice(0, 10);
+      const todayIndexes = mealLog.map((meal, index) => ({ meal, index })).filter(({ meal }) => meal.date === today);
+      const target = todayIndexes[Number(button.dataset.deleteMeal)];
+      if (!target) return;
+      mealLog.splice(target.index, 1);
+      saveMealLog();
+      renderNutrition();
+    });
+  });
+  $("#food-search").addEventListener("input", renderFoodSearch);
+  $("#food-results").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-food-name]");
+    if (!button) return;
+    const current = $("#meal-input").value.trim();
+    $("#meal-input").value = current ? `${current}, 100g ${button.dataset.foodName}` : `100g ${button.dataset.foodName}`;
+    previewMeal();
+  });
+  $$("#nutrition-view [data-meal-example]").forEach((button) => {
+    button.addEventListener("click", () => {
+      $("#meal-input").value = button.dataset.mealExample;
+      previewMeal();
+    });
+  });
+  $("#open-onboarding").addEventListener("click", () => openOnboarding(0));
+  $("#close-onboarding").addEventListener("click", closeOnboarding);
+  $("#next-onboarding").onclick = () => moveOnboarding(1);
+  $("#prev-onboarding").onclick = () => moveOnboarding(-1);
+  $("#onboarding-flow").addEventListener("click", (event) => {
+    if (event.target.id === "onboarding-flow") closeOnboarding();
+  });
+}
+
+let onboardingIndex = 0;
+
+function openOnboarding(index = 0) {
+  onboardingIndex = index;
+  $("#onboarding-flow").classList.add("show");
+  $("#onboarding-flow").setAttribute("aria-hidden", "false");
+  renderOnboarding();
+}
+
+function closeOnboarding() {
+  $("#onboarding-flow").classList.remove("show");
+  $("#onboarding-flow").setAttribute("aria-hidden", "true");
+  sessionStorage.setItem("liftlab-onboarding-seen", "1");
+}
+
+function moveOnboarding(delta) {
+  const steps = $$(".onboarding-step");
+  onboardingIndex = Math.max(0, Math.min(steps.length - 1, onboardingIndex + delta));
+  renderOnboarding();
+}
+
+function renderOnboarding() {
+  const steps = $$(".onboarding-step");
+  steps.forEach((step, index) => step.classList.toggle("active", index === onboardingIndex));
+  $("#onboarding-progress").style.width = `${((onboardingIndex + 1) / steps.length) * 100}%`;
+  $("#prev-onboarding").disabled = onboardingIndex === 0;
+  $("#next-onboarding").textContent = onboardingIndex === steps.length - 1 ? "Entrar" : "Siguiente";
+  if (onboardingIndex === steps.length - 1) $("#next-onboarding").onclick = closeOnboarding;
+  else $("#next-onboarding").onclick = () => moveOnboarding(1);
+}
+
+function init() {
+  renderDate();
+  renderPhonePreview();
+  renderWeekPlan();
+  renderFeed();
+  renderWorkoutLog();
+  renderRoutines();
+  renderFilters();
+  renderMuscleAtlas();
+  renderLibrary();
+  renderCues();
+  drawProgressChart();
+  renderCalculator();
+  renderMilestones();
+  renderCommunity();
+  renderMeasures();
+  runAIAgents();
+  renderNutrition();
+  renderFoodSearch();
+  updateTimerText();
+  updateDeviceToggleLabel();
+  bindEvents();
+  animateExercise();
+}
+
+function updateDeviceToggleLabel() {
+  const toggle = $("#device-toggle");
+  if (!toggle) return;
+  toggle.innerHTML = document.body.classList.contains("device-mobile")
+    ? '<svg viewBox="0 0 24 24"><path d="M3 5h18v12H3zM8 21h8M12 17v4"/></svg>Modo PC'
+    : '<svg viewBox="0 0 24 24"><path d="M7 3h10v18H7zM11 18h2"/></svg>Modo movil';
+}
+
+init();
+

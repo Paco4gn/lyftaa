@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LiftLab - Entrenador de fuerza</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="dark lyfta-skin device-mobile">
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Navegacion principal">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg>
+          </span>
+          <div>
+            <strong>LiftLab</strong>
+            <small>Entrenador de fuerza</small>
+          </div>
+        </div>
+        <nav class="nav-list">
+          <button class="nav-item active" data-view="dashboard">
+            <svg viewBox="0 0 24 24"><path d="M4 13h6V4H4v9Zm10 7h6V4h-6v16ZM4 20h6v-5H4v5Z"/></svg>
+            Inicio
+          </button>
+          <button class="nav-item" data-view="workout">
+            <svg viewBox="0 0 24 24"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg>
+            Entrenar
+          </button>
+          <button class="nav-item" data-view="ai">
+            <svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.4L19 10l-5.2 1.6L12 17l-1.8-5.4L5 10l5.2-1.6L12 3ZM5 16l.8 2.2L8 19l-2.2.8L5 22l-.8-2.2L2 19l2.2-.8L5 16ZM19 15l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3Z"/></svg>
+            IA
+          </button>
+          <button class="nav-item" data-view="nutrition">
+            <svg viewBox="0 0 24 24"><path d="M4 19h16M6 19V8a4 4 0 0 1 8 0v11M14 10h2a4 4 0 0 1 0 8h-2M9 4v3M7 5l2 2M11 5 9 7"/></svg>
+            Nutrición
+          </button>
+          <button class="nav-item" data-view="routines">
+            <svg viewBox="0 0 24 24"><path d="M7 6h13M7 12h13M7 18h13M4 6h.01M4 12h.01M4 18h.01"/></svg>
+            Rutinas
+          </button>
+          <button class="nav-item" data-view="library">
+            <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h6"/></svg>
+            Ejercicios
+          </button>
+          <button class="nav-item" data-view="progress">
+            <svg viewBox="0 0 24 24"><path d="M4 19V5M8 17v-5M13 17V8M18 17v-9M4 19h17"/></svg>
+            Progreso
+          </button>
+          <button class="nav-item" data-view="community">
+            <svg viewBox="0 0 24 24"><path d="M16 11a4 4 0 1 0-8 0M4 20a8 8 0 0 1 16 0M18 8a3 3 0 0 1 2 5"/></svg>
+            Comunidad
+          </button>
+          <button class="nav-item" data-view="profile">
+            <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0"/></svg>
+            Perfil
+          </button>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="mini-stat">
+            <span>Racha</span>
+            <strong id="side-streak">8 dias</strong>
+          </div>
+          <button class="icon-button" id="theme-toggle" title="Cambiar tema" aria-label="Cambiar tema">
+            <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z"/></svg>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow" id="today-label"></p>
+            <h1 id="view-title">Inicio</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="ghost-button" id="device-toggle">
+              <svg viewBox="0 0 24 24"><path d="M3 5h18v12H3zM8 21h8M12 17v4"/></svg>
+              Modo PC
+            </button>
+            <button class="ghost-button" id="open-onboarding">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+              Inicio guiado
+            </button>
+            <button class="ghost-button" data-view-shortcut="library">
+              <svg viewBox="0 0 24 24"><path d="M21 21l-4.3-4.3M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"/></svg>
+              Buscar
+            </button>
+            <button class="primary-button" data-view-shortcut="workout">
+              <svg viewBox="0 0 24 24"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg>
+              Iniciar entreno
+            </button>
+          </div>
+        </header>
+
+        <section class="view active" id="dashboard-view" aria-label="Panel de inicio">
+          <div class="hero-panel">
+            <div class="hero-copy">
+              <span class="pill">Sesion de hoy</span>
+              <h2>Empuje superior con foco en fuerza</h2>
+              <p>Press banca, press inclinado, fondos y triceps. Descansos automáticos, progresion por volumen y registro de RPE.</p>
+              <div class="hero-actions">
+                <button class="primary-button" data-view-shortcut="workout">Entrenar ahora</button>
+                <button class="ghost-button" data-load-template="push">Cargar rutina</button>
+              </div>
+            </div>
+            <div class="phone-stage" aria-label="Vista previa del entrenamiento">
+              <div class="phone-screen">
+                <div class="phone-header">
+                  <span></span>
+                  <strong>Empuje A</strong>
+                  <span></span>
+                </div>
+                <div class="workout-preview" id="phone-preview"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <article class="metric-card">
+              <span>Volumen semanal</span>
+              <strong id="weekly-volume">34.820 kg</strong>
+              <small>+8% vs semana anterior</small>
+            </article>
+            <article class="metric-card">
+              <span>Mejor 1RM</span>
+              <strong id="best-orm">112 kg</strong>
+              <small>Press banca estimado</small>
+            </article>
+            <article class="metric-card">
+              <span>Entrenos</span>
+              <strong id="weekly-workouts">5</strong>
+              <small>Objetivo: 5 por semana</small>
+            </article>
+            <article class="metric-card">
+              <span>Recuperacion</span>
+              <strong id="recovery-score">82%</strong>
+              <small>Listo para intensidad media</small>
+            </article>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>Plan de la semana</h3>
+                <button class="text-button" data-view-shortcut="routines">Editar</button>
+              </div>
+              <div class="week-plan" id="week-plan"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>Actividad reciente</h3>
+                <button class="text-button" data-view-shortcut="community">Ver todo</button>
+              </div>
+              <div class="feed-list" id="recent-feed"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="ai-view" aria-label="Centro de inteligencia artificial">
+          <div class="ai-hero">
+            <div>
+              <span class="pill">Entrenador IA gratuito</span>
+              <h2>Entrena con agentes que piensan contigo</h2>
+              <p>Planifica la sesión, ajusta cargas, detecta fatiga, mejora técnica y genera una estrategia semanal sin salir de la app.</p>
+            </div>
+            <button class="primary-button" id="run-ai-agents">
+              <svg viewBox="0 0 24 24"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2 2-6Z"/></svg>
+              Analizar ahora
+            </button>
+          </div>
+
+          <div class="ai-control-panel">
+            <label>Objetivo
+              <select id="ai-goal">
+                <option value="hypertrophy">Ganar músculo</option>
+                <option value="strength">Fuerza máxima</option>
+                <option value="fatloss">Perder grasa</option>
+                <option value="recomp">Recomposición</option>
+              </select>
+            </label>
+            <label>Tiempo
+              <select id="ai-time">
+                <option value="45">45 min</option>
+                <option value="60" selected>60 min</option>
+                <option value="75">75 min</option>
+                <option value="90">90 min</option>
+              </select>
+            </label>
+            <label>Recuperación
+              <input id="ai-recovery" type="range" min="30" max="100" value="82" />
+              <span id="ai-recovery-label">82%</span>
+            </label>
+            <label>Molestias
+              <select id="ai-soreness">
+                <option value="none">Sin molestias</option>
+                <option value="shoulder">Hombro</option>
+                <option value="back">Espalda baja</option>
+                <option value="knee">Rodilla</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="ai-agent-grid" id="ai-agent-grid"></div>
+
+          <div class="ai-workbench">
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>Plan inteligente de hoy</h3>
+                <button class="text-button" id="apply-ai-plan">Cargar en entreno</button>
+              </div>
+              <div id="ai-plan" class="ai-plan"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-heading">
+              <h3>Chat del entrenador</h3>
+              </div>
+              <div class="ai-chat" id="ai-chat"></div>
+              <div class="ai-prompts">
+                <button type="button" data-ai-prompt="¿Subo peso hoy?">Subo peso</button>
+                <button type="button" data-ai-prompt="Me duele el hombro">Dolor hombro</button>
+                <button type="button" data-ai-prompt="¿Qué como antes de entrenar?">Nutrición</button>
+              </div>
+              <form class="ai-chat-form" id="ai-chat-form">
+                <input id="ai-chat-input" placeholder="Pregunta: ¿subo peso hoy?, ¿qué cambio si me duele el hombro?" />
+                <button class="primary-button" type="submit">Enviar</button>
+              </form>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="nutrition-view" aria-label="Contador de calorías con IA">
+          <div class="nutrition-hero">
+            <div>
+              <span class="pill">Contador IA gratuito</span>
+              <h2>Calorías reales, macros claros</h2>
+              <p>Escribe tus comidas en lenguaje natural y el motor local calcula calorías, proteína, carbohidratos y grasas con una base nutricional integrada.</p>
+            </div>
+            <button class="primary-button" id="analyze-meal">
+              <svg viewBox="0 0 24 24"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2 2-6Z"/></svg>
+              Analizar comida
+            </button>
+          </div>
+
+          <div class="nutrition-grid">
+            <section class="panel nutrition-targets">
+              <div class="panel-heading">
+                <h3>Objetivo diario</h3>
+                <button class="text-button" id="recalc-nutrition">Recalcular</button>
+              </div>
+              <div class="body-inputs">
+                <label>Peso kg<input id="nutri-weight" type="number" value="82" min="30" max="250"></label>
+                <label>Altura cm<input id="nutri-height" type="number" value="178" min="120" max="230"></label>
+                <label>Edad<input id="nutri-age" type="number" value="35" min="12" max="90"></label>
+                <label>Sexo<select id="nutri-sex"><option value="male">Hombre</option><option value="female">Mujer</option></select></label>
+                <label>Actividad<select id="nutri-activity"><option value="1.2">Baja</option><option value="1.375">Ligera</option><option value="1.55" selected>Media</option><option value="1.725">Alta</option></select></label>
+                <label>Meta<select id="nutri-goal"><option value="cut">Perder grasa</option><option value="maintain" selected>Mantener</option><option value="bulk">Ganar músculo</option></select></label>
+              </div>
+              <div class="macro-rings" id="macro-rings"></div>
+            </section>
+
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>Registrar comida</h3>
+                <button class="text-button" id="clear-meals">Limpiar día</button>
+              </div>
+              <textarea id="meal-input" rows="5" placeholder="Ejemplo: 200g pechuga de pollo, 150g arroz cocido, 1 huevo, 20g aceite de oliva"></textarea>
+              <div class="meal-actions">
+                <select id="meal-slot">
+                  <option>Desayuno</option>
+                  <option>Comida</option>
+                  <option>Merienda</option>
+                  <option>Cena</option>
+                  <option>Snack</option>
+                </select>
+                <button class="primary-button" id="add-meal">Guardar comida</button>
+              </div>
+              <div class="ai-prompts">
+                <button type="button" data-meal-example="60g avena, 250ml leche, 1 plátano, 25g proteína whey">Desayuno fitness</button>
+                <button type="button" data-meal-example="200g pechuga de pollo, 180g arroz cocido, 100g brócoli, 10g aceite de oliva">Comida limpia</button>
+                <button type="button" data-meal-example="2 huevos, 120g pan integral, 80g aguacate">Rápida</button>
+              </div>
+              <div id="meal-preview" class="meal-preview"></div>
+            </section>
+          </div>
+
+          <div class="nutrition-grid">
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>Hoy</h3>
+                <span id="nutrition-date"></span>
+              </div>
+              <div class="daily-summary" id="daily-summary"></div>
+              <div class="meal-log" id="meal-log"></div>
+            </section>
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>Entrenador nutricional</h3>
+              </div>
+              <div class="nutrition-coach" id="nutrition-coach"></div>
+              <div class="food-search">
+                <input id="food-search" placeholder="Buscar alimento: pollo, arroz, huevo..." />
+                <div id="food-results"></div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="workout-view" aria-label="Registro de entrenamiento">
+          <div class="workout-layout">
+            <section class="panel active-workout">
+              <div class="panel-heading">
+                <div>
+                  <h3 id="active-workout-name">Empuje A</h3>
+                  <p class="subtle">Registra series, peso, reps, RPE y notas.</p>
+                </div>
+                <div class="timer-box">
+                  <span>Descanso</span>
+                  <strong id="rest-timer">01:30</strong>
+                </div>
+              </div>
+              <div class="exercise-log" id="exercise-log"></div>
+              <div class="workout-actions">
+                <button class="ghost-button" id="add-exercise-btn">
+                  <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                  Ejercicio
+                </button>
+                <button class="ghost-button" id="timer-btn">
+                  <svg viewBox="0 0 24 24"><path d="M12 8v5l3 2M9 2h6M12 4a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z"/></svg>
+                  Temporizador
+                </button>
+                <button class="primary-button" id="finish-workout-btn">Finalizar</button>
+              </div>
+            </section>
+            <aside class="panel coach-panel">
+              <div class="panel-heading">
+                <h3>Guia visual</h3>
+                <button class="icon-button" id="swap-demo" title="Cambiar ejercicio" aria-label="Cambiar ejercicio">
+                  <svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>
+                </button>
+              </div>
+              <canvas id="exercise-canvas" width="520" height="360" aria-label="Demo animada de tecnica"></canvas>
+              <div class="cue-list" id="cue-list"></div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="routines-view" aria-label="Rutinas">
+          <div class="routines-grid" id="routines-grid"></div>
+        </section>
+
+        <section class="view" id="library-view" aria-label="Biblioteca de ejercicios">
+          <div class="filters-row">
+            <label class="search-field">
+              <svg viewBox="0 0 24 24"><path d="M21 21l-4.3-4.3M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"/></svg>
+              <input id="exercise-search" type="search" placeholder="Buscar ejercicio, musculo o equipo" />
+            </label>
+            <div class="segmented" id="muscle-filter" role="tablist" aria-label="Filtro muscular"></div>
+          </div>
+          <section class="atlas-panel" aria-label="Grupos musculares">
+            <div class="panel-heading">
+              <h3>Grupos Musculares</h3>
+            </div>
+            <div class="muscle-atlas" id="muscle-atlas"></div>
+          </section>
+          <div class="section-title">
+            <h3>Ejercicios</h3>
+            <span id="exercise-count-label">30 ejercicios</span>
+          </div>
+          <div class="exercise-library" id="exercise-library"></div>
+        </section>
+
+        <section class="view" id="progress-view" aria-label="Progreso">
+          <div class="progress-grid">
+            <section class="panel chart-panel">
+              <div class="panel-heading">
+                <h3>Volumen e intensidad</h3>
+                <select id="chart-mode" aria-label="Modo de grafico">
+                  <option value="volume">Volumen</option>
+                  <option value="orm">1RM estimado</option>
+                  <option value="sets">Series duras</option>
+                </select>
+              </div>
+              <canvas id="progress-chart" width="900" height="360" aria-label="Grafico de progreso"></canvas>
+            </section>
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>Calculadora 1RM</h3>
+              </div>
+              <div class="calculator">
+                <label>Peso <input id="calc-weight" type="text" inputmode="decimal" value="100" /></label>
+                <label>Reps <input id="calc-reps" type="text" inputmode="numeric" value="5" /></label>
+                <div class="calc-result">
+                  <span>Estimacion</span>
+                  <strong id="calc-result">117 kg</strong>
+                </div>
+              </div>
+              <div class="milestones" id="milestones"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="community-view" aria-label="Comunidad">
+          <div class="community-grid">
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>Reto mensual</h3>
+                <span class="pill">100.000 lb</span>
+              </div>
+              <div class="challenge">
+                <div class="ring" style="--progress: 72">
+                  <strong>72%</strong>
+                  <span>completado</span>
+                </div>
+                <div>
+                  <h4>Reto de fuerza de mayo</h4>
+                  <p class="subtle">Suma volumen total con tus sesiones registradas. Tu proyeccion supera el objetivo por 11%.</p>
+                  <button class="primary-button">Compartir avance</button>
+                </div>
+              </div>
+            </section>
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>Clasificacion</h3>
+              </div>
+              <div class="leaderboard" id="leaderboard"></div>
+            </section>
+          </div>
+          <section class="panel">
+            <div class="panel-heading">
+              <h3>Amigos</h3>
+              <button class="ghost-button" id="add-friend-btn">
+                <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                Seguir
+              </button>
+            </div>
+            <div class="feed-list wide" id="community-feed"></div>
+          </section>
+        </section>
+
+        <section class="view" id="profile-view" aria-label="Perfil y ajustes">
+          <div class="profile-grid">
+            <section class="panel profile-card">
+              <div class="avatar">FG</div>
+              <div>
+                <h3>Fernando</h3>
+                <p class="subtle">Objetivo: fuerza e hipertrofia · 5 dias/semana</p>
+              </div>
+              <button class="ghost-button">Editar perfil</button>
+            </section>
+            <section class="panel settings-panel">
+              <div class="panel-heading">
+                <h3>Preferencias</h3>
+              </div>
+              <label class="switch-row">
+                Perfil publico
+                <input type="checkbox" checked />
+              </label>
+              <label class="switch-row">
+                Descansos automaticos
+                <input type="checkbox" checked />
+              </label>
+              <label class="switch-row">
+                Sincronizar con Salud
+                <input type="checkbox" />
+              </label>
+              <label class="switch-row">
+                Notificaciones de marcas
+                <input type="checkbox" checked />
+              </label>
+            </section>
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>Medidas</h3>
+                <button class="text-button" id="random-measure">Actualizar</button>
+              </div>
+              <div class="measure-grid" id="measure-grid"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+
+      <nav class="mobile-tabs" aria-label="Navegacion movil">
+        <button class="mobile-tab active" data-view="dashboard"><svg viewBox="0 0 24 24"><path d="M4 13h6V4H4v9Zm10 7h6V4h-6v16ZM4 20h6v-5H4v5Z"/></svg><span>Inicio</span></button>
+        <button class="mobile-tab" data-view="library"><svg viewBox="0 0 24 24"><path d="M21 21l-4.3-4.3M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"/></svg><span>Explorar</span></button>
+        <button class="mobile-tab" data-view="ai"><svg viewBox="0 0 24 24"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2 2-6Z"/></svg><span>IA</span></button>
+        <button class="mobile-tab" data-view="nutrition"><svg viewBox="0 0 24 24"><path d="M4 19h16M6 19V8a4 4 0 0 1 8 0v11M14 10h2a4 4 0 0 1 0 8h-2"/></svg><span>Kcal</span></button>
+        <button class="mobile-tab" data-view="workout"><svg viewBox="0 0 24 24"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg><span>Entreno</span></button>
+      </nav>
+    </div>
+
+    <dialog id="exercise-dialog">
+      <div class="dialog-head">
+        <div>
+          <span class="pill" id="dialog-muscle">Pecho</span>
+          <h3 id="dialog-title">Press banca</h3>
+        </div>
+        <button class="icon-button" id="close-dialog" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div class="exercise-media">
+        <div class="video-frame">
+          <img id="dialog-video-frame" src="assets/exercises/bench-0.svg" alt="Video animado del ejercicio">
+          <span class="play-badge">
+            <svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></svg>
+            Video HD
+          </span>
+        </div>
+        <div class="photo-strip" id="dialog-photos" aria-label="Fotos del ejercicio"></div>
+      </div>
+      <section class="worked-muscles">
+        <h4>Músculos trabajados</h4>
+        <div id="dialog-muscles" class="dialog-muscles"></div>
+      </section>
+      <p id="dialog-description"></p>
+      <div class="dialog-actions">
+        <button class="ghost-button" id="add-to-workout">Anadir al entreno</button>
+        <button class="primary-button" id="start-from-dialog">Iniciar ahora</button>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="onboarding-flow" id="onboarding-flow" aria-hidden="true">
+      <div class="onboarding-phone" role="dialog" aria-label="Inicio guiado">
+        <div class="ios-status">
+          <span>9:30</span>
+          <span>5G · 82%</span>
+        </div>
+        <div class="onboarding-bar"><span id="onboarding-progress"></span></div>
+        <button class="onboarding-close" id="close-onboarding" aria-label="Cerrar">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+        <section class="onboarding-step active" data-step="0">
+          <div class="photo-collage" aria-hidden="true"></div>
+          <h2>Ponte más fuerte con LiftLab</h2>
+          <p>Registra entrenamientos, rutinas y progreso desde el móvil o el PC.</p>
+        </section>
+        <section class="onboarding-step" data-step="1">
+          <h2>¿Cuáles son tus objetivos?</h2>
+          <div class="goal-grid">
+            <button>Ganar músculo</button><button>Hacerme más fuerte</button><button>Perder peso</button><button>Fundamentos</button><button>Acondicionamiento</button><button>Deporte</button>
+          </div>
+        </section>
+        <section class="onboarding-step" data-step="2">
+          <span class="success-line">Estás en el lugar correcto</span>
+          <h2>Has registrado más de <strong>100 millones</strong> de levantamientos</h2>
+          <div class="coach-figures" aria-hidden="true"><span></span><span></span></div>
+        </section>
+        <section class="onboarding-step" data-step="3">
+          <h2>¿Qué experiencia tienes con el levantamiento de pesas?</h2>
+          <div class="choice-stack"><button>Soy nuevo en el levantamiento de pesas</button><button>Llevo unos meses levantando pesas</button><button>Llevo un año levantando pesas</button><button>Llevo años levantando pesas</button><button>Soy un competidor</button></div>
+        </section>
+        <section class="onboarding-step" data-step="4">
+          <h2>¿Qué equipo tienes?</h2>
+          <div class="choice-stack light"><button>Gimnasio completo</button><button>Barras</button><button>Mancuernas</button><button>Pesas rusas</button><button>Máquinas</button><button>Ninguno de los anteriores</button></div>
+        </section>
+        <section class="onboarding-step" data-step="5">
+          <h2>¿Cuánto pesas?</h2>
+          <div class="weight-picker"><strong>70,0 kg</strong><span>90 · 91 · 92 · 93</span></div>
+        </section>
+        <section class="onboarding-step" data-step="6">
+          <h2>Crear una cuenta</h2>
+          <p>Guarda tus entrenamientos, progreso, ajustes y más.</p>
+          <button class="apple-button">Continuar con Apple</button>
+          <button class="dark-button">Continuar con correo electrónico</button>
+        </section>
+        <section class="onboarding-step" data-step="7">
+          <div class="free-hero"></div>
+          <h2>Todo listo para entrenar</h2>
+          <p>Todas las funciones están disponibles gratis: entrenos, rutinas, biblioteca, progreso y perfil.</p>
+          <button class="apple-button">Entrar gratis</button>
+        </section>
+        <div class="onboarding-actions">
+          <button class="ghost-button" id="prev-onboarding">Atrás</button>
+          <button class="primary-button" id="next-onboarding">Siguiente</button>
+        </div>
+      </div>
+    </div>
+    <script src="app.js"></script>
+  </body>
+</html>

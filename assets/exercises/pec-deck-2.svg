@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#ffd2c2"/>
+      <stop offset="1" stop-color="#f8f5ed"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="16" stdDeviation="14" flood-opacity=".22"/>
+    </filter>
+  </defs>
+  <rect width="640" height="420" rx="28" fill="url(#bg)"/>
+  <path d="M0 332 C126 286 216 348 338 300 C468 250 552 292 640 248 L640 420 L0 420 Z" fill="#ff6b4a" opacity=".16"/>
+  <g stroke="#ffffff" stroke-opacity=".45" stroke-width="2">
+    <path d="M72 70h496M72 140h496M72 210h496M72 280h496"/>
+    <path d="M120 42v310M240 42v310M360 42v310M480 42v310"/>
+  </g>
+  <g filter="url(#shadow)"><path d="M178 130h284v210H178z" fill="#111217" opacity=".12" stroke="#ff6b4a" stroke-width="8"/><path d="M230 150v160M410 150v160" stroke="#ff6b4a" stroke-width="12"/><circle cx="320" cy="154" r="24" fill="#111217"/><g stroke="#111217" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="18"><path d="M320 178v112M300 204L255 220M340 204L385 220M320 290l-48 72M320 290l48 72"/></g></g>
+  <g>
+    <rect x="28" y="28" width="254" height="66" rx="18" fill="#ffffff" opacity=".88"/>
+    <text x="48" y="56" font-family="Arial, sans-serif" font-size="22" font-weight="800" fill="#17191c">Contractora</text>
+    <text x="48" y="78" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#ff6b4a">Pecho - Maquina</text>
+  </g>
+</svg>
