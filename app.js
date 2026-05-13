@@ -320,6 +320,64 @@ const foodDb = [
 
 let mealLog = loadMealLog();
 
+const defaultAppData = {
+  account: null,
+  profile: {
+    name: "Fernando",
+    age: 35,
+    sex: "male",
+    height: 178,
+    weight: 82,
+    goal: "Ganar músculo",
+    secondaryGoal: "Mejorar salud general",
+    level: "Intermedio",
+    days: 5,
+    sessionTime: 60,
+    place: "Gimnasio",
+    equipment: "Barra, mancuernas, polea, maquinas",
+    injuries: "",
+    medical: "",
+    sleep: "Normal",
+    stress: "Medio",
+    work: "Mixto",
+    steps: 8000,
+    diet: "Alta en proteina",
+    allergies: "",
+    intolerances: "",
+    dislikes: "",
+    meals: 4,
+    budget: "Medio",
+    trainingTime: "18:30",
+    mealTimes: "08:00, 14:00, 18:00, 21:00",
+    health: "manual",
+  },
+  health: {
+    steps: 8200,
+    active: 640,
+    resting: 1840,
+    sleep: 7.1,
+    rhr: 58,
+    hrv: 62,
+    distance: 6.4,
+    workouts: 1,
+    activityMinutes: 64,
+  },
+  habits: [
+    { id: "water", label: "Beber 2 vasos de agua", done: false },
+    { id: "steps", label: "Llegar al objetivo de pasos", done: false },
+    { id: "protein", label: "Cumplir proteína", done: false },
+    { id: "sleep", label: "Preparar sueño", done: false },
+  ],
+  selectedWeekDay: 0,
+  photoItems: [
+    { name: "Arroz cocido", grams: 150, kcal: 195, protein: 4.1, carbs: 42, fat: 0.5 },
+    { name: "Pechuga de pollo", grams: 180, kcal: 297, protein: 55.8, carbs: 0, fat: 6.5 },
+    { name: "Verduras", grams: 100, kcal: 35, protein: 2.4, carbs: 7.2, fat: 0.4 },
+  ],
+};
+
+let appData = loadAppData();
+
 const state = {
   view: "dashboard",
   currentTemplate: "push",
@@ -330,6 +388,30 @@ const state = {
 };
 
 let dialogFrameTimer = null;
+
+function cloneData(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function loadAppData() {
+  try {
+    const stored = JSON.parse(localStorage.getItem("liftlab-app-data") || "null");
+    return {
+      ...cloneData(defaultAppData),
+      ...(stored || {}),
+      profile: { ...defaultAppData.profile, ...(stored?.profile || {}) },
+      health: { ...defaultAppData.health, ...(stored?.health || {}) },
+      habits: stored?.habits?.length ? stored.habits : cloneData(defaultAppData.habits),
+      photoItems: stored?.photoItems?.length ? stored.photoItems : cloneData(defaultAppData.photoItems),
+    };
+  } catch {
+    return cloneData(defaultAppData);
+  }
+}
+
+function saveAppData() {
+  localStorage.setItem("liftlab-app-data", JSON.stringify(appData));
+}
 
 function loadWorkout() {
   const stored = localStorage.getItem("liftlab-workout");
@@ -366,6 +448,27 @@ function createWorkout(templateId) {
         { weight: index === 0 ? 80 : 32, reps: index === 0 ? 6 : 10, rpe: 8, type: index === 0 ? "Top" : "Normal", done: false },
         { weight: index === 0 ? 75 : 30, reps: index === 0 ? 8 : 12, rpe: 7, type: "Back", done: false },
         { weight: index === 0 ? 72.5 : 28, reps: index === 0 ? 8 : 12, rpe: 7, type: "Back", done: false },
+      ],
+    })),
+  };
+}
+
+function createWorkoutFromWeekDay(day) {
+  const exerciseNames = day.blocks.flatMap((block) => block.exercises);
+  const ids = exerciseNames
+    .map((name) => exercises.find((exercise) => normalizeText(exercise.name) === normalizeText(name) || normalizeText(name).includes(normalizeText(exercise.name)))?.id)
+    .filter(Boolean);
+  const fallback = ["push", "pull", "fullbody", "legs", "power"][appData.selectedWeekDay] || "push";
+  const workout = createWorkout(fallback);
+  if (!ids.length) return workout;
+  return {
+    name: day.title,
+    exercises: ids.slice(0, 5).map((id, index) => ({
+      id,
+      sets: [
+        { weight: index === 0 ? 80 : 30, reps: index === 0 ? 6 : 10, rpe: 8, type: index === 0 ? "Principal" : "Trabajo", done: false },
+        { weight: index === 0 ? 75 : 28, reps: index === 0 ? 8 : 12, rpe: 7, type: "Progresion", done: false },
+        { weight: index === 0 ? 72.5 : 26, reps: index === 0 ? 8 : 12, rpe: 7, type: "Volumen", done: false },
       ],
     })),
   };
@@ -429,13 +532,12 @@ function renderPhonePreview() {
 }
 
 function renderWeekPlan() {
-  const days = [
-    ["Lun", "Empuje A", "Completado", true],
-    ["Mar", "Tiron A", "Completado", true],
-    ["Mie", "Movilidad", "28 min", true],
-    ["Jue", "Legs A", "Hoy", false],
-    ["Vie", "Torso fuerza", "Programado", false],
-  ];
+  const days = weeklyRoutinePlan.map((item, index) => [
+    item.day.slice(0, 3),
+    item.title.split(" - ")[0],
+    index < 2 ? "Completado" : index === 3 ? "Hoy" : item.status,
+    index < 2,
+  ]);
   $("#week-plan").innerHTML = days
     .map(([day, title, status, done]) => `
       <article class="week-day ${done ? "done" : ""}">
@@ -1384,6 +1486,7 @@ function renderNutrition() {
     : `<p class="subtle">Aun no hay comidas registradas hoy.</p>`;
   renderNutritionAI(totals, targets);
   renderNutritionCoach(totals, targets);
+  renderDashboardData();
 }
 
 function renderNutritionCoach(totals, targets) {
@@ -1484,12 +1587,235 @@ function renderFoodSearch() {
     .join("");
 }
 
+function renderPhotoFoodResults() {
+  const container = $("#photo-food-results");
+  if (!container) return;
+  container.innerHTML = appData.photoItems
+    .map((item, index) => `
+      <article class="photo-food-item">
+        <label>Alimento<input data-photo-field="name" data-photo-index="${index}" value="${escapeHtml(item.name)}"></label>
+        <label>Gramos<input data-photo-field="grams" data-photo-index="${index}" type="number" value="${item.grams}"></label>
+        <label>Kcal<input data-photo-field="kcal" data-photo-index="${index}" type="number" value="${item.kcal}"></label>
+        <small>${round1(item.protein)}p · ${round1(item.carbs)}c · ${round1(item.fat)}g</small>
+        <button class="icon-button" data-remove-photo-food="${index}" aria-label="Eliminar alimento"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      </article>
+    `)
+    .join("");
+}
+
+function simulatePhotoFood() {
+  const plate = $("#photo-plate-size")?.value || "Normal";
+  const fat = $("#photo-extra-fat")?.value || "Poco";
+  const scale = plate === "Grande" ? 1.25 : plate === "Pequeño" ? 0.8 : 1;
+  appData.photoItems = [
+    scalePhotoItem("Arroz cocido", 160 * scale),
+    scalePhotoItem("Pechuga de pollo", 170 * scale),
+    scalePhotoItem("Verduras", 100 * scale),
+  ];
+  if (fat === "Mucho" || fat === "No se ve") appData.photoItems.push(scalePhotoItem("aceite de oliva", fat === "Mucho" ? 15 : 7));
+  saveAppData();
+  renderPhotoFoodResults();
+  showToast("Analisis aproximado generado. Revisa y corrige antes de guardar.");
+}
+
+function scalePhotoItem(name, grams) {
+  const food = findFood(name) || foodDb[0];
+  const factor = grams / 100;
+  return {
+    name: food[0],
+    grams: Math.round(grams),
+    kcal: Math.round(food[2] * factor),
+    protein: round1(food[3] * factor),
+    carbs: round1(food[4] * factor),
+    fat: round1(food[5] * factor),
+  };
+}
+
+function updatePhotoFoodItem(index, field, value) {
+  const item = appData.photoItems[index];
+  if (!item) return;
+  if (field === "name") {
+    item.name = value;
+  } else {
+    item[field] = Math.max(0, Number(value) || 0);
+  }
+  if (field === "grams" || field === "name") {
+    const recalculated = scalePhotoItem(item.name, item.grams || 100);
+    Object.assign(item, recalculated, { name: item.name || recalculated.name });
+  }
+  saveAppData();
+  renderPhotoFoodResults();
+}
+
+function confirmPhotoFood() {
+  const text = appData.photoItems.map((item) => `${Math.round(item.grams)}g ${item.name}`).join(", ");
+  $("#meal-input").value = text;
+  const parsed = previewMeal();
+  if (!parsed.items.length) {
+    showToast("No hay alimentos detectados para guardar.");
+    return;
+  }
+  addMeal();
+  showToast("Comida por foto revisada y guardada.");
+}
+
+function renderDashboardData() {
+  const profile = appData.profile;
+  const health = appData.health;
+  const meals = todayMeals();
+  const totals = sumNutrition(meals.map((meal) => meal.totals));
+  const targets = getNutritionTargets();
+  $("#weekly-workouts").textContent = `${Math.min(profile.days, 5)}`;
+  $("#recovery-score").textContent = `${estimateRecovery()}%`;
+  $("#side-streak").textContent = `${Math.max(1, Math.round(health.steps / 1000))} días`;
+  const data = [
+    ["Hola", profile.name, profile.goal],
+    ["Pasos", health.steps.toLocaleString("es-ES"), `${Math.round((health.steps / profile.steps) * 100)}% objetivo`],
+    ["Calorías gastadas", `${health.active + health.resting}`, `${health.active} activas`],
+    ["Calorías restantes", `${Math.max(0, targets.kcal - totals.kcal)}`, `${totals.kcal} consumidas`],
+    ["Proteína", `${totals.protein}/${targets.protein} g`, "objetivo diario"],
+    ["Sueño", `${health.sleep} h`, `FC reposo ${health.rhr}`],
+    ["Agua", `${targets.water.liters} L`, "objetivo IA"],
+    ["Peso", `${profile.weight} kg`, `IMC ${targets.bmi}`],
+  ];
+  $("#dashboard-real-data").innerHTML = data
+    .map(([label, value, help]) => `<div><span>${label}</span><strong>${value}</strong><small>${help}</small></div>`)
+    .join("");
+}
+
+function estimateRecovery() {
+  const health = appData.health;
+  let score = 70;
+  if (health.sleep >= 7) score += 10;
+  if (health.hrv >= 55) score += 8;
+  if (health.rhr <= 60) score += 6;
+  if (health.steps > appData.profile.steps * 1.25) score -= 8;
+  if (appData.profile.stress === "Alto") score -= 10;
+  return Math.max(35, Math.min(98, Math.round(score)));
+}
+
+function renderHabits() {
+  $("#habit-list").innerHTML = appData.habits
+    .map((habit) => `
+      <label class="habit-item ${habit.done ? "done" : ""}">
+        <input type="checkbox" data-habit-id="${habit.id}" ${habit.done ? "checked" : ""}>
+        <span>${habit.label}</span>
+      </label>
+    `)
+    .join("");
+}
+
+function renderHealthInputs() {
+  const health = appData.health;
+  const fields = [
+    ["#health-steps-input", health.steps],
+    ["#health-active-input", health.active],
+    ["#health-resting-input", health.resting],
+    ["#health-sleep-input", health.sleep],
+    ["#health-rhr-input", health.rhr],
+    ["#health-hrv-input", health.hrv],
+  ];
+  fields.forEach(([selector, value]) => {
+    if ($(selector)) $(selector).value = value;
+  });
+}
+
+function renderAuthStatus() {
+  const status = $("#auth-status");
+  if (!status) return;
+  status.textContent = appData.account ? `Cuenta local iniciada: ${appData.account.email}` : "Cuenta local: sin iniciar sesion";
+}
+
+function renderProfileInputs() {
+  const profile = appData.profile;
+  const fields = {
+    "#profile-name-input": profile.name,
+    "#profile-age-input": profile.age,
+    "#profile-sex-input": profile.sex,
+    "#profile-height-input": profile.height,
+    "#profile-weight-input": profile.weight,
+    "#profile-goal-input": profile.goal,
+    "#profile-secondary-goal-input": profile.secondaryGoal,
+    "#profile-level-input": profile.level,
+    "#profile-days-input": profile.days,
+    "#profile-session-time-input": profile.sessionTime,
+    "#profile-place-input": profile.place,
+    "#profile-equipment-input": profile.equipment,
+    "#profile-injuries-input": profile.injuries,
+    "#profile-medical-input": profile.medical,
+    "#profile-sleep-input": profile.sleep,
+    "#profile-stress-input": profile.stress,
+    "#profile-work-input": profile.work,
+    "#profile-steps-input": profile.steps,
+    "#profile-diet-input": profile.diet,
+    "#profile-allergies-input": profile.allergies,
+    "#profile-intolerances-input": profile.intolerances,
+    "#profile-dislikes-input": profile.dislikes,
+    "#profile-meals-input": profile.meals,
+    "#profile-budget-input": profile.budget,
+    "#profile-training-time-input": profile.trainingTime,
+    "#profile-meal-times-input": profile.mealTimes,
+    "#profile-health-input": profile.health,
+  };
+  Object.entries(fields).forEach(([selector, value]) => {
+    if ($(selector)) $(selector).value = value;
+  });
+  const profileTitle = $(".profile-card h3");
+  const profileText = $(".profile-card .subtle");
+  if (profileTitle) profileTitle.textContent = profile.name;
+  if (profileText) profileText.textContent = `Objetivo: ${profile.goal.toLowerCase()} · ${profile.days} días/semana`;
+  if ($("#nutri-weight")) $("#nutri-weight").value = profile.weight;
+  if ($("#nutri-height")) $("#nutri-height").value = profile.height;
+  if ($("#nutri-age")) $("#nutri-age").value = profile.age;
+  if ($("#nutri-sex")) $("#nutri-sex").value = profile.sex;
+  if ($("#nutri-training-min")) $("#nutri-training-min").value = profile.sessionTime;
+}
+
+function saveProfileFromForm() {
+  appData.profile = {
+    ...appData.profile,
+    name: $("#profile-name-input").value.trim() || "Usuario",
+    age: clampNumber($("#profile-age-input").value, 12, 90, 35),
+    sex: $("#profile-sex-input").value,
+    height: clampNumber($("#profile-height-input").value, 120, 230, 178),
+    weight: clampNumber($("#profile-weight-input").value, 30, 250, 82),
+    goal: $("#profile-goal-input").value,
+    secondaryGoal: $("#profile-secondary-goal-input").value.trim(),
+    level: $("#profile-level-input").value,
+    days: clampNumber($("#profile-days-input").value, 1, 7, 4),
+    sessionTime: clampNumber($("#profile-session-time-input").value, 15, 180, 60),
+    place: $("#profile-place-input").value,
+    equipment: $("#profile-equipment-input").value.trim(),
+    injuries: $("#profile-injuries-input").value.trim(),
+    medical: $("#profile-medical-input").value.trim(),
+    sleep: $("#profile-sleep-input").value,
+    stress: $("#profile-stress-input").value,
+    work: $("#profile-work-input").value,
+    steps: clampNumber($("#profile-steps-input").value, 1000, 30000, 8000),
+    diet: $("#profile-diet-input").value.trim(),
+    allergies: $("#profile-allergies-input").value.trim(),
+    intolerances: $("#profile-intolerances-input").value.trim(),
+    dislikes: $("#profile-dislikes-input").value.trim(),
+    meals: clampNumber($("#profile-meals-input").value, 1, 8, 4),
+    budget: $("#profile-budget-input").value.trim(),
+    trainingTime: $("#profile-training-time-input").value.trim(),
+    mealTimes: $("#profile-meal-times-input").value.trim(),
+    health: $("#profile-health-input").value,
+  };
+  saveAppData();
+  renderProfileInputs();
+  renderDashboardData();
+  renderNutrition();
+  runAIAgents();
+  showToast("Perfil guardado y planes recalculados.");
+}
+
 function renderWeeklyRoutineBoard() {
   const board = $("#weekly-routine-board");
   if (!board) return;
   board.innerHTML = weeklyRoutinePlan
     .map((day, index) => `
-      <article class="weekly-day-card ${day.status === "Recuperacion" ? "recovery" : ""}">
+      <article class="weekly-day-card ${day.status === "Recuperacion" ? "recovery" : ""} ${appData.selectedWeekDay === index ? "active" : ""}" data-select-week-day="${index}">
         <div class="weekly-day-head">
           <div>
             <span>${day.day}</span>
@@ -1520,6 +1846,60 @@ function renderWeeklyRoutineBoard() {
       </article>
     `)
     .join("");
+  renderRoutineDayDetail();
+}
+
+function renderRoutineDayDetail() {
+  const day = weeklyRoutinePlan[appData.selectedWeekDay] || weeklyRoutinePlan[0];
+  if (!$("#routine-day-detail")) return;
+  $("#routine-detail-title").textContent = `${day.day}: ${day.title}`;
+  $("#routine-detail-subtitle").textContent = `${day.duration} · ${day.difficulty} · ${day.muscles.join(", ")}`;
+  const allExercises = day.blocks.flatMap((block) => block.exercises);
+  $("#routine-day-detail").innerHTML = `
+    <div class="routine-day-summary">
+      <div><span>Estado</span><strong>${day.status}</strong></div>
+      <div><span>Ejercicios</span><strong>${allExercises.length}</strong></div>
+      <div><span>Volumen estimado</span><strong>${allExercises.length * 9} series</strong></div>
+      <div><span>Progresion</span><strong>+1 rep o +2,5 kg</strong></div>
+    </div>
+    <div class="routine-detail-blocks">
+      ${day.blocks
+        .map((block, blockIndex) => `
+          <section class="routine-detail-block">
+            <h4>Bloque ${blockIndex + 1}: ${block.name}</h4>
+            ${block.exercises
+              .map((name, exerciseIndex) => {
+                const exercise = exercises.find((item) => normalizeText(name).includes(normalizeText(item.name))) || exercises[(blockIndex + exerciseIndex) % exercises.length];
+                return `
+                  <article class="routine-detail-exercise">
+                    <img src="${posterSrc(exercise, 1)}" alt="Imagen anatomica de ${exercise.name}">
+                    <div>
+                      <strong>${exercise.name}</strong>
+                      <small>${exercise.muscle} · ${exercise.equipment}</small>
+                      <p>${exercise.cues[0]} ${exercise.cues[1]}</p>
+                    </div>
+                    <div class="routine-prescription">
+                      <span>3 series</span>
+                      <span>${exerciseIndex === 0 && blockIndex === 1 ? "6-8 reps" : "10-12 reps"}</span>
+                      <span>RPE ${exerciseIndex === 0 ? "8" : "7"}</span>
+                      <span>${exerciseIndex === 0 ? "120s" : "75s"}</span>
+                    </div>
+                  </article>
+                `;
+              })
+              .join("")}
+          </section>
+        `)
+        .join("")}
+    </div>
+    <div class="coach-note">Coach IA: si duermes mal o Salud marca baja recuperacion, baja 1 serie en accesorios. Si una maquina esta ocupada, usa la sustitucion del dia.</div>
+  `;
+}
+
+function selectWeekDay(index) {
+  appData.selectedWeekDay = Number(index);
+  saveAppData();
+  renderWeeklyRoutineBoard();
 }
 
 function openExercise(id) {
@@ -1608,6 +1988,92 @@ function loadTemplate(id) {
   setView("workout");
 }
 
+function syncHealthDemo() {
+  appData.health = {
+    ...appData.health,
+    steps: Math.max(4500, appData.health.steps + 650),
+    active: Math.max(250, appData.health.active + 45),
+    resting: appData.health.resting,
+    sleep: round1(Math.max(5.5, appData.health.sleep - 0.1)),
+    rhr: appData.health.rhr,
+    hrv: appData.health.hrv,
+    distance: round1((appData.health.steps + 650) * 0.00078),
+    workouts: Math.max(1, appData.health.workouts),
+    activityMinutes: appData.health.activityMinutes + 6,
+  };
+  saveAppData();
+  renderHealthInputs();
+  renderDashboardData();
+  renderNutrition();
+  runAIAgents();
+  showToast("Datos de Salud simulados sincronizados. En iOS se leeran con HealthKit real.");
+}
+
+function saveManualHealth() {
+  appData.health = {
+    ...appData.health,
+    steps: clampNumber($("#health-steps-input").value, 0, 50000, 8000),
+    active: clampNumber($("#health-active-input").value, 0, 5000, 500),
+    resting: clampNumber($("#health-resting-input").value, 800, 3500, 1800),
+    sleep: clampNumber($("#health-sleep-input").value, 0, 14, 7),
+    rhr: clampNumber($("#health-rhr-input").value, 35, 120, 60),
+    hrv: clampNumber($("#health-hrv-input").value, 10, 180, 60),
+  };
+  appData.health.distance = round1(appData.health.steps * 0.00078);
+  saveAppData();
+  renderDashboardData();
+  renderNutrition();
+  showToast("Datos manuales de salud guardados.");
+}
+
+function registerLocalAccount() {
+  const email = $("#auth-email")?.value.trim();
+  const password = $("#auth-password")?.value || "";
+  if (!email || password.length < 6) {
+    showToast("Introduce email y contraseña de al menos 6 caracteres.");
+    return;
+  }
+  appData.account = { email, createdAt: new Date().toISOString(), mode: "local-demo" };
+  saveAppData();
+  renderAuthStatus();
+  showToast("Cuenta local creada. Para sincronizar entre dispositivos falta backend real.");
+}
+
+function loginLocalAccount() {
+  const email = $("#auth-email")?.value.trim();
+  if (!email) {
+    showToast("Introduce el email.");
+    return;
+  }
+  appData.account = { email, lastLogin: new Date().toISOString(), mode: "local-demo" };
+  saveAppData();
+  renderAuthStatus();
+  showToast("Sesion local iniciada.");
+}
+
+function deleteLocalAccount() {
+  localStorage.removeItem("liftlab-app-data");
+  localStorage.removeItem("liftlab-meals");
+  localStorage.removeItem("liftlab-workout");
+  appData = cloneData(defaultAppData);
+  mealLog = [];
+  state.activeWorkout = createWorkout("push");
+  renderAllAppData();
+  showToast("Cuenta y datos locales eliminados.");
+}
+
+function renderAllAppData() {
+  renderProfileInputs();
+  renderAuthStatus();
+  renderHealthInputs();
+  renderDashboardData();
+  renderHabits();
+  renderPhotoFoodResults();
+  renderWeeklyRoutineBoard();
+  renderWorkoutLog();
+  renderNutrition();
+}
+
 function startTimer(seconds = 90) {
   clearInterval(state.timer.handle);
   state.timer.remaining = seconds;
@@ -1637,11 +2103,38 @@ function bindEvents() {
     const templateButton = event.target.closest("[data-load-template]");
     if (templateButton) loadTemplate(templateButton.dataset.loadTemplate);
 
+    const weekCard = event.target.closest("[data-select-week-day]");
+    if (weekCard && !event.target.closest("button")) selectWeekDay(weekCard.dataset.selectWeekDay);
+
     const editWeekDay = event.target.closest("[data-edit-week-day]");
-    if (editWeekDay) showToast("Editor de dia preparado: aqui se cambiaran series, reps, descansos y orden.");
+    if (editWeekDay) {
+      selectWeekDay(editWeekDay.dataset.editWeekDay);
+      showToast("Dia seleccionado. Cambia ejercicios desde Sustituir o empieza la sesion.");
+    }
 
     const swapWeekDay = event.target.closest("[data-swap-week-day]");
-    if (swapWeekDay) showToast("Sustitucion preparada: cambiara ejercicios segun material, dolor o maquina ocupada.");
+    if (swapWeekDay) {
+      const day = weeklyRoutinePlan[Number(swapWeekDay.dataset.swapWeekDay)];
+      day.blocks[day.blocks.length - 1].exercises = day.blocks[day.blocks.length - 1].exercises.map((name) => (name.includes("Plancha") ? "Elevacion lateral" : name));
+      selectWeekDay(swapWeekDay.dataset.swapWeekDay);
+      showToast("Ejercicio sustituido segun disponibilidad y molestias.");
+    }
+
+    const habitToggle = event.target.closest("[data-habit-id]");
+    if (habitToggle) {
+      const habit = appData.habits.find((item) => item.id === habitToggle.dataset.habitId);
+      if (habit) habit.done = habitToggle.checked;
+      saveAppData();
+      renderHabits();
+      showToast(habitToggle.checked ? "Habito completado." : "Habito pendiente.");
+    }
+
+    const removePhotoFood = event.target.closest("[data-remove-photo-food]");
+    if (removePhotoFood) {
+      appData.photoItems.splice(Number(removePhotoFood.dataset.removePhotoFood), 1);
+      saveAppData();
+      renderPhotoFoodResults();
+    }
 
     const openButton = event.target.closest("[data-open-exercise]");
     if (openButton) openExercise(openButton.dataset.openExercise);
@@ -1749,26 +2242,72 @@ function bindEvents() {
     showToast("Avance preparado para compartir con la comunidad.");
     setView("community");
   });
+  $("#quick-log-workout")?.addEventListener("click", () => setView("workout"));
+  $("#quick-log-meal")?.addEventListener("click", () => setView("nutrition"));
+  $("#quick-photo-food")?.addEventListener("click", () => {
+    setView("nutrition");
+    $("#simulate-photo-food")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+  $("#quick-log-weight")?.addEventListener("click", () => {
+    setView("implementation");
+    $("#profile-weight-input")?.focus();
+  });
+  $("#sync-health-dashboard")?.addEventListener("click", syncHealthDemo);
+  $("#sync-health-profile")?.addEventListener("click", syncHealthDemo);
+  $("#reset-habits")?.addEventListener("click", () => {
+    appData.habits = appData.habits.map((habit) => ({ ...habit, done: false }));
+    saveAppData();
+    renderHabits();
+    showToast("Habitos reiniciados.");
+  });
   $("#generate-week-btn")?.addEventListener("click", () => {
     renderWeeklyRoutineBoard();
     showToast("Semana generada segun objetivo, dias, tiempo y material.");
   });
-  $("#simulate-photo-food")?.addEventListener("click", () => {
-    $("#photo-food-results").innerHTML = `
-      <article><strong>Arroz cocido</strong><span>160 g estimados</span><small>208 kcal · revisable</small></article>
-      <article><strong>Pechuga de pollo</strong><span>170 g estimados</span><small>281 kcal · revisable</small></article>
-      <article><strong>Aceite o salsa</strong><span>Posible extra</span><small>Confirmar manualmente</small></article>
-    `;
-    showToast("Analisis simulado: revisa cantidades antes de guardar.");
+  $("#duplicate-routine-day")?.addEventListener("click", () => {
+    const day = weeklyRoutinePlan[appData.selectedWeekDay];
+    weeklyRoutinePlan.push({ ...cloneData(day), day: "Extra", status: "Pendiente" });
+    renderWeeklyRoutineBoard();
+    showToast("Dia duplicado en la semana.");
   });
-  $("#confirm-photo-food")?.addEventListener("click", () => {
-    $("#meal-input").value = "160g arroz cocido, 170g pechuga de pollo, 100g verduras";
-    previewMeal();
-    showToast("Estimacion pasada al registro manual para confirmar.");
+  $("#favorite-routine-day")?.addEventListener("click", () => showToast("Rutina guardada como favorita local."));
+  $("#start-routine-day")?.addEventListener("click", () => {
+    state.activeWorkout = createWorkoutFromWeekDay(weeklyRoutinePlan[appData.selectedWeekDay]);
+    saveWorkout();
+    renderWorkoutLog();
+    setView("workout");
+    showToast("Dia cargado en modo entrenamiento.");
   });
-  $("#mock-login")?.addEventListener("click", () => showToast("Siguiente fase: login real con email y contraseña."));
-  $("#mock-reset")?.addEventListener("click", () => showToast("Siguiente fase: recuperacion segura de contraseña."));
-  $("#mock-delete-account")?.addEventListener("click", () => showToast("Siguiente fase: borrado completo de cuenta y datos."));
+  $("#simulate-photo-food")?.addEventListener("click", simulatePhotoFood);
+  $("#confirm-photo-food")?.addEventListener("click", confirmPhotoFood);
+  $("#add-photo-food-item")?.addEventListener("click", () => {
+    appData.photoItems.push(scalePhotoItem("huevo", 50));
+    saveAppData();
+    renderPhotoFoodResults();
+  });
+  $("#food-photo-input")?.addEventListener("change", () => {
+    simulatePhotoFood();
+    showToast("Foto cargada. Analisis aproximado listo para revisar.");
+  });
+  $("#photo-food-results")?.addEventListener("change", (event) => {
+    const input = event.target.closest("[data-photo-field]");
+    if (!input) return;
+    updatePhotoFoodItem(Number(input.dataset.photoIndex), input.dataset.photoField, input.value);
+  });
+  $("#save-onboarding-real")?.addEventListener("click", saveProfileFromForm);
+  $("#mock-register")?.addEventListener("click", registerLocalAccount);
+  $("#mock-login")?.addEventListener("click", loginLocalAccount);
+  $("#mock-reset")?.addEventListener("click", () => showToast("En esta version local se ha preparado el flujo de recuperacion. En backend enviara email seguro."));
+  $("#mock-logout")?.addEventListener("click", () => {
+    appData.account = null;
+    saveAppData();
+    renderAuthStatus();
+    showToast("Sesion local cerrada.");
+  });
+  $("#mock-delete-account")?.addEventListener("click", deleteLocalAccount);
+  ["#health-steps-input", "#health-active-input", "#health-resting-input", "#health-sleep-input", "#health-rhr-input", "#health-hrv-input"].forEach((selector) => {
+    $(selector)?.addEventListener("change", saveManualHealth);
+  });
   $("#edit-profile-btn").addEventListener("click", () => {
     const card = $(".profile-card");
     const name = $(".profile-card h3");
@@ -1905,6 +2444,7 @@ function renderOnboarding() {
 }
 
 function init() {
+  renderProfileInputs();
   renderDate();
   renderPhonePreview();
   renderWeekPlan();
@@ -1920,6 +2460,11 @@ function init() {
   renderMilestones();
   renderCommunity();
   renderMeasures();
+  renderAuthStatus();
+  renderHealthInputs();
+  renderDashboardData();
+  renderHabits();
+  renderPhotoFoodResults();
   runAIAgents();
   renderNutrition();
   renderFoodSearch();

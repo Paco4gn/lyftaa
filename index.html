@@ -161,6 +161,29 @@
               <div class="feed-list" id="recent-feed"></div>
             </section>
           </div>
+
+          <div class="dashboard-grid">
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>Datos reales de hoy</h3>
+                <button class="text-button" id="sync-health-dashboard">Sincronizar Salud</button>
+              </div>
+              <div class="real-data-grid" id="dashboard-real-data"></div>
+              <div class="quick-actions">
+                <button class="ghost-button" id="quick-log-workout">Registrar entreno</button>
+                <button class="ghost-button" id="quick-log-meal">Registrar comida</button>
+                <button class="ghost-button" id="quick-photo-food">Comida por foto</button>
+                <button class="ghost-button" id="quick-log-weight">Registrar peso</button>
+              </div>
+            </section>
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>Habitos pendientes</h3>
+                <button class="text-button" id="reset-habits">Reiniciar</button>
+              </div>
+              <div class="habit-list" id="habit-list"></div>
+            </section>
+          </div>
         </section>
 
         <section class="view" id="implementation-view" aria-label="Plan funcional de LiftLab">
@@ -242,6 +265,45 @@
               </div>
             </section>
           </div>
+
+          <section class="panel onboarding-real-panel">
+            <div class="panel-heading">
+              <div>
+                <h3>Cuestionario inicial funcional</h3>
+                <p class="subtle">Estos datos se guardan en este dispositivo y personalizan dashboard, rutina y nutricion.</p>
+              </div>
+              <button class="primary-button" id="save-onboarding-real">Guardar y personalizar</button>
+            </div>
+            <div class="onboarding-real-grid">
+              <label>Nombre<input id="profile-name-input" value="Fernando"></label>
+              <label>Edad<input id="profile-age-input" type="number" value="35"></label>
+              <label>Sexo<select id="profile-sex-input"><option value="male">Hombre</option><option value="female">Mujer</option></select></label>
+              <label>Altura cm<input id="profile-height-input" type="number" value="178"></label>
+              <label>Peso kg<input id="profile-weight-input" type="number" value="82"></label>
+              <label>Objetivo principal<select id="profile-goal-input"><option>Ganar músculo</option><option>Perder grasa</option><option>Mantenerse</option><option>Recomposición corporal</option><option>Mejorar fuerza</option><option>Mejorar resistencia</option><option>Salud general</option><option>Tonificar</option><option>Volver tras pausa</option></select></label>
+              <label>Objetivo secundario<input id="profile-secondary-goal-input" value="Mejorar salud general"></label>
+              <label>Nivel<select id="profile-level-input"><option>Principiante</option><option selected>Intermedio</option><option>Avanzado</option></select></label>
+              <label>Dias disponibles<input id="profile-days-input" type="number" value="5" min="1" max="7"></label>
+              <label>Tiempo por sesion<input id="profile-session-time-input" type="number" value="60"></label>
+              <label>Lugar<select id="profile-place-input"><option>Gimnasio</option><option>Casa</option><option>Exterior</option></select></label>
+              <label>Material<input id="profile-equipment-input" value="Barra, mancuernas, polea, maquinas"></label>
+              <label>Lesiones o molestias<input id="profile-injuries-input" placeholder="Hombro, rodilla, espalda..."></label>
+              <label>Enfermedades relevantes<input id="profile-medical-input" placeholder="Opcional"></label>
+              <label>Sueño<select id="profile-sleep-input"><option>Malo</option><option selected>Normal</option><option>Bueno</option></select></label>
+              <label>Estrés<select id="profile-stress-input"><option>Bajo</option><option selected>Medio</option><option>Alto</option></select></label>
+              <label>Trabajo<select id="profile-work-input"><option>Sedentario</option><option selected>Mixto</option><option>Activo</option></select></label>
+              <label>Pasos diarios<input id="profile-steps-input" type="number" value="8000"></label>
+              <label>Preferencia alimentaria<input id="profile-diet-input" value="Alta en proteina"></label>
+              <label>Alergias<input id="profile-allergies-input" placeholder="Sin alergias"></label>
+              <label>Intolerancias<input id="profile-intolerances-input" placeholder="Sin intolerancias"></label>
+              <label>No me gusta<input id="profile-dislikes-input" placeholder="Alimentos a evitar"></label>
+              <label>Comidas al dia<input id="profile-meals-input" type="number" value="4"></label>
+              <label>Presupuesto comida<input id="profile-budget-input" value="Medio"></label>
+              <label>Hora entreno<input id="profile-training-time-input" value="18:30"></label>
+              <label>Horas comida<input id="profile-meal-times-input" value="08:00, 14:00, 18:00, 21:00"></label>
+              <label>Conectar Salud<select id="profile-health-input"><option value="manual">No, manual</option><option value="ios">Si, cuando haya app iOS</option></select></label>
+            </div>
+          </section>
         </section>
 
         <section class="view" id="ai-view" aria-label="Centro de inteligencia artificial">
@@ -414,6 +476,7 @@
               <div class="food-photo-frame">
                 <span>Foto del plato</span>
                 <strong>Arroz + pollo + verduras</strong>
+                <input id="food-photo-input" type="file" accept="image/*" />
               </div>
               <div class="photo-result-list" id="photo-food-results">
                 <article><strong>Arroz cocido</strong><span>150 g estimados</span><small>195 kcal</small></article>
@@ -423,6 +486,12 @@
               <div class="photo-warning">
                 <strong>Revision obligatoria</strong>
                 <p>No se puede saber el peso exacto solo con una imagen. El usuario debe corregir y confirmar antes de guardar.</p>
+                <div class="photo-context-inputs">
+                  <label>Plato<select id="photo-plate-size"><option>Normal</option><option>Pequeño</option><option>Grande</option></select></label>
+                  <label>Cocinado<select id="photo-cooking-method"><option>Plancha</option><option>Hervido</option><option>Horno</option><option>Frito</option></select></label>
+                  <label>Aceite/salsas<select id="photo-extra-fat"><option>Poco</option><option>No se ve</option><option>Mucho</option></select></label>
+                </div>
+                <button class="ghost-button" id="add-photo-food-item">Añadir alimento</button>
                 <button class="ghost-button" id="confirm-photo-food">Guardar estimacion revisada</button>
               </div>
             </div>
@@ -479,6 +548,20 @@
             </div>
             <div class="weekly-routine-board" id="weekly-routine-board"></div>
           </div>
+          <section class="panel routine-detail-panel">
+            <div class="panel-heading">
+              <div>
+                <h3 id="routine-detail-title">Detalle del dia</h3>
+                <p class="subtle" id="routine-detail-subtitle">Calentamiento, ejercicios principales, accesorios, core y vuelta a la calma.</p>
+              </div>
+              <div class="detail-actions">
+                <button class="ghost-button" id="duplicate-routine-day">Duplicar</button>
+                <button class="ghost-button" id="favorite-routine-day">Favorita</button>
+                <button class="primary-button" id="start-routine-day">Empezar dia</button>
+              </div>
+            </div>
+            <div class="routine-day-detail" id="routine-day-detail"></div>
+          </section>
           <div class="routines-grid" id="routines-grid"></div>
         </section>
 
@@ -614,15 +697,21 @@
                 <h3>Cuenta y privacidad</h3>
               </div>
               <div class="account-actions">
+                <input id="auth-email" type="email" placeholder="email@liftlab.app" />
+                <input id="auth-password" type="password" placeholder="contraseña" />
+                <button class="ghost-button" id="mock-register">Crear cuenta</button>
                 <button class="ghost-button" id="mock-login">Iniciar sesion</button>
                 <button class="ghost-button" id="mock-reset">Recuperar contraseña</button>
+                <button class="ghost-button" id="mock-logout">Cerrar sesion</button>
                 <button class="ghost-button danger" id="mock-delete-account">Eliminar cuenta y datos</button>
               </div>
+              <div class="auth-status" id="auth-status">Cuenta local: sin iniciar sesion</div>
               <p class="subtle">En la app real esto ira conectado a autenticacion segura, base de datos por usuario y borrado completo.</p>
             </section>
             <section class="panel health-panel">
               <div class="panel-heading">
                 <h3>Salud del iPhone</h3>
+                <button class="text-button" id="sync-health-profile">Sincronizar demo</button>
               </div>
               <div class="health-permission-list">
                 <span>Pasos</span>
@@ -630,6 +719,14 @@
                 <span>Sueño</span>
                 <span>Entrenamientos</span>
                 <span>Frecuencia cardiaca</span>
+              </div>
+              <div class="manual-health-grid">
+                <label>Pasos<input id="health-steps-input" type="number" value="8200"></label>
+                <label>Calorias activas<input id="health-active-input" type="number" value="640"></label>
+                <label>Calorias reposo<input id="health-resting-input" type="number" value="1840"></label>
+                <label>Sueño horas<input id="health-sleep-input" type="number" value="7.1" step="0.1"></label>
+                <label>FC reposo<input id="health-rhr-input" type="number" value="58"></label>
+                <label>HRV<input id="health-hrv-input" type="number" value="62"></label>
               </div>
               <p class="subtle">Disponible cuando LiftLab tenga app iOS real con HealthKit. La web puede funcionar manualmente sin Salud.</p>
             </section>

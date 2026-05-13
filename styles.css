@@ -97,6 +97,13 @@ body.device-mobile .routines-grid,
 body.device-mobile .implementation-grid,
 body.device-mobile .weekly-routine-board,
 body.device-mobile .photo-food-flow,
+body.device-mobile .onboarding-real-grid,
+body.device-mobile .manual-health-grid,
+body.device-mobile .real-data-grid,
+body.device-mobile .quick-actions,
+body.device-mobile .routine-day-summary,
+body.device-mobile .routine-detail-exercise,
+body.device-mobile .account-actions,
 body.device-mobile .exercise-library {
   grid-template-columns: 1fr;
 }
@@ -790,6 +797,42 @@ h1 {
   font-weight: 800;
 }
 
+.onboarding-real-panel {
+  margin-top: 16px;
+}
+
+.onboarding-real-grid,
+.manual-health-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.onboarding-real-grid label,
+.manual-health-grid label,
+.photo-context-inputs label,
+.photo-food-item label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.onboarding-real-grid input,
+.onboarding-real-grid select,
+.manual-health-grid input,
+.photo-context-inputs select,
+.photo-food-item input,
+.account-actions input {
+  min-height: 40px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #1e1e22;
+  color: #fff;
+  padding: 0 10px;
+}
+
 .panel-heading {
   justify-content: space-between;
   gap: 12px;
@@ -823,6 +866,62 @@ h1 {
 .week-day {
   min-height: 138px;
   padding: 12px;
+}
+
+.real-data-grid,
+.habit-list,
+.quick-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.real-data-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.real-data-grid div,
+.habit-item {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #111114;
+}
+
+.real-data-grid div {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+}
+
+.real-data-grid span,
+.real-data-grid small {
+  color: var(--muted);
+}
+
+.real-data-grid strong {
+  font-size: 1.2rem;
+}
+
+.quick-actions {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 12px;
+}
+
+.habit-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.habit-item.done {
+  color: var(--text);
+  border-color: rgba(104, 255, 204, 0.4);
+}
+
+.habit-item input {
+  accent-color: var(--accent);
 }
 
 .week-day strong {
@@ -1013,6 +1112,11 @@ dialog canvas {
   background: color-mix(in srgb, var(--surface) 92%, transparent);
 }
 
+.weekly-day-card.active {
+  border-color: rgba(104, 255, 204, 0.55);
+  box-shadow: 0 0 0 1px rgba(104, 255, 204, 0.18);
+}
+
 .weekly-day-card.recovery {
   background:
     linear-gradient(135deg, rgba(104, 255, 204, 0.1), transparent 58%),
@@ -1084,6 +1188,93 @@ dialog canvas {
 .weekly-day-actions .ghost-button {
   min-height: 38px;
   padding: 0 10px;
+}
+
+.routine-detail-panel {
+  margin-bottom: 16px;
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.routine-day-detail,
+.routine-detail-blocks {
+  display: grid;
+  gap: 12px;
+}
+
+.routine-day-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.routine-day-summary div,
+.routine-detail-block,
+.routine-detail-exercise {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #111114;
+}
+
+.routine-day-summary div {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+}
+
+.routine-day-summary span,
+.routine-detail-exercise small,
+.routine-detail-exercise p {
+  color: var(--muted);
+}
+
+.routine-detail-block {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+
+.routine-detail-block h4 {
+  margin: 0;
+}
+
+.routine-detail-exercise {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr) minmax(170px, 0.6fr);
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+}
+
+.routine-detail-exercise img {
+  width: 84px;
+  height: 62px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.routine-detail-exercise p {
+  margin: 4px 0 0;
+  line-height: 1.35;
+}
+
+.routine-prescription {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.routine-prescription span {
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
 }
 
 .routine-card {
@@ -1633,6 +1824,7 @@ dialog canvas {
 .food-photo-frame {
   display: grid;
   place-items: center;
+  gap: 10px;
   min-height: 210px;
   padding: 18px;
   text-align: center;
@@ -1653,6 +1845,11 @@ dialog canvas {
   line-height: 1.05;
 }
 
+.food-photo-frame input {
+  max-width: 210px;
+  color: var(--muted);
+}
+
 .photo-result-list {
   display: grid;
   gap: 10px;
@@ -1667,6 +1864,16 @@ dialog canvas {
   background: #111114;
 }
 
+.photo-food-item {
+  grid-template-columns: minmax(0, 1.3fr) 88px 88px auto 40px;
+  align-items: end;
+}
+
+.photo-food-item small {
+  align-self: center;
+  white-space: nowrap;
+}
+
 .photo-result-list span,
 .photo-result-list small {
   color: var(--muted);
@@ -1677,6 +1884,11 @@ dialog canvas {
   gap: 10px;
   align-content: center;
   padding: 14px;
+}
+
+.photo-context-inputs {
+  display: grid;
+  gap: 8px;
 }
 
 .macro-rings,
@@ -1876,11 +2088,20 @@ dialog canvas {
 }
 
 .account-actions {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .health-permission-list {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.auth-status {
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #111114;
+  color: var(--muted);
+  font-weight: 800;
 }
 
 .ghost-button.danger {
