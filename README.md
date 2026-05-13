@@ -1,6 +1,6 @@
 # LiftLab
 
-Aplicacion gratuita de entrenamiento, ejercicios, nutricion e IA local.
+Aplicacion gratuita de entrenamiento, ejercicios, nutricion, IA local y backend real opcional.
 
 ## Abrir la aplicacion
 
@@ -22,10 +22,35 @@ La pagina principal del repositorio de GitHub muestra este README y la lista de 
 
 ## Ejecutar
 
-Abre `index.html` directamente en el navegador o levanta un servidor local:
+Para ver la version estatica publicada, abre `index.html` directamente o usa GitHub Pages.
+
+Para ejecutar LiftLab como app real local con API, usuarios, contraseñas hasheadas y base de datos SQLite:
+
+```bash
+npm start
+```
+
+Despues entra en:
+
+```text
+http://127.0.0.1:5174/
+```
+
+Comprobaciones:
+
+```bash
+npm run check
+npm run test:api
+```
+
+Servidor estatico simple, sin API:
 
 ```bash
 python -m http.server 5174
 ```
 
-Despues entra en `http://127.0.0.1:5174/`.
+## Estado real
+
+- GitHub Pages: funciona como app estatica con localStorage.
+- `npm start`: añade backend local con SQLite, auth, usuarios separados y API.
+- Apple Health real requiere app iOS con HealthKit; la web solo puede guardar datos manuales o simulados.

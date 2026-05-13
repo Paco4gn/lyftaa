@@ -1,0 +1,15 @@
+{
+  "name": "liftlab",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "check": "node --check app.js && node --check server/index.js && node --check server/database.js && node --check server/security.js",
+    "test:api": "node server/api-smoke-test.js"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}

@@ -377,6 +377,8 @@ const defaultAppData = {
 };
 
 let appData = loadAppData();
+let apiToken = localStorage.getItem("liftlab-api-token") || "";
+let apiOnline = false;
 
 const state = {
   view: "dashboard",
@@ -411,6 +413,61 @@ function loadAppData() {
 
 function saveAppData() {
   localStorage.setItem("liftlab-app-data", JSON.stringify(appData));
+}
+
+async function apiRequest(path, options = {}) {
+  const response = await fetch(path, {
+    ...options,
+    headers: {
+      "content-type": "application/json",
+      ...(apiToken ? { authorization: `Bearer ${apiToken}` } : {}),
+      ...(options.headers || {}),
+    },
+    body: options.body && typeof options.body !== "string" ? JSON.stringify(options.body) : options.body,
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.error || "API no disponible");
+  return payload;
+}
+
+async function detectApi() {
+  try {
+    await apiRequest("/api/status");
+    apiOnline = true;
+  } catch {
+    apiOnline = false;
+  }
+  renderAuthStatus();
+  return apiOnline;
+}
+
+async function loadApiUserData() {
+  if (!apiToken || !(await detectApi())) return;
+  try {
+    const data = await apiRequest("/api/export");
+    appData.profile = { ...appData.profile, ...data.profile };
+    appData.health = { ...appData.health, ...data.health };
+    if (Array.isArray(data.habits) && data.habits.length) appData.habits = data.habits;
+    if (Array.isArray(data.meals)) {
+      mealLog = data.meals.map((meal) => ({ ...meal, date: meal.date || new Date().toISOString().slice(0, 10) }));
+      saveMealLog();
+    }
+    saveAppData();
+    renderAllAppData();
+  } catch {
+    apiToken = "";
+    localStorage.removeItem("liftlab-api-token");
+  }
+}
+
+async function pushApi(path, data) {
+  if (!apiToken || !apiOnline) return;
+  try {
+    await apiRequest(path, { method: "PUT", body: data });
+  } catch {
+    apiOnline = false;
+    renderAuthStatus();
+  }
 }
 
 function loadWorkout() {
@@ -1564,13 +1621,15 @@ function addMeal() {
     showToast("Hay alimentos sin reconocer. Corrige el texto o busca el alimento abajo.");
     return;
   }
-  mealLog.push({
+  const meal = {
     date: new Date().toISOString().slice(0, 10),
     slot: $("#meal-slot").value,
     text: $("#meal-input").value,
     ...parsed,
-  });
+  };
+  mealLog.push(meal);
   saveMealLog();
+  if (apiToken && apiOnline) apiRequest("/api/meals", { method: "POST", body: meal }).catch(() => {});
   $("#meal-input").value = "";
   $("#meal-preview").innerHTML = "";
   renderNutrition();
@@ -1647,7 +1706,7 @@ function updatePhotoFoodItem(index, field, value) {
   renderPhotoFoodResults();
 }
 
-function confirmPhotoFood() {
+async function confirmPhotoFood() {
   const text = appData.photoItems.map((item) => `${Math.round(item.grams)}g ${item.name}`).join(", ");
   $("#meal-input").value = text;
   const parsed = previewMeal();
@@ -1656,6 +1715,17 @@ function confirmPhotoFood() {
     return;
   }
   addMeal();
+  if (apiToken && apiOnline) {
+    await apiRequest("/api/food-photo/analyze", {
+      method: "POST",
+      body: {
+        plateSize: $("#photo-plate-size")?.value,
+        cookingMethod: $("#photo-cooking-method")?.value,
+        extraFat: $("#photo-extra-fat")?.value,
+        confirmedItems: appData.photoItems,
+      },
+    }).catch(() => {});
+  }
   showToast("Comida por foto revisada y guardada.");
 }
 
@@ -1723,7 +1793,8 @@ function renderHealthInputs() {
 function renderAuthStatus() {
   const status = $("#auth-status");
   if (!status) return;
-  status.textContent = appData.account ? `Cuenta local iniciada: ${appData.account.email}` : "Cuenta local: sin iniciar sesion";
+  const mode = apiOnline ? "backend conectado" : "modo local";
+  status.textContent = appData.account ? `Cuenta iniciada (${mode}): ${appData.account.email}` : `Sin iniciar sesion (${mode})`;
 }
 
 function renderProfileInputs() {
@@ -1771,7 +1842,7 @@ function renderProfileInputs() {
   if ($("#nutri-training-min")) $("#nutri-training-min").value = profile.sessionTime;
 }
 
-function saveProfileFromForm() {
+async function saveProfileFromForm() {
   appData.profile = {
     ...appData.profile,
     name: $("#profile-name-input").value.trim() || "Usuario",
@@ -1803,6 +1874,7 @@ function saveProfileFromForm() {
     health: $("#profile-health-input").value,
   };
   saveAppData();
+  await pushApi("/api/profile", appData.profile);
   renderProfileInputs();
   renderDashboardData();
   renderNutrition();
@@ -2021,29 +2093,63 @@ function saveManualHealth() {
   };
   appData.health.distance = round1(appData.health.steps * 0.00078);
   saveAppData();
+  pushApi("/api/health", appData.health);
   renderDashboardData();
   renderNutrition();
   showToast("Datos manuales de salud guardados.");
 }
 
-function registerLocalAccount() {
+async function registerLocalAccount() {
   const email = $("#auth-email")?.value.trim();
   const password = $("#auth-password")?.value || "";
   if (!email || password.length < 6) {
     showToast("Introduce email y contraseña de al menos 6 caracteres.");
     return;
   }
-  appData.account = { email, createdAt: new Date().toISOString(), mode: "local-demo" };
+  if (await detectApi()) {
+    try {
+      const session = await apiRequest("/api/auth/register", { method: "POST", body: { email, password } });
+      apiToken = session.token;
+      localStorage.setItem("liftlab-api-token", apiToken);
+      appData.account = { email: session.user.email, id: session.user.id, mode: "api" };
+      appData.profile = { ...appData.profile, ...session.data.profile, email };
+      await pushApi("/api/profile", appData.profile);
+      await pushApi("/api/health", appData.health);
+      await pushApi("/api/habits", appData.habits);
+      showToast("Cuenta real creada en backend local.");
+    } catch (error) {
+      showToast(error.message);
+      return;
+    }
+  } else {
+    appData.account = { email, createdAt: new Date().toISOString(), mode: "local-demo" };
+    showToast("Cuenta local creada. Arranca npm start para cuenta con backend.");
+  }
   saveAppData();
   renderAuthStatus();
-  showToast("Cuenta local creada. Para sincronizar entre dispositivos falta backend real.");
 }
 
-function loginLocalAccount() {
+async function loginLocalAccount() {
   const email = $("#auth-email")?.value.trim();
+  const password = $("#auth-password")?.value || "";
   if (!email) {
     showToast("Introduce el email.");
     return;
+  }
+  if (await detectApi()) {
+    try {
+      const session = await apiRequest("/api/auth/login", { method: "POST", body: { email, password } });
+      apiToken = session.token;
+      localStorage.setItem("liftlab-api-token", apiToken);
+      appData.account = { email: session.user.email, id: session.user.id, mode: "api" };
+      saveAppData();
+      await loadApiUserData();
+      showToast("Sesion iniciada con backend.");
+      return;
+    } catch (error) {
+      showToast(error.message);
+      return;
+    }
   }
   appData.account = { email, lastLogin: new Date().toISOString(), mode: "local-demo" };
   saveAppData();
@@ -2051,10 +2157,13 @@ function loginLocalAccount() {
   showToast("Sesion local iniciada.");
 }
 
-function deleteLocalAccount() {
+async function deleteLocalAccount() {
+  if (apiToken && apiOnline) await apiRequest("/api/account", { method: "DELETE" }).catch(() => {});
   localStorage.removeItem("liftlab-app-data");
   localStorage.removeItem("liftlab-meals");
   localStorage.removeItem("liftlab-workout");
+  localStorage.removeItem("liftlab-api-token");
+  apiToken = "";
   appData = cloneData(defaultAppData);
   mealLog = [];
   state.activeWorkout = createWorkout("push");
@@ -2117,6 +2226,7 @@ function bindEvents() {
       const day = weeklyRoutinePlan[Number(swapWeekDay.dataset.swapWeekDay)];
       day.blocks[day.blocks.length - 1].exercises = day.blocks[day.blocks.length - 1].exercises.map((name) => (name.includes("Plancha") ? "Elevacion lateral" : name));
       selectWeekDay(swapWeekDay.dataset.swapWeekDay);
+      pushApi("/api/routines", weeklyRoutinePlan);
       showToast("Ejercicio sustituido segun disponibilidad y molestias.");
     }
 
@@ -2125,6 +2235,7 @@ function bindEvents() {
       const habit = appData.habits.find((item) => item.id === habitToggle.dataset.habitId);
       if (habit) habit.done = habitToggle.checked;
       saveAppData();
+      pushApi("/api/habits", appData.habits);
       renderHabits();
       showToast(habitToggle.checked ? "Habito completado." : "Habito pendiente.");
     }
@@ -2268,6 +2379,7 @@ function bindEvents() {
     const day = weeklyRoutinePlan[appData.selectedWeekDay];
     weeklyRoutinePlan.push({ ...cloneData(day), day: "Extra", status: "Pendiente" });
     renderWeeklyRoutineBoard();
+    pushApi("/api/routines", weeklyRoutinePlan);
     showToast("Dia duplicado en la semana.");
   });
   $("#favorite-routine-day")?.addEventListener("click", () => showToast("Rutina guardada como favorita local."));
@@ -2300,6 +2412,8 @@ function bindEvents() {
   $("#mock-reset")?.addEventListener("click", () => showToast("En esta version local se ha preparado el flujo de recuperacion. En backend enviara email seguro."));
   $("#mock-logout")?.addEventListener("click", () => {
     appData.account = null;
+    apiToken = "";
+    localStorage.removeItem("liftlab-api-token");
     saveAppData();
     renderAuthStatus();
     showToast("Sesion local cerrada.");
@@ -2472,6 +2586,7 @@ function init() {
   updateDeviceToggleLabel();
   bindEvents();
   animateExercise();
+  detectApi().then(() => loadApiUserData());
 }
 
 function updateDeviceToggleLabel() {
