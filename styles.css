@@ -158,7 +158,8 @@ body.device-mobile .exercise-card .ghost-button {
 body.device-mobile .ai-hero,
 body.device-mobile .ai-control-panel,
 body.device-mobile .ai-agent-grid,
-body.device-mobile .ai-workbench {
+body.device-mobile .ai-workbench,
+body.device-mobile .nutrition-ai-grid {
   grid-template-columns: 1fr;
 }
 
@@ -1134,6 +1135,71 @@ dialog canvas {
 .ai-workbench {
   grid-template-columns: minmax(0, 1fr) minmax(320px, 0.82fr);
   align-items: start;
+}
+
+.nutrition-ai-panel {
+  grid-column: 1 / -1;
+}
+
+.nutrition-ai-summary {
+  display: grid;
+  gap: 12px;
+}
+
+.nutrition-ai-summary.compact {
+  margin-top: 14px;
+}
+
+.nutrition-ai-head {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, rgba(104, 255, 204, 0.13), transparent 52%),
+    #111114;
+}
+
+.nutrition-ai-head strong {
+  font-size: clamp(1.35rem, 3vw, 2.1rem);
+  line-height: 1.05;
+}
+
+.nutrition-ai-head small {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.nutrition-ai-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.nutrition-ai-grid div {
+  display: grid;
+  gap: 6px;
+  min-height: 104px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #111114;
+}
+
+.nutrition-ai-grid span {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.nutrition-ai-grid strong {
+  font-size: 1.3rem;
+}
+
+.nutrition-ai-grid small {
+  color: var(--muted);
+  line-height: 1.35;
 }
 
 .ai-plan-row {

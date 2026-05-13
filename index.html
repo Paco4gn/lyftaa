@@ -205,6 +205,13 @@
           <div class="ai-agent-grid" id="ai-agent-grid"></div>
 
           <div class="ai-workbench">
+            <section class="panel nutrition-ai-panel">
+              <div class="panel-heading">
+                <h3>IA de calorías, proteína y agua</h3>
+                <button class="text-button" data-view-shortcut="nutrition">Ajustar datos</button>
+              </div>
+              <div id="ai-nutrition-panel" class="nutrition-ai-summary"></div>
+            </section>
             <section class="panel">
               <div class="panel-heading">
                 <h3>Plan inteligente de hoy</h3>
@@ -258,6 +265,7 @@
                 <label>Meta<select id="nutri-goal"><option value="cut">Perder grasa</option><option value="maintain" selected>Mantener</option><option value="bulk">Ganar músculo</option></select></label>
               </div>
               <div class="macro-rings" id="macro-rings"></div>
+              <div id="nutrition-ai-summary" class="nutrition-ai-summary compact"></div>
             </section>
 
             <section class="panel">

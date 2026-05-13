@@ -984,7 +984,20 @@ function runAIAgents() {
     `)
     .join("");
   renderAIPlan(ctx, deload);
+  renderAINutritionFromTraining(ctx);
   addAIMessage("Entrenador", agents[0].text);
+}
+
+function renderAINutritionFromTraining(ctx) {
+  const mappedGoal = {
+    hypertrophy: "bulk",
+    strength: "maintain",
+    fatloss: "cut",
+    recomp: "maintain",
+  }[ctx.goal] || "maintain";
+  const targets = getNutritionTargets(mappedGoal);
+  const totals = sumNutrition(todayMeals().map((meal) => meal.totals));
+  renderNutritionAI(totals, targets);
 }
 
 function renderAIPlan(ctx, deload = false) {
@@ -1155,20 +1168,35 @@ function round1(value) {
   return Math.round(Number(value || 0) * 10) / 10;
 }
 
-function getNutritionTargets() {
+function getNutritionTargets(goalOverride = null) {
   const weight = Number($("#nutri-weight")?.value || 82);
   const height = Number($("#nutri-height")?.value || 178);
   const age = Number($("#nutri-age")?.value || 35);
   const sex = $("#nutri-sex")?.value || "male";
   const activity = Number($("#nutri-activity")?.value || 1.55);
-  const goal = $("#nutri-goal")?.value || "maintain";
+  const goal = goalOverride || $("#nutri-goal")?.value || "maintain";
   const bmr = sex === "male" ? 10 * weight + 6.25 * height - 5 * age + 5 : 10 * weight + 6.25 * height - 5 * age - 161;
   const adjustment = goal === "cut" ? -400 : goal === "bulk" ? 250 : 0;
   const kcal = Math.max(1400, Math.round(bmr * activity + adjustment));
   const protein = Math.round(weight * (goal === "cut" ? 2.2 : 2));
   const fat = Math.round(weight * 0.8);
   const carbs = Math.max(50, Math.round((kcal - protein * 4 - fat * 9) / 4));
-  return { kcal, protein, carbs, fat, bmr: Math.round(bmr), goal };
+  const water = getHydrationTarget(weight, activity);
+  return { kcal, protein, carbs, fat, bmr: Math.round(bmr), goal, water };
+}
+
+function getHydrationTarget(weight, activity) {
+  const trainingMinutes = Number($("#ai-time")?.value || 60);
+  const baseMl = weight * 35;
+  const activityMl = activity >= 1.725 ? 600 : activity >= 1.55 ? 400 : activity >= 1.375 ? 250 : 150;
+  const trainingMl = Math.round((trainingMinutes / 60) * 500);
+  const totalMl = Math.round((baseMl + activityMl + trainingMl) / 100) * 100;
+  return {
+    ml: totalMl,
+    liters: round1(totalMl / 1000),
+    duringTraining: Math.round(trainingMl / 100) * 100,
+    electrolytes: totalMl >= 3600 ? "Añade sal/electrolitos si sudas mucho." : "Agua normal suficiente salvo calor o sudor alto.",
+  };
 }
 
 function todayMeals() {
@@ -1186,16 +1214,19 @@ function renderNutrition() {
     ["Proteína", totals.protein, targets.protein, "g"],
     ["Carbos", totals.carbs, targets.carbs, "g"],
     ["Grasas", totals.fat, targets.fat, "g"],
+    ["Agua", 0, targets.water.liters, " L"],
   ]
     .map(([label, value, target, unit = ""]) => {
-      const pct = Math.min(100, Math.round((Number(value) / Number(target)) * 100) || 0);
-      return `<div class="macro-card"><span>${label}</span><strong>${value}${unit}</strong><small>${target}${unit} objetivo</small><div class="macro-bar"><i style="width:${pct}%"></i></div></div>`;
+      const displayValue = label === "Agua" ? targets.water.liters : value;
+      const pct = label === "Agua" ? 100 : Math.min(100, Math.round((Number(value) / Number(target)) * 100) || 0);
+      return `<div class="macro-card"><span>${label}</span><strong>${displayValue}${unit}</strong><small>${target}${unit} objetivo</small><div class="macro-bar"><i style="width:${pct}%"></i></div></div>`;
     })
     .join("");
   $("#daily-summary").innerHTML = `
     <div><span>Consumido</span><strong>${totals.kcal} kcal</strong></div>
     <div><span>Restante</span><strong>${Math.max(0, targets.kcal - totals.kcal)} kcal</strong></div>
     <div><span>Proteína</span><strong>${totals.protein} / ${targets.protein} g</strong></div>
+    <div><span>Agua IA</span><strong>${targets.water.liters} L/día</strong></div>
   `;
   $("#meal-log").innerHTML = meals.length
     ? meals
@@ -1208,18 +1239,52 @@ function renderNutrition() {
         `)
         .join("")
     : `<p class="subtle">Aun no hay comidas registradas hoy.</p>`;
+  renderNutritionAI(totals, targets);
   renderNutritionCoach(totals, targets);
 }
 
 function renderNutritionCoach(totals, targets) {
   const remaining = targets.kcal - totals.kcal;
   const proteinLeft = targets.protein - totals.protein;
+  const water = targets.water;
   const messages = [
     remaining > 500 ? `Te quedan ${remaining} kcal. Prioriza una comida con proteína y carbohidrato si vas a entrenar.` : `Vas cerca del objetivo. Mantén comidas simples para no pasarte.`,
     proteinLeft > 25 ? `Faltan ${Math.round(proteinLeft)} g de proteína. Buena opción: pollo, yogur griego, whey o atún.` : "Proteína bien encaminada.",
     totals.fat > targets.fat ? "Grasas por encima del objetivo: el resto del día usa carnes magras y evita aceite/frutos secos." : "Grasas bajo control.",
+    `Agua estimada: ${water.liters} L/día. Durante el entreno: ${water.duringTraining} ml extra. ${water.electrolytes}`,
   ];
   $("#nutrition-coach").innerHTML = messages.map((msg) => `<div class="coach-note">${msg}</div>`).join("");
+}
+
+function renderNutritionAI(totals, targets) {
+  const remaining = targets.kcal - totals.kcal;
+  const proteinLeft = Math.max(0, targets.protein - totals.protein);
+  const carbLeft = Math.max(0, targets.carbs - totals.carbs);
+  const fatLeft = Math.max(0, targets.fat - totals.fat);
+  const goalLabel = {
+    cut: "perder grasa",
+    maintain: "mantener",
+    bulk: "ganar músculo",
+  }[targets.goal] || "mantener";
+  const status = remaining > 250 ? "Faltan calorías útiles." : remaining < -150 ? "Vas por encima del objetivo." : "Vas dentro del rango.";
+  const proteinAdvice = proteinLeft > 30 ? "Sube proteína en la siguiente comida." : proteinLeft > 10 ? "Remata con una ración pequeña de proteína." : "Proteína cubierta.";
+  const html = `
+    <div class="nutrition-ai-head">
+      <span class="pill">IA nutricional local</span>
+      <strong>${targets.kcal} kcal para ${goalLabel}</strong>
+      <small>${status} ${proteinAdvice}</small>
+    </div>
+    <div class="nutrition-ai-grid">
+      <div><span>Calorías restantes</span><strong>${remaining} kcal</strong><small>Base metabólica: ${targets.bmr} kcal</small></div>
+      <div><span>Proteína restante</span><strong>${proteinLeft} g</strong><small>Objetivo: ${targets.protein} g/día</small></div>
+      <div><span>Carbohidratos restantes</span><strong>${carbLeft} g</strong><small>Objetivo: ${targets.carbs} g/día</small></div>
+      <div><span>Grasas restantes</span><strong>${fatLeft} g</strong><small>Objetivo: ${targets.fat} g/día</small></div>
+      <div><span>Agua necesaria</span><strong>${targets.water.liters} L/día</strong><small>${targets.water.duringTraining} ml extra entrenando</small></div>
+      <div><span>Electrolitos</span><strong>${targets.water.ml >= 3600 ? "Recomendados" : "Opcional"}</strong><small>${targets.water.electrolytes}</small></div>
+    </div>
+  `;
+  if ($("#ai-nutrition-panel")) $("#ai-nutrition-panel").innerHTML = html;
+  if ($("#nutrition-ai-summary")) $("#nutrition-ai-summary").innerHTML = html;
 }
 
 function previewMeal() {
