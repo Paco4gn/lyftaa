@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#ffd2c2"/>
+      <stop offset="1" stop-color="#f8f5ed"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="16" stdDeviation="14" flood-opacity=".22"/>
+    </filter>
+  </defs>
+  <rect width="640" height="420" rx="28" fill="url(#bg)"/>
+  <path d="M0 332 C126 286 216 348 338 300 C468 250 552 292 640 248 L640 420 L0 420 Z" fill="#ff6b4a" opacity=".16"/>
+  <g stroke="#ffffff" stroke-opacity=".45" stroke-width="2">
+    <path d="M72 70h496M72 140h496M72 210h496M72 280h496"/>
+    <path d="M120 42v310M240 42v310M360 42v310M480 42v310"/>
+  </g>
+  <g filter="url(#shadow)"><circle cx="320" cy="120" r="24" fill="#111217"/><g stroke="#111217" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="18"><path d="M320 144v120M320 172L218 238M320 172L422 238M320 264l-48 92M320 264l48 92"/></g><path d="M172 238h68" stroke="#ff6b4a" stroke-width="10" stroke-linecap="round"/><rect x="161" y="216" width="15" height="44" rx="5" fill="#ff6b4a"/><rect x="236" y="216" width="15" height="44" rx="5" fill="#ff6b4a"/><path d="M400 238h68" stroke="#ff6b4a" stroke-width="10" stroke-linecap="round"/><rect x="389" y="216" width="15" height="44" rx="5" fill="#ff6b4a"/><rect x="464" y="216" width="15" height="44" rx="5" fill="#ff6b4a"/></g>
+  <g>
+    <rect x="28" y="28" width="254" height="66" rx="18" fill="#ffffff" opacity=".88"/>
+    <text x="48" y="56" font-family="Arial, sans-serif" font-size="22" font-weight="800" fill="#17191c">Elevacion lateral</text>
+    <text x="48" y="78" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#ff6b4a">Hombro - Mancuernas</text>
+  </g>
+</svg>
