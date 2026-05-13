@@ -2,6 +2,14 @@
 
 Aplicacion gratuita de entrenamiento, ejercicios, nutricion e IA local.
 
+## Abrir la aplicacion
+
+Cuando GitHub Pages termine de publicar, la app estara aqui:
+
+[Abrir LiftLab](https://paco4gn.github.io/lyftaa/)
+
+La pagina principal del repositorio de GitHub muestra este README y la lista de archivos. Para usar la aplicacion hay que abrir el enlace anterior o `index.html`.
+
 ## Que incluye
 
 - Biblioteca con 30 ejercicios en espanol.
