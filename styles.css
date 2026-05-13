@@ -1202,6 +1202,21 @@ dialog canvas {
   line-height: 1.35;
 }
 
+.nutrition-ai-flags {
+  display: grid;
+  gap: 8px;
+}
+
+.nutrition-ai-flags span {
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 193, 7, 0.35);
+  border-radius: var(--radius);
+  background: rgba(255, 193, 7, 0.08);
+  color: var(--text);
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
 .ai-plan-row {
   display: grid;
   grid-template-columns: 34px 96px 1fr;

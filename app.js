@@ -221,28 +221,32 @@ const foodDb = [
   ["arroz cocido", ["arroz", "rice"], 130, 2.7, 28, 0.3],
   ["pasta cocida", ["pasta", "macarrones", "espagueti"], 158, 5.8, 31, 0.9],
   ["avena", ["oats", "copos de avena"], 389, 16.9, 66, 6.9],
-  ["huevo", ["huevos", "egg"], 143, 12.6, 0.7, 9.5, 50],
   ["claras de huevo", ["claras", "clara"], 52, 10.9, 0.7, 0.2],
+  ["huevo", ["huevos", "egg"], 143, 12.6, 0.7, 9.5, 50],
   ["leche semidesnatada", ["leche", "milk"], 47, 3.4, 4.8, 1.6],
   ["yogur griego", ["yogur", "yogurt griego"], 97, 9, 3.9, 5],
-  ["proteina whey", ["whey", "proteina", "proteina"], 400, 80, 8, 6],
+  ["proteina whey", ["whey", "proteina", "proteina en polvo"], 400, 80, 8, 6, 30],
   ["platano", ["platano", "banana"], 89, 1.1, 23, 0.3, 120],
   ["manzana", ["apple"], 52, 0.3, 14, 0.2, 180],
   ["aguacate", ["avocado"], 160, 2, 8.5, 14.7],
   ["aceite de oliva", ["aceite", "aove"], 884, 0, 0, 100, 10],
-  ["pan integral", ["pan", "tostada integral"], 247, 13, 41, 4.2],
+  ["pan integral", ["pan", "tostada integral"], 247, 13, 41, 4.2, 35],
   ["patata cocida", ["patata", "papa"], 87, 1.9, 20, 0.1],
   ["boniato", ["batata"], 86, 1.6, 20, 0.1],
+  ["pavo", ["pechuga de pavo"], 104, 22, 1, 1.5],
   ["ternera magra", ["ternera", "carne"], 170, 26, 0, 7],
   ["salmon", ["salmon"], 208, 20, 0, 13],
-  ["atun natural", ["atun", "atun"], 116, 26, 0, 1],
+  ["atun natural", ["atun", "atun al natural"], 116, 26, 0, 1, 80],
+  ["merluza", ["pescado blanco"], 89, 17, 0, 2],
   ["brocoli", ["brocoli"], 35, 2.4, 7.2, 0.4],
+  ["tomate", ["tomates"], 18, 0.9, 3.9, 0.2, 120],
   ["ensalada", ["lechuga", "verdura"], 20, 1.2, 3.5, 0.2],
   ["garbanzos cocidos", ["garbanzos"], 164, 8.9, 27, 2.6],
   ["lentejas cocidas", ["lentejas"], 116, 9, 20, 0.4],
   ["almendras", ["almendra"], 579, 21, 22, 50],
   ["mantequilla cacahuete", ["crema cacahuete", "cacahuete"], 588, 25, 20, 50],
   ["queso fresco batido", ["queso fresco", "quark"], 62, 8.5, 4, 0.2],
+  ["cafe con leche", ["cafe leche", "cortado"], 35, 1.8, 3, 1.2, 200],
   ["pizza", ["porcion pizza", "porcion pizza"], 266, 11, 33, 10],
   ["hamburguesa", ["burger"], 254, 17, 24, 10],
 ];
@@ -995,7 +999,7 @@ function renderAINutritionFromTraining(ctx) {
     fatloss: "cut",
     recomp: "maintain",
   }[ctx.goal] || "maintain";
-  const targets = getNutritionTargets(mappedGoal);
+  const targets = getNutritionTargets(mappedGoal, { trainingMinutes: ctx.time });
   const totals = sumNutrition(todayMeals().map((meal) => meal.totals));
   renderNutritionAI(totals, targets);
 }
@@ -1100,9 +1104,34 @@ function normalizeText(value) {
     .trim();
 }
 
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function clampNumber(value, min, max, fallback) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(max, Math.max(min, parsed));
+}
+
 function findFood(fragment) {
   const text = normalizeText(fragment);
-  return foodDb.find(([name, aliases]) => [name, ...aliases].some((alias) => text.includes(normalizeText(alias))));
+  return foodDb
+    .map((food) => {
+      const [name, aliases] = food;
+      const match = [name, ...aliases]
+        .map((alias) => normalizeText(alias))
+        .filter((alias) => alias && text.includes(alias))
+        .sort((a, b) => b.length - a.length)[0];
+      return match ? { food, score: match.length } : null;
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.score - a.score)[0]?.food;
 }
 
 function parseAmount(fragment, food) {
@@ -1113,10 +1142,18 @@ function parseAmount(fragment, food) {
   const kgMatch = text.match(/(\d+(?:\.\d+)?)\s*(kg|kilo|kilos)\b/);
   if (kgMatch) return Number(kgMatch[1]) * 1000;
   const spoonMatch = text.match(/(\d+(?:\.\d+)?)\s*(cucharada|cucharadas|tbsp)\b/);
-  if (spoonMatch) return Number(spoonMatch[1]) * 10;
+  if (spoonMatch) return Number(spoonMatch[1]) * 15;
+  const teaspoonMatch = text.match(/(\d+(?:\.\d+)?)\s*(cucharadita|cucharaditas|tsp)\b/);
+  if (teaspoonMatch) return Number(teaspoonMatch[1]) * 5;
   const cupMatch = text.match(/(\d+(?:\.\d+)?)\s*(taza|tazas)\b/);
   if (cupMatch) return Number(cupMatch[1]) * 240;
-  const unitMatch = text.match(/(\d+(?:\.\d+)?)\s*(unidad|unidades|huevo|huevos|platano|banana|manzana)\b/);
+  const scoopMatch = text.match(/(\d+(?:\.\d+)?)\s*(scoop|scoops|cacito|cacitos)\b/);
+  if (scoopMatch) return Number(scoopMatch[1]) * unitWeight;
+  const sliceMatch = text.match(/(\d+(?:\.\d+)?)\s*(rebanada|rebanadas|tostada|tostadas)\b/);
+  if (sliceMatch) return Number(sliceMatch[1]) * unitWeight;
+  const canMatch = text.match(/(\d+(?:\.\d+)?)\s*(lata|latas)\b/);
+  if (canMatch) return Number(canMatch[1]) * unitWeight;
+  const unitMatch = text.match(/(\d+(?:\.\d+)?)\s*(unidad|unidades|huevo|huevos|platano|banana|manzana|tomate|tomates)\b/);
   if (unitMatch) return Number(unitMatch[1]) * unitWeight;
   const leading = text.match(/^(\d+(?:\.\d+)?)/);
   if (leading && food?.[6]) return Number(leading[1]) * unitWeight;
@@ -1168,33 +1205,69 @@ function round1(value) {
   return Math.round(Number(value || 0) * 10) / 10;
 }
 
-function getNutritionTargets(goalOverride = null) {
-  const weight = Number($("#nutri-weight")?.value || 82);
-  const height = Number($("#nutri-height")?.value || 178);
-  const age = Number($("#nutri-age")?.value || 35);
+function getNutritionTargets(goalOverride = null, options = {}) {
+  const weight = clampNumber($("#nutri-weight")?.value, 30, 250, 82);
+  const height = clampNumber($("#nutri-height")?.value, 120, 230, 178);
+  const age = clampNumber($("#nutri-age")?.value, 12, 90, 35);
   const sex = $("#nutri-sex")?.value || "male";
-  const activity = Number($("#nutri-activity")?.value || 1.55);
+  const activity = clampNumber($("#nutri-activity")?.value, 1.2, 1.9, 1.55);
   const goal = goalOverride || $("#nutri-goal")?.value || "maintain";
+  const rate = $("#nutri-rate")?.value || "standard";
   const bmr = sex === "male" ? 10 * weight + 6.25 * height - 5 * age + 5 : 10 * weight + 6.25 * height - 5 * age - 161;
-  const adjustment = goal === "cut" ? -400 : goal === "bulk" ? 250 : 0;
-  const kcal = Math.max(1400, Math.round(bmr * activity + adjustment));
-  const protein = Math.round(weight * (goal === "cut" ? 2.2 : 2));
-  const fat = Math.round(weight * 0.8);
+  const tdee = bmr * activity;
+  const adjustments = {
+    cut: { controlled: -0.1, standard: -0.15, aggressive: -0.2 },
+    maintain: { controlled: 0, standard: 0, aggressive: 0 },
+    bulk: { controlled: 0.05, standard: 0.08, aggressive: 0.12 },
+  };
+  const adjustmentPct = adjustments[goal]?.[rate] ?? adjustments.maintain.standard;
+  const floor = sex === "female" ? 1200 : 1500;
+  const kcal = Math.max(floor, Math.round(tdee * (1 + adjustmentPct)));
+  const proteinRate = goal === "cut" ? 2.2 : goal === "bulk" ? 2 : 1.8;
+  const fatRate = goal === "cut" ? 0.7 : 0.8;
+  const protein = Math.round(weight * proteinRate);
+  const fat = Math.max(Math.round(weight * fatRate), Math.round((kcal * 0.2) / 9));
   const carbs = Math.max(50, Math.round((kcal - protein * 4 - fat * 9) / 4));
-  const water = getHydrationTarget(weight, activity);
-  return { kcal, protein, carbs, fat, bmr: Math.round(bmr), goal, water };
+  const macroKcal = Math.round(protein * 4 + carbs * 4 + fat * 9);
+  const water = getHydrationTarget(weight, activity, options.trainingMinutes);
+  const bmi = round1(weight / (height / 100) ** 2);
+  const weeklyWeightChange = round1(((kcal - tdee) * 7) / 7700);
+  const flags = [];
+  if (kcal === floor && goal === "cut") flags.push("El déficit ha sido limitado para no bajar de un mínimo seguro.");
+  if (Math.abs(macroKcal - kcal) > 80) flags.push("Los macros se han ajustado para mantener proteína y grasa mínima.");
+  if (rate === "aggressive" && goal !== "maintain") flags.push("Ritmo agresivo: revisa energía, hambre, rendimiento y sueño cada semana.");
+  return {
+    kcal,
+    protein,
+    carbs,
+    fat,
+    bmr: Math.round(bmr),
+    tdee: Math.round(tdee),
+    macroKcal,
+    goal,
+    rate,
+    adjustmentPct,
+    proteinRate,
+    fatRate,
+    bmi,
+    weeklyWeightChange,
+    water,
+    flags,
+  };
 }
 
-function getHydrationTarget(weight, activity) {
-  const trainingMinutes = Number($("#ai-time")?.value || 60);
-  const baseMl = weight * 35;
-  const activityMl = activity >= 1.725 ? 600 : activity >= 1.55 ? 400 : activity >= 1.375 ? 250 : 150;
+function getHydrationTarget(weight, activity, trainingOverride = null) {
+  const trainingMinutes = clampNumber(trainingOverride ?? $("#nutri-training-min")?.value ?? $("#ai-time")?.value, 0, 240, 60);
+  const mlPerKg = activity >= 1.725 ? 38 : activity >= 1.55 ? 35 : activity >= 1.375 ? 33 : 30;
+  const baseMl = weight * mlPerKg;
   const trainingMl = Math.round((trainingMinutes / 60) * 500);
-  const totalMl = Math.round((baseMl + activityMl + trainingMl) / 100) * 100;
+  const totalMl = Math.round((baseMl + trainingMl) / 100) * 100;
   return {
     ml: totalMl,
     liters: round1(totalMl / 1000),
     duringTraining: Math.round(trainingMl / 100) * 100,
+    mlPerKg,
+    trainingMinutes,
     electrolytes: totalMl >= 3600 ? "Añade sal/electrolitos si sudas mucho." : "Agua normal suficiente salvo calor o sudor alto.",
   };
 }
@@ -1227,12 +1300,13 @@ function renderNutrition() {
     <div><span>Restante</span><strong>${Math.max(0, targets.kcal - totals.kcal)} kcal</strong></div>
     <div><span>Proteína</span><strong>${totals.protein} / ${targets.protein} g</strong></div>
     <div><span>Agua IA</span><strong>${targets.water.liters} L/día</strong></div>
+    <div><span>Gasto total</span><strong>${targets.tdee} kcal</strong></div>
   `;
   $("#meal-log").innerHTML = meals.length
     ? meals
         .map((meal, index) => `
           <article class="meal-entry">
-            <div><strong>${meal.slot}</strong><small>${meal.items.map((item) => item.name).join(", ")}</small></div>
+            <div><strong>${escapeHtml(meal.slot)}</strong><small>${meal.items.map((item) => escapeHtml(item.name)).join(", ")}</small></div>
             <span>${meal.totals.kcal} kcal</span>
             <button class="icon-button" data-delete-meal="${index}" aria-label="Eliminar comida"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
           </article>
@@ -1251,9 +1325,10 @@ function renderNutritionCoach(totals, targets) {
     remaining > 500 ? `Te quedan ${remaining} kcal. Prioriza una comida con proteína y carbohidrato si vas a entrenar.` : `Vas cerca del objetivo. Mantén comidas simples para no pasarte.`,
     proteinLeft > 25 ? `Faltan ${Math.round(proteinLeft)} g de proteína. Buena opción: pollo, yogur griego, whey o atún.` : "Proteína bien encaminada.",
     totals.fat > targets.fat ? "Grasas por encima del objetivo: el resto del día usa carnes magras y evita aceite/frutos secos." : "Grasas bajo control.",
+    `Cálculo base: BMR ${targets.bmr} kcal, gasto total ${targets.tdee} kcal, objetivo ${targets.kcal} kcal.`,
     `Agua estimada: ${water.liters} L/día. Durante el entreno: ${water.duringTraining} ml extra. ${water.electrolytes}`,
   ];
-  $("#nutrition-coach").innerHTML = messages.map((msg) => `<div class="coach-note">${msg}</div>`).join("");
+  $("#nutrition-coach").innerHTML = [...messages, ...targets.flags].map((msg) => `<div class="coach-note">${escapeHtml(msg)}</div>`).join("");
 }
 
 function renderNutritionAI(totals, targets) {
@@ -1268,20 +1343,29 @@ function renderNutritionAI(totals, targets) {
   }[targets.goal] || "mantener";
   const status = remaining > 250 ? "Faltan calorías útiles." : remaining < -150 ? "Vas por encima del objetivo." : "Vas dentro del rango.";
   const proteinAdvice = proteinLeft > 30 ? "Sube proteína en la siguiente comida." : proteinLeft > 10 ? "Remata con una ración pequeña de proteína." : "Proteína cubierta.";
+  const energyLabel = remaining >= 0 ? "Calorías restantes" : "Calorías por encima";
+  const energyValue = `${Math.abs(remaining)} kcal`;
+  const adjustmentLabel = targets.adjustmentPct === 0 ? "mantenimiento" : `${Math.abs(Math.round(targets.adjustmentPct * 100))}% ${targets.adjustmentPct > 0 ? "superávit" : "déficit"}`;
+  const weeklyLabel = targets.weeklyWeightChange === 0 ? "peso estable" : `${targets.weeklyWeightChange > 0 ? "+" : ""}${targets.weeklyWeightChange} kg/sem estimado`;
+  const flags = targets.flags.length ? `<div class="nutrition-ai-flags">${targets.flags.map((flag) => `<span>${escapeHtml(flag)}</span>`).join("")}</div>` : "";
   const html = `
     <div class="nutrition-ai-head">
       <span class="pill">IA nutricional local</span>
       <strong>${targets.kcal} kcal para ${goalLabel}</strong>
-      <small>${status} ${proteinAdvice}</small>
+      <small>${status} ${proteinAdvice} Fórmula Mifflin-St Jeor, ${adjustmentLabel}, ${weeklyLabel}.</small>
     </div>
     <div class="nutrition-ai-grid">
-      <div><span>Calorías restantes</span><strong>${remaining} kcal</strong><small>Base metabólica: ${targets.bmr} kcal</small></div>
+      <div><span>${energyLabel}</span><strong>${energyValue}</strong><small>BMR ${targets.bmr} kcal · TDEE ${targets.tdee} kcal</small></div>
       <div><span>Proteína restante</span><strong>${proteinLeft} g</strong><small>Objetivo: ${targets.protein} g/día</small></div>
       <div><span>Carbohidratos restantes</span><strong>${carbLeft} g</strong><small>Objetivo: ${targets.carbs} g/día</small></div>
       <div><span>Grasas restantes</span><strong>${fatLeft} g</strong><small>Objetivo: ${targets.fat} g/día</small></div>
       <div><span>Agua necesaria</span><strong>${targets.water.liters} L/día</strong><small>${targets.water.duringTraining} ml extra entrenando</small></div>
       <div><span>Electrolitos</span><strong>${targets.water.ml >= 3600 ? "Recomendados" : "Opcional"}</strong><small>${targets.water.electrolytes}</small></div>
+      <div><span>IMC y macros</span><strong>${targets.bmi} IMC</strong><small>${targets.macroKcal} kcal desde macros</small></div>
+      <div><span>Proteína/kg</span><strong>${targets.proteinRate} g/kg</strong><small>Grasa mínima: ${targets.fatRate} g/kg o 20% kcal</small></div>
+      <div><span>Agua/kg</span><strong>${targets.water.mlPerKg} ml/kg</strong><small>${targets.water.trainingMinutes} min entreno incluidos</small></div>
     </div>
+    ${flags}
   `;
   if ($("#ai-nutrition-panel")) $("#ai-nutrition-panel").innerHTML = html;
   if ($("#nutrition-ai-summary")) $("#nutrition-ai-summary").innerHTML = html;
@@ -1292,7 +1376,7 @@ function previewMeal() {
   $("#meal-preview").innerHTML = parsed.items.length
     ? `
       <div class="meal-total"><strong>${parsed.totals.kcal} kcal</strong><span>${parsed.totals.protein}p - ${parsed.totals.carbs}c - ${parsed.totals.fat}g</span></div>
-      ${parsed.items.map((item) => `<div class="meal-item ${item.matched ? "" : "unmatched"}"><span>${item.name}</span><small>${item.grams ? `${Math.round(item.grams)}g` : "sin coincidencia"} - ${item.kcal} kcal</small></div>`).join("")}
+      ${parsed.items.map((item) => `<div class="meal-item ${item.matched ? "" : "unmatched"}"><span>${escapeHtml(item.name)}</span><small>${item.grams ? `${Math.round(item.grams)}g` : "sin coincidencia"} - ${item.kcal} kcal</small></div>`).join("")}
     `
     : "";
   return parsed;
@@ -1302,6 +1386,10 @@ function addMeal() {
   const parsed = previewMeal();
   if (!parsed.items.length || parsed.totals.kcal === 0) {
     showToast("Escribe una comida reconocible con cantidades.");
+    return;
+  }
+  if (parsed.items.some((item) => !item.matched)) {
+    showToast("Hay alimentos sin reconocer. Corrige el texto o busca el alimento abajo.");
     return;
   }
   mealLog.push({
@@ -1323,7 +1411,7 @@ function renderFoodSearch() {
     .filter(([name, aliases]) => !query || [name, ...aliases].some((alias) => normalizeText(alias).includes(query)))
     .slice(0, 8);
   $("#food-results").innerHTML = matches
-    .map(([name, , kcal, protein, carbs, fat]) => `<button type="button" data-food-name="${name}"><strong>${name}</strong><small>${kcal} kcal - ${protein}p ${carbs}c ${fat}g /100g</small></button>`)
+    .map(([name, , kcal, protein, carbs, fat]) => `<button type="button" data-food-name="${escapeHtml(name)}"><strong>${escapeHtml(name)}</strong><small>${kcal} kcal - ${protein}p ${carbs}c ${fat}g /100g</small></button>`)
     .join("");
 }
 
@@ -1597,7 +1685,7 @@ function bindEvents() {
     renderNutrition();
     showToast("Día nutricional limpiado.");
   });
-  ["#nutri-weight", "#nutri-height", "#nutri-age", "#nutri-sex", "#nutri-activity", "#nutri-goal"].forEach((selector) => {
+  ["#nutri-weight", "#nutri-height", "#nutri-age", "#nutri-sex", "#nutri-activity", "#nutri-goal", "#nutri-rate", "#nutri-training-min"].forEach((selector) => {
     $(selector).addEventListener("change", renderNutrition);
   });
   $$("#meal-log").forEach((log) => {
