@@ -448,6 +448,7 @@ async function loadApiUserData() {
     appData.profile = { ...appData.profile, ...data.profile };
     appData.health = { ...appData.health, ...data.health };
     if (Array.isArray(data.habits) && data.habits.length) appData.habits = data.habits;
+    if (Array.isArray(data.routines) && data.routines.length) weeklyRoutinePlan.splice(0, weeklyRoutinePlan.length, ...data.routines);
     if (Array.isArray(data.meals)) {
       mealLog = data.meals.map((meal) => ({ ...meal, date: meal.date || new Date().toISOString().slice(0, 10) }));
       saveMealLog();
@@ -1875,6 +1876,7 @@ async function saveProfileFromForm() {
   };
   saveAppData();
   await pushApi("/api/profile", appData.profile);
+  await pushApi("/api/onboarding", appData.profile);
   renderProfileInputs();
   renderDashboardData();
   renderNutrition();
@@ -2114,8 +2116,10 @@ async function registerLocalAccount() {
       appData.account = { email: session.user.email, id: session.user.id, mode: "api" };
       appData.profile = { ...appData.profile, ...session.data.profile, email };
       await pushApi("/api/profile", appData.profile);
+      await pushApi("/api/onboarding", appData.profile);
       await pushApi("/api/health", appData.health);
       await pushApi("/api/habits", appData.habits);
+      await pushApi("/api/routines", weeklyRoutinePlan);
       showToast("Cuenta real creada en backend local.");
     } catch (error) {
       showToast(error.message);
@@ -2309,6 +2313,15 @@ function bindEvents() {
   $("#timer-btn").addEventListener("click", () => startTimer(90));
   $("#finish-workout-btn").addEventListener("click", () => {
     const completed = state.activeWorkout.exercises.flatMap((item) => item.sets).filter((set) => set.done).length;
+    const durationMin = Number($("#ai-time")?.value || appData.profile.sessionTime || 60);
+    const finishedWorkout = {
+      ...cloneData(state.activeWorkout),
+      completedAt: new Date().toISOString(),
+      durationMin,
+      calories: Math.round((durationMin * appData.profile.weight * 5.5) / 60),
+      source: "LiftLab modo entrenamiento",
+    };
+    if (apiToken && apiOnline) apiRequest("/api/workouts", { method: "POST", body: finishedWorkout }).catch(() => {});
     showToast(`Entreno guardado con ${completed} series completadas.`);
   });
   $("#add-exercise-btn").addEventListener("click", () => setView("library"));
@@ -2442,6 +2455,7 @@ function bindEvents() {
       $(".profile-card .avatar").textContent = initials || "LL";
       saveAppData();
       renderDashboardData();
+      pushApi("/api/profile", appData.profile);
     }
     showToast(editing ? "Edita tu nombre y pulsa Guardar perfil." : "Perfil guardado.");
   });

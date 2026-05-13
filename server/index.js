@@ -6,16 +6,22 @@ import { fileURLToPath } from "node:url";
 import {
   addFoodPhotoResult,
   addMeal,
+  addRecord,
+  addWorkoutSession,
   authenticate,
   createUser,
   db,
   deleteMeal,
+  deleteRecord,
   deleteUser,
+  deleteWorkoutSession,
   exportUserData,
   getJsonRow,
   getUserByEmail,
   getUserById,
   listMeals,
+  listRecords,
+  listWorkoutSessions,
   migrate,
   setJsonRow,
 } from "./database.js";
@@ -60,6 +66,7 @@ async function handleApi(req, res) {
       mode: "local-real-backend",
       database: "sqlite",
       users: db.prepare("SELECT COUNT(*) AS count FROM users WHERE deleted_at IS NULL").get().count,
+      tables: db.prepare("SELECT COUNT(*) AS count FROM sqlite_master WHERE type = 'table'").get().count,
       note: "HealthKit real requiere app iOS; esta API guarda datos manuales/sincronizados.",
     });
     return;
@@ -92,6 +99,7 @@ async function handleApi(req, res) {
   if (!user) return;
 
   if (req.method === "GET" && path === "/api/me") return json(res, 200, publicUser(user));
+  if (req.method === "GET" && path === "/api/database/schema") return json(res, 200, databaseSchema());
   if (req.method === "DELETE" && path === "/api/account") {
     deleteUser(user.id);
     return json(res, 200, { ok: true });
@@ -103,6 +111,30 @@ async function handleApi(req, res) {
   if (await jsonResource(req, res, path, user.id, "/api/health", "health_metrics", {})) return;
   if (await jsonResource(req, res, path, user.id, "/api/habits", "habits", [])) return;
   if (await jsonResource(req, res, path, user.id, "/api/routines", "routines", [])) return;
+  if (await jsonResource(req, res, path, user.id, "/api/onboarding", "onboarding_answers", {})) return;
+  if (await jsonResource(req, res, path, user.id, "/api/preferences", "preferences", {})) return;
+  if (await jsonResource(req, res, path, user.id, "/api/nutrition-plan", "nutrition_plans", {})) return;
+  if (await jsonResource(req, res, path, user.id, "/api/notification-settings", "notification_settings", {})) return;
+  if (await jsonResource(req, res, path, user.id, "/api/privacy", "privacy_settings", {})) return;
+  if (await jsonResource(req, res, path, user.id, "/api/health-permissions", "health_permissions", {})) return;
+  if (await jsonResource(req, res, path, user.id, "/api/community/profile", "community_profiles", {})) return;
+
+  if (req.method === "GET" && path === "/api/workouts") return json(res, 200, listWorkoutSessions(user.id));
+  if (req.method === "POST" && path === "/api/workouts") return json(res, 201, addWorkoutSession(user.id, await readJson(req)));
+  if (req.method === "DELETE" && path.startsWith("/api/workouts/")) {
+    deleteWorkoutSession(user.id, Number(path.split("/").pop()));
+    return json(res, 200, { ok: true });
+  }
+
+  if (await recordResource(req, res, path, user.id, "/api/body-metrics", "body_metrics")) return;
+  if (await recordResource(req, res, path, user.id, "/api/progress-photos", "progress_photos")) return;
+  if (await recordResource(req, res, path, user.id, "/api/recipes", "recipes")) return;
+  if (await recordResource(req, res, path, user.id, "/api/shopping-lists", "shopping_lists")) return;
+  if (await recordResource(req, res, path, user.id, "/api/notifications", "user_notifications")) return;
+  if (await recordResource(req, res, path, user.id, "/api/consents", "consent_events")) return;
+  if (await recordResource(req, res, path, user.id, "/api/community/posts", "community_posts")) return;
+  if (await recordResource(req, res, path, user.id, "/api/community/friends", "friendships")) return;
+  if (await recordResource(req, res, path, user.id, "/api/community/challenges", "challenges")) return;
 
   if (req.method === "GET" && path === "/api/meals") return json(res, 200, listMeals(user.id));
   if (req.method === "POST" && path === "/api/meals") return json(res, 201, addMeal(user.id, await readJson(req)));
@@ -132,6 +164,34 @@ async function jsonResource(req, res, path, userId, apiPath, table, fallback) {
   }
   json(res, 405, { error: "Metodo no permitido" });
   return true;
+}
+
+async function recordResource(req, res, path, userId, apiPath, table) {
+  if (path === apiPath && req.method === "GET") {
+    json(res, 200, listRecords(table, userId));
+    return true;
+  }
+  if (path === apiPath && req.method === "POST") {
+    json(res, 201, addRecord(table, userId, await readJson(req)));
+    return true;
+  }
+  if (path.startsWith(`${apiPath}/`) && req.method === "DELETE") {
+    deleteRecord(table, userId, Number(path.split("/").pop()));
+    json(res, 200, { ok: true });
+    return true;
+  }
+  if (path === apiPath) {
+    json(res, 405, { error: "Metodo no permitido" });
+    return true;
+  }
+  return false;
+}
+
+function databaseSchema() {
+  return db
+    .prepare("SELECT name, sql FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name")
+    .all()
+    .map((row) => ({ table: row.name, sql: row.sql }));
 }
 
 function analyzeFoodPhoto(body) {
