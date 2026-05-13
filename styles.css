@@ -94,6 +94,9 @@ body.device-mobile .progress-grid,
 body.device-mobile .community-grid,
 body.device-mobile .profile-grid,
 body.device-mobile .routines-grid,
+body.device-mobile .implementation-grid,
+body.device-mobile .weekly-routine-board,
+body.device-mobile .photo-food-flow,
 body.device-mobile .exercise-library {
   grid-template-columns: 1fr;
 }
@@ -602,6 +605,8 @@ h1 {
 .community-grid,
 .profile-grid,
 .routines-grid,
+.implementation-grid,
+.weekly-routine-board,
 .exercise-library {
   display: grid;
   gap: 16px;
@@ -641,6 +646,148 @@ h1 {
 
 .panel {
   padding: 18px;
+}
+
+.implementation-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(260px, 0.7fr);
+  gap: 18px;
+  align-items: stretch;
+  margin-bottom: 16px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(135deg, rgba(104, 255, 204, 0.13), transparent 54%),
+    var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.implementation-hero h2 {
+  max-width: 760px;
+  margin: 8px 0;
+  font-size: clamp(2rem, 5vw, 4.1rem);
+  line-height: 0.95;
+}
+
+.implementation-hero p {
+  max-width: 760px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.implementation-status,
+.implementation-card,
+.routine-planner,
+.photo-warning,
+.food-photo-frame {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #111114;
+}
+
+.implementation-status {
+  display: grid;
+  gap: 10px;
+  align-content: center;
+  padding: 18px;
+}
+
+.implementation-status strong {
+  font-size: 1.15rem;
+}
+
+.implementation-status span {
+  padding: 9px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.implementation-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 16px;
+}
+
+.implementation-grid.wide {
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+}
+
+.implementation-card {
+  display: grid;
+  gap: 9px;
+  min-height: 180px;
+  padding: 16px;
+}
+
+.implementation-card span {
+  justify-self: start;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #fff;
+  color: #000;
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.implementation-card.ready span {
+  background: var(--mint);
+}
+
+.implementation-card.blocked span {
+  background: var(--amber);
+}
+
+.implementation-card h3,
+.implementation-card p {
+  margin: 0;
+}
+
+.implementation-card p {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.mvp-list,
+.architecture-list {
+  display: grid;
+  gap: 10px;
+}
+
+.mvp-list div {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #111114;
+}
+
+.mvp-list strong {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #fff;
+  color: #000;
+}
+
+.architecture-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.architecture-list span,
+.health-permission-list span {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #111114;
+  color: var(--muted);
+  font-weight: 800;
 }
 
 .panel-heading {
@@ -843,6 +990,100 @@ dialog canvas {
 
 .routines-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.routine-planner {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 18px;
+}
+
+.weekly-routine-board {
+  grid-template-columns: repeat(5, minmax(220px, 1fr));
+}
+
+.weekly-day-card {
+  display: grid;
+  gap: 12px;
+  min-height: 300px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+
+.weekly-day-card.recovery {
+  background:
+    linear-gradient(135deg, rgba(104, 255, 204, 0.1), transparent 58%),
+    color-mix(in srgb, var(--surface) 92%, transparent);
+}
+
+.weekly-day-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.weekly-day-head div {
+  display: grid;
+  gap: 4px;
+}
+
+.weekly-day-head span,
+.weekly-day-meta,
+.routine-block small {
+  color: var(--muted);
+}
+
+.weekly-day-head small {
+  align-self: start;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #fff;
+  color: #000;
+  font-weight: 900;
+}
+
+.weekly-day-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.weekly-day-meta span {
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.routine-blocks {
+  display: grid;
+  gap: 8px;
+}
+
+.routine-block {
+  display: grid;
+  gap: 4px;
+  padding: 9px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #111114;
+}
+
+.weekly-day-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  align-self: end;
+}
+
+.weekly-day-actions .primary-button,
+.weekly-day-actions .ghost-button {
+  min-height: 38px;
+  padding: 0 10px;
 }
 
 .routine-card {
@@ -1378,6 +1619,66 @@ dialog canvas {
   resize: vertical;
 }
 
+.photo-food-panel {
+  margin-top: 16px;
+}
+
+.photo-food-flow {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1fr) minmax(240px, 0.8fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.food-photo-frame {
+  display: grid;
+  place-items: center;
+  min-height: 210px;
+  padding: 18px;
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.18), transparent 30%),
+    linear-gradient(135deg, rgba(255, 107, 53, 0.2), transparent 55%),
+    #111114;
+}
+
+.food-photo-frame span,
+.photo-warning p {
+  color: var(--muted);
+}
+
+.food-photo-frame strong {
+  max-width: 190px;
+  font-size: 1.45rem;
+  line-height: 1.05;
+}
+
+.photo-result-list {
+  display: grid;
+  gap: 10px;
+}
+
+.photo-result-list article {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #111114;
+}
+
+.photo-result-list span,
+.photo-result-list small {
+  color: var(--muted);
+}
+
+.photo-warning {
+  display: grid;
+  gap: 10px;
+  align-content: center;
+  padding: 14px;
+}
+
 .macro-rings,
 .daily-summary {
   display: grid;
@@ -1561,9 +1862,30 @@ dialog canvas {
 }
 
 .settings-panel,
-.measure-grid {
+.measure-grid,
+.account-panel,
+.health-panel {
   display: grid;
   gap: 10px;
+}
+
+.account-actions,
+.health-permission-list {
+  display: grid;
+  gap: 10px;
+}
+
+.account-actions {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.health-permission-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ghost-button.danger {
+  border-color: rgba(255, 107, 53, 0.45);
+  color: #ffd8cc;
 }
 
 .switch-row,

@@ -24,6 +24,10 @@
             <svg viewBox="0 0 24 24"><path d="M4 13h6V4H4v9Zm10 7h6V4h-6v16ZM4 20h6v-5H4v5Z"/></svg>
             Inicio
           </button>
+          <button class="nav-item" data-view="implementation">
+            <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM7 9h10M7 13h6M16 13h1M7 17h4"/></svg>
+            Plan real
+          </button>
           <button class="nav-item" data-view="workout">
             <svg viewBox="0 0 24 24"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg>
             Entrenar
@@ -103,6 +107,7 @@
               <div class="hero-actions">
                 <button class="primary-button" data-view-shortcut="workout">Entrenar ahora</button>
                 <button class="ghost-button" data-load-template="push">Cargar rutina</button>
+                <button class="ghost-button" data-view-shortcut="implementation">Ver app real</button>
               </div>
             </div>
             <div class="phone-stage" aria-label="Vista previa del entrenamiento">
@@ -154,6 +159,87 @@
                 <button class="text-button" data-view-shortcut="community">Ver todo</button>
               </div>
               <div class="feed-list" id="recent-feed"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="implementation-view" aria-label="Plan funcional de LiftLab">
+          <div class="implementation-hero">
+            <div>
+              <span class="pill">LiftLab 100% gratis</span>
+              <h2>De maqueta visual a app real personalizada</h2>
+              <p>Esta es la hoja de trabajo visible dentro de la app: usuarios reales, onboarding, rutinas por dias, HealthKit, comida por foto, privacidad y MVP por fases.</p>
+              <div class="hero-actions">
+                <button class="primary-button" data-view-shortcut="routines">Ver rutinas por dias</button>
+                <button class="ghost-button" data-view-shortcut="nutrition">Ver comida por foto</button>
+              </div>
+            </div>
+            <div class="implementation-status">
+              <strong>Estado actual</strong>
+              <span>Base visual publicada</span>
+              <span>LocalStorage, sin backend real</span>
+              <span>Proximo paso: usuarios + base de datos</span>
+            </div>
+          </div>
+
+          <div class="implementation-grid">
+            <article class="implementation-card ready">
+              <span>Ya visible</span>
+              <h3>Interfaz completa</h3>
+              <p>Dashboard, entreno, IA, nutricion, rutinas, ejercicios, progreso, comunidad, perfil y onboarding.</p>
+            </article>
+            <article class="implementation-card next">
+              <span>Fase 1</span>
+              <h3>Usuarios reales</h3>
+              <p>Registro, login, recuperacion de contraseña, perfil privado, datos separados por usuario y borrado completo.</p>
+            </article>
+            <article class="implementation-card next">
+              <span>Fase 2</span>
+              <h3>Rutinas por dias</h3>
+              <p>Semana organizada por dia, musculos, bloques, ejercicios, series, reps, RPE, descansos y progresion.</p>
+            </article>
+            <article class="implementation-card next">
+              <span>Fase 3</span>
+              <h3>Modo entrenamiento real</h3>
+              <p>Registro de series, pesos, repeticiones, notas, temporizador, resumen final, volumen y 1RM estimado.</p>
+            </article>
+            <article class="implementation-card next">
+              <span>Fase 4</span>
+              <h3>Nutricion y foto IA</h3>
+              <p>Registro manual, calorias, macros, agua, recetas y analisis de foto siempre aproximado, editable y confirmado.</p>
+            </article>
+            <article class="implementation-card blocked">
+              <span>Requiere iOS</span>
+              <h3>Apple Health</h3>
+              <p>HealthKit no funciona desde una web normal. Hace falta app iOS para leer pasos, calorias, sueño y entrenamientos.</p>
+            </article>
+          </div>
+
+          <div class="implementation-grid wide">
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>MVP que hay que construir primero</h3>
+              </div>
+              <div class="mvp-list">
+                <div><strong>1</strong><span>Auth real: registro, login, reset y eliminar cuenta.</span></div>
+                <div><strong>2</strong><span>Onboarding persistente con perfil, objetivos, lesiones, disponibilidad y preferencias.</span></div>
+                <div><strong>3</strong><span>Base de datos por usuario para rutinas, entrenos, comidas, peso, medidas y habitos.</span></div>
+                <div><strong>4</strong><span>Rutina semanal generada por objetivo, nivel, dias, tiempo y material.</span></div>
+                <div><strong>5</strong><span>Modo entreno con historial real y progresion automatica.</span></div>
+              </div>
+            </section>
+            <section class="panel">
+              <div class="panel-heading">
+                <h3>Arquitectura recomendada</h3>
+              </div>
+              <div class="architecture-list">
+                <span>React + TypeScript</span>
+                <span>Supabase Auth</span>
+                <span>PostgreSQL con RLS</span>
+                <span>Storage privado para fotos</span>
+                <span>React Native o SwiftUI para HealthKit</span>
+                <span>IA de comida con revision manual obligatoria</span>
+              </div>
             </section>
           </div>
         </section>
@@ -315,6 +401,32 @@
               </div>
             </section>
           </div>
+
+          <section class="panel photo-food-panel">
+            <div class="panel-heading">
+              <div>
+                <h3>Comida por foto con IA</h3>
+                <p class="subtle">La foto solo puede dar una estimacion. Siempre hay que revisar gramos, alimentos y macros antes de guardar.</p>
+              </div>
+              <button class="primary-button" id="simulate-photo-food">Simular analisis</button>
+            </div>
+            <div class="photo-food-flow">
+              <div class="food-photo-frame">
+                <span>Foto del plato</span>
+                <strong>Arroz + pollo + verduras</strong>
+              </div>
+              <div class="photo-result-list" id="photo-food-results">
+                <article><strong>Arroz cocido</strong><span>150 g estimados</span><small>195 kcal</small></article>
+                <article><strong>Pechuga de pollo</strong><span>180 g estimados</span><small>297 kcal</small></article>
+                <article><strong>Verduras</strong><span>100 g estimados</span><small>35 kcal</small></article>
+              </div>
+              <div class="photo-warning">
+                <strong>Revision obligatoria</strong>
+                <p>No se puede saber el peso exacto solo con una imagen. El usuario debe corregir y confirmar antes de guardar.</p>
+                <button class="ghost-button" id="confirm-photo-food">Guardar estimacion revisada</button>
+              </div>
+            </div>
+          </section>
         </section>
 
         <section class="view" id="workout-view" aria-label="Registro de entrenamiento">
@@ -357,6 +469,16 @@
         </section>
 
         <section class="view" id="routines-view" aria-label="Rutinas">
+          <div class="routine-planner">
+            <div class="panel-heading">
+              <div>
+                <h3>Semana organizada por dias, musculos y ejercicios</h3>
+                <p class="subtle">Estructura estilo planificador real: cada dia tiene estado, bloques, musculos, ejercicios y acciones.</p>
+              </div>
+              <button class="primary-button" id="generate-week-btn">Generar semana</button>
+            </div>
+            <div class="weekly-routine-board" id="weekly-routine-board"></div>
+          </div>
           <div class="routines-grid" id="routines-grid"></div>
         </section>
 
@@ -486,6 +608,30 @@
                 <button class="text-button" id="random-measure">Actualizar</button>
               </div>
               <div class="measure-grid" id="measure-grid"></div>
+            </section>
+            <section class="panel account-panel">
+              <div class="panel-heading">
+                <h3>Cuenta y privacidad</h3>
+              </div>
+              <div class="account-actions">
+                <button class="ghost-button" id="mock-login">Iniciar sesion</button>
+                <button class="ghost-button" id="mock-reset">Recuperar contraseña</button>
+                <button class="ghost-button danger" id="mock-delete-account">Eliminar cuenta y datos</button>
+              </div>
+              <p class="subtle">En la app real esto ira conectado a autenticacion segura, base de datos por usuario y borrado completo.</p>
+            </section>
+            <section class="panel health-panel">
+              <div class="panel-heading">
+                <h3>Salud del iPhone</h3>
+              </div>
+              <div class="health-permission-list">
+                <span>Pasos</span>
+                <span>Calorias activas</span>
+                <span>Sueño</span>
+                <span>Entrenamientos</span>
+                <span>Frecuencia cardiaca</span>
+              </div>
+              <p class="subtle">Disponible cuando LiftLab tenga app iOS real con HealthKit. La web puede funcionar manualmente sin Salud.</p>
             </section>
           </div>
         </section>

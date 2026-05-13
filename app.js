@@ -190,6 +190,73 @@ const routineTemplates = [
   },
 ];
 
+const weeklyRoutinePlan = [
+  {
+    day: "Lunes",
+    title: "Push - pecho, hombro y triceps",
+    status: "Pendiente",
+    duration: "62 min",
+    difficulty: "Media",
+    muscles: ["Pecho", "Hombro", "Tríceps"],
+    blocks: [
+      { name: "Calentamiento", exercises: ["Movilidad hombro", "Press banca aproximacion"] },
+      { name: "Principal", exercises: ["Press banca", "Press inclinado mancuernas"] },
+      { name: "Accesorios", exercises: ["Fondos", "Elevacion lateral"] },
+    ],
+  },
+  {
+    day: "Martes",
+    title: "Pull - espalda y biceps",
+    status: "Pendiente",
+    duration: "58 min",
+    difficulty: "Media",
+    muscles: ["Espalda", "Bíceps"],
+    blocks: [
+      { name: "Calentamiento", exercises: ["Activacion escapular", "Jalon suave"] },
+      { name: "Principal", exercises: ["Dominadas", "Remo con barra"] },
+      { name: "Accesorios", exercises: ["Jalon al pecho", "Curl biceps"] },
+    ],
+  },
+  {
+    day: "Miercoles",
+    title: "Movilidad y pasos",
+    status: "Recuperacion",
+    duration: "25 min",
+    difficulty: "Suave",
+    muscles: ["Core", "Movilidad"],
+    blocks: [
+      { name: "Movilidad", exercises: ["Cadera", "Columna toracica"] },
+      { name: "Habito", exercises: ["8.000 pasos", "Respiracion 5 min"] },
+    ],
+  },
+  {
+    day: "Jueves",
+    title: "Pierna y gluteo",
+    status: "Pendiente",
+    duration: "70 min",
+    difficulty: "Alta",
+    muscles: ["Pierna", "Femoral", "Glúteo"],
+    blocks: [
+      { name: "Calentamiento", exercises: ["Movilidad tobillo", "Sentadilla goblet"] },
+      { name: "Principal", exercises: ["Sentadilla", "Peso muerto rumano"] },
+      { name: "Accesorios", exercises: ["Extension cuadriceps", "Hip thrust"] },
+    ],
+  },
+  {
+    day: "Viernes",
+    title: "Torso fuerza",
+    status: "Pendiente",
+    duration: "55 min",
+    difficulty: "Media",
+    muscles: ["Pecho", "Espalda", "Hombro"],
+    blocks: [
+      { name: "Principal", exercises: ["Press banca pesado", "Dominadas"] },
+      { name: "Accesorios", exercises: ["Remo", "Press hombro mancuernas"] },
+      { name: "Core", exercises: ["Plancha", "Pallof press"] },
+    ],
+  },
+];
+
 const progressData = {
   volume: [22400, 24750, 23820, 26800, 30340, 31800, 34820],
   orm: [98, 101, 102, 105, 108, 110, 112],
@@ -325,6 +392,7 @@ function setView(view) {
     ai: "Entrenador IA",
     nutrition: "Nutrición",
     workout: "Entrenar",
+    implementation: "Plan real",
     routines: "Rutinas",
     library: "Ejercicios",
     progress: "Progreso",
@@ -613,6 +681,7 @@ function renderWorkoutLog() {
 }
 
 function renderRoutines() {
+  renderWeeklyRoutineBoard();
   $("#routines-grid").innerHTML = routineTemplates
     .map((routine) => `
       <article class="routine-card">
@@ -1415,6 +1484,44 @@ function renderFoodSearch() {
     .join("");
 }
 
+function renderWeeklyRoutineBoard() {
+  const board = $("#weekly-routine-board");
+  if (!board) return;
+  board.innerHTML = weeklyRoutinePlan
+    .map((day, index) => `
+      <article class="weekly-day-card ${day.status === "Recuperacion" ? "recovery" : ""}">
+        <div class="weekly-day-head">
+          <div>
+            <span>${day.day}</span>
+            <strong>${day.title}</strong>
+          </div>
+          <small>${day.status}</small>
+        </div>
+        <div class="weekly-day-meta">
+          <span>${day.duration}</span>
+          <span>${day.difficulty}</span>
+          <span>${day.muscles.join(" · ")}</span>
+        </div>
+        <div class="routine-blocks">
+          ${day.blocks
+            .map((block) => `
+              <div class="routine-block">
+                <strong>${block.name}</strong>
+                <small>${block.exercises.join(", ")}</small>
+              </div>
+            `)
+            .join("")}
+        </div>
+        <div class="weekly-day-actions">
+          <button class="primary-button" data-load-template="${["push", "pull", "fullbody", "legs", "power"][index] || "push"}">Empezar</button>
+          <button class="ghost-button" data-edit-week-day="${index}">Editar</button>
+          <button class="ghost-button" data-swap-week-day="${index}">Sustituir</button>
+        </div>
+      </article>
+    `)
+    .join("");
+}
+
 function openExercise(id) {
   const exercise = findExercise(id);
   state.selectedExercise = exercise;
@@ -1530,6 +1637,12 @@ function bindEvents() {
     const templateButton = event.target.closest("[data-load-template]");
     if (templateButton) loadTemplate(templateButton.dataset.loadTemplate);
 
+    const editWeekDay = event.target.closest("[data-edit-week-day]");
+    if (editWeekDay) showToast("Editor de dia preparado: aqui se cambiaran series, reps, descansos y orden.");
+
+    const swapWeekDay = event.target.closest("[data-swap-week-day]");
+    if (swapWeekDay) showToast("Sustitucion preparada: cambiara ejercicios segun material, dolor o maquina ocupada.");
+
     const openButton = event.target.closest("[data-open-exercise]");
     if (openButton) openExercise(openButton.dataset.openExercise);
 
@@ -1636,6 +1749,26 @@ function bindEvents() {
     showToast("Avance preparado para compartir con la comunidad.");
     setView("community");
   });
+  $("#generate-week-btn")?.addEventListener("click", () => {
+    renderWeeklyRoutineBoard();
+    showToast("Semana generada segun objetivo, dias, tiempo y material.");
+  });
+  $("#simulate-photo-food")?.addEventListener("click", () => {
+    $("#photo-food-results").innerHTML = `
+      <article><strong>Arroz cocido</strong><span>160 g estimados</span><small>208 kcal · revisable</small></article>
+      <article><strong>Pechuga de pollo</strong><span>170 g estimados</span><small>281 kcal · revisable</small></article>
+      <article><strong>Aceite o salsa</strong><span>Posible extra</span><small>Confirmar manualmente</small></article>
+    `;
+    showToast("Analisis simulado: revisa cantidades antes de guardar.");
+  });
+  $("#confirm-photo-food")?.addEventListener("click", () => {
+    $("#meal-input").value = "160g arroz cocido, 170g pechuga de pollo, 100g verduras";
+    previewMeal();
+    showToast("Estimacion pasada al registro manual para confirmar.");
+  });
+  $("#mock-login")?.addEventListener("click", () => showToast("Siguiente fase: login real con email y contraseña."));
+  $("#mock-reset")?.addEventListener("click", () => showToast("Siguiente fase: recuperacion segura de contraseña."));
+  $("#mock-delete-account")?.addEventListener("click", () => showToast("Siguiente fase: borrado completo de cuenta y datos."));
   $("#edit-profile-btn").addEventListener("click", () => {
     const card = $(".profile-card");
     const name = $(".profile-card h3");
