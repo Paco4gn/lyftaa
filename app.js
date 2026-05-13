@@ -2429,7 +2429,20 @@ function bindEvents() {
     card.classList.toggle("editing", editing);
     name.contentEditable = editing ? "true" : "false";
     $("#edit-profile-btn").textContent = editing ? "Guardar perfil" : "Editar perfil";
-    if (editing) name.focus();
+    if (editing) {
+      name.focus();
+    } else {
+      const nextName = name.textContent.trim() || appData.profile.name || "Usuario";
+      appData.profile.name = nextName;
+      const initials = nextName
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() || "")
+        .join("");
+      $(".profile-card .avatar").textContent = initials || "LL";
+      saveAppData();
+      renderDashboardData();
+    }
     showToast(editing ? "Edita tu nombre y pulsa Guardar perfil." : "Perfil guardado.");
   });
   $("#random-measure").addEventListener("click", () => {

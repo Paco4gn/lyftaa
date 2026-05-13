@@ -2332,6 +2332,230 @@ dialog::backdrop {
   }
 }
 
+/* Mobile app polish: full-screen app, complete navigation and no hidden actions. */
+body.device-mobile {
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+body.device-mobile .app-shell {
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  min-height: 100dvh;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+body.device-mobile .main {
+  height: 100dvh;
+  max-height: none;
+  padding: 12px 12px calc(152px + env(safe-area-inset-bottom));
+  scroll-padding-bottom: calc(160px + env(safe-area-inset-bottom));
+}
+
+body.device-mobile .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 8;
+  padding: 4px 0 10px;
+  margin-bottom: 10px;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(14px);
+}
+
+body.device-mobile .topbar p {
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+}
+
+body.device-mobile h1 {
+  font-size: clamp(1.45rem, 6.7vw, 1.85rem);
+  line-height: 0.96;
+}
+
+body.device-mobile .view.active {
+  display: grid;
+  gap: 14px;
+}
+
+body.device-mobile .hero-panel,
+body.device-mobile .nutrition-hero,
+body.device-mobile .ai-hero,
+body.device-mobile .routine-planner,
+body.device-mobile .panel {
+  padding: 16px;
+}
+
+body.device-mobile .hero-panel {
+  min-height: 0;
+  gap: 12px;
+}
+
+body.device-mobile .hero-copy h2,
+body.device-mobile .nutrition-hero h2,
+body.device-mobile .ai-hero h2,
+body.device-mobile .routine-planner h2 {
+  font-size: clamp(1.45rem, 7vw, 1.8rem);
+  line-height: 1;
+}
+
+body.device-mobile .hero-copy p,
+body.device-mobile .nutrition-hero p,
+body.device-mobile .ai-hero p,
+body.device-mobile .routine-planner p,
+body.device-mobile .panel p {
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+body.device-mobile .panel h2,
+body.device-mobile .panel h3,
+body.device-mobile .routine-day-card h3 {
+  font-size: 1.18rem;
+  line-height: 1.15;
+}
+
+body.device-mobile .primary-button,
+body.device-mobile .ghost-button {
+  min-height: 46px;
+  padding-inline: 14px;
+  font-size: 0.94rem;
+}
+
+body.device-mobile .text-button {
+  font-size: 0.88rem;
+}
+
+body.device-mobile .metric-card strong {
+  font-size: 1.9rem;
+}
+
+body.device-mobile .hero-actions,
+body.device-mobile .quick-actions,
+body.device-mobile .meal-actions,
+body.device-mobile .account-actions,
+body.device-mobile .weekly-day-actions,
+body.device-mobile .routine-actions {
+  grid-template-columns: 1fr;
+}
+
+body.device-mobile .hero-actions button,
+body.device-mobile .quick-actions button,
+body.device-mobile .meal-actions button,
+body.device-mobile .account-actions button,
+body.device-mobile .weekly-day-actions button,
+body.device-mobile .routine-actions button {
+  width: 100%;
+  justify-content: center;
+}
+
+body.device-mobile .phone-stage {
+  display: none;
+}
+
+body.device-mobile .phone-screen {
+  width: min(100%, 286px);
+  max-height: 250px;
+  overflow: hidden;
+}
+
+body.device-mobile .panel-heading {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+body.device-mobile .panel-heading button,
+body.device-mobile .panel-heading .pill {
+  justify-self: start;
+}
+
+body.device-mobile .stats-grid,
+body.device-mobile .real-data-grid,
+body.device-mobile .implementation-grid,
+body.device-mobile .weekly-routine-board,
+body.device-mobile .routines-grid,
+body.device-mobile .nutrition-grid,
+body.device-mobile .ai-agent-grid,
+body.device-mobile .progress-grid,
+body.device-mobile .community-grid,
+body.device-mobile .profile-grid,
+body.device-mobile .onboarding-real-grid,
+body.device-mobile .manual-health-grid,
+body.device-mobile .photo-food-flow,
+body.device-mobile .photo-food-item,
+body.device-mobile .exercise-media {
+  grid-template-columns: 1fr;
+}
+
+body.device-mobile .week-plan {
+  grid-template-columns: 1fr;
+}
+
+body.device-mobile .weekly-day-card,
+body.device-mobile .routine-day-card,
+body.device-mobile .routine-block,
+body.device-mobile .meal-card,
+body.device-mobile .ai-agent-card {
+  min-height: 0;
+}
+
+body.device-mobile .routine-detail-exercise {
+  gap: 12px;
+}
+
+body.device-mobile .exercise-card {
+  grid-template-columns: 112px minmax(0, 1fr);
+}
+
+body.device-mobile .exercise-card .media-card {
+  min-height: 90px;
+}
+
+body.device-mobile .exercise-card h3,
+body.device-mobile .routine-detail-exercise h4,
+body.device-mobile .ai-plan-row strong {
+  overflow-wrap: anywhere;
+}
+
+body.device-mobile .mobile-tabs {
+  position: fixed;
+  inset: auto 8px max(8px, env(safe-area-inset-bottom)) 8px;
+  z-index: 40;
+  width: auto;
+  max-width: none;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  padding: 8px;
+  overflow: hidden;
+  border-radius: 20px;
+  transform: none;
+}
+
+body.device-mobile .mobile-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+body.device-mobile .mobile-tab {
+  min-width: 0;
+  min-height: 54px;
+  border: 0;
+  font-size: 0.68rem;
+}
+
+body.device-mobile .mobile-tab span {
+  max-width: 68px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .lyfta-skin {
   --bg: #000000;
   --surface: #0b0b0d;
