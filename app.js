@@ -1335,7 +1335,7 @@ function addExerciseToWorkout(id) {
   });
   saveWorkout();
   renderWorkoutLog();
-  showToast("Ejercicio anadido al entreno.");
+  showToast("Ejercicio añadido al entreno.");
 }
 
 function loadTemplate(id) {
@@ -1479,6 +1479,20 @@ function bindEvents() {
     drawProgressChart();
   });
   $("#add-friend-btn").addEventListener("click", () => showToast("Solicitud de seguimiento preparada."));
+  $("#share-progress-btn").addEventListener("click", () => {
+    showToast("Avance preparado para compartir con la comunidad.");
+    setView("community");
+  });
+  $("#edit-profile-btn").addEventListener("click", () => {
+    const card = $(".profile-card");
+    const name = $(".profile-card h3");
+    const editing = !card.classList.contains("editing");
+    card.classList.toggle("editing", editing);
+    name.contentEditable = editing ? "true" : "false";
+    $("#edit-profile-btn").textContent = editing ? "Guardar perfil" : "Editar perfil";
+    if (editing) name.focus();
+    showToast(editing ? "Edita tu nombre y pulsa Guardar perfil." : "Perfil guardado.");
+  });
   $("#random-measure").addEventListener("click", () => {
     renderMeasures();
     showToast("Medidas actualizadas.");
@@ -1516,7 +1530,7 @@ function bindEvents() {
     mealLog = mealLog.filter((meal) => meal.date !== today);
     saveMealLog();
     renderNutrition();
-    showToast("Dia nutricional limpiado.");
+    showToast("Día nutricional limpiado.");
   });
   ["#nutri-weight", "#nutri-height", "#nutri-age", "#nutri-sex", "#nutri-activity", "#nutri-goal"].forEach((selector) => {
     $(selector).addEventListener("change", renderNutrition);
@@ -1554,6 +1568,22 @@ function bindEvents() {
   $("#prev-onboarding").onclick = () => moveOnboarding(-1);
   $("#onboarding-flow").addEventListener("click", (event) => {
     if (event.target.id === "onboarding-flow") closeOnboarding();
+    const choice = event.target.closest(".onboarding-step button");
+    if (!choice) return;
+    const step = choice.closest(".onboarding-step");
+    step.querySelectorAll("button").forEach((button) => button.classList.remove("selected"));
+    choice.classList.add("selected");
+    const label = choice.textContent.trim();
+    if (label.includes("Continuar")) {
+      showToast("Cuenta local preparada gratis.");
+      moveOnboarding(1);
+    } else if (label.includes("Entrar gratis")) {
+      showToast("Todo listo. Entrenamiento abierto.");
+      closeOnboarding();
+      setView("workout");
+    } else {
+      showToast("Preferencia guardada.");
+    }
   });
 }
 
