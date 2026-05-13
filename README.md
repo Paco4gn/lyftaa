@@ -16,9 +16,9 @@ La pagina principal del repositorio de GitHub muestra este README y la lista de 
 - 90 laminas SVG propias para ejercicios, con 3 fases visuales por movimiento.
 - Vista movil y vista PC desde el mismo archivo.
 - Entrenamiento guiado, rutinas, progresion y registro de series.
-- Agentes IA locales para planificacion, tecnica, recuperacion, nutricion y riesgo.
+- Agentes IA locales para planificación, técnica, recuperación, nutrición y riesgo.
 - Calculadora completa de calorias y macros con base de alimentos local.
-- Sin pagos, sin premium, sin claves externas y sin dependencias obligatorias.
+- Sin pagos, sin claves externas y sin dependencias obligatorias.
 
 ## Ejecutar
 

@@ -23,10 +23,10 @@ const exercises = [
   {
     id: "dip",
     name: "Fondos",
-    muscle: "Triceps",
+    muscle: "Tríceps",
     equipment: "Paralelas",
     type: "push",
-    cues: ["Inclina el torso si buscas pecho.", "Bloquea suave arriba.", "Manten hombros lejos de las orejas."],
+    cues: ["Inclina el torso si buscas pecho.", "Bloquea suave arriba.", "Mantén hombros lejos de las orejas."],
     description: "Ejercicio de peso corporal con alta transferencia a fuerza de empuje.",
   },
   {
@@ -45,12 +45,12 @@ const exercises = [
     equipment: "Polea",
     type: "pull",
     cues: ["Pecho alto.", "Codos hacia atras y cerca del cuerpo.", "Pausa un segundo al contraer."],
-    description: "Remo horizontal facil de progresar y muy util para volumen de espalda.",
+    description: "Remo horizontal fácil de progresar y muy útil para volumen de espalda.",
   },
   {
     id: "curl",
     name: "Curl barra",
-    muscle: "Biceps",
+    muscle: "Bíceps",
     equipment: "Barra",
     type: "pull",
     cues: ["Codos quietos.", "Sube sin balanceo.", "Controla la bajada completa."],
@@ -62,7 +62,7 @@ const exercises = [
     muscle: "Pierna",
     equipment: "Barra",
     type: "legs",
-    cues: ["Respira y bloquea el tronco.", "Rodillas siguen la linea de los pies.", "Manten el medio pie firme."],
+    cues: ["Respira y bloquea el tronco.", "Rodillas siguen la línea de los pies.", "Mantén el medio pie firme."],
     description: "Patron dominante de rodilla para fuerza global y masa muscular.",
   },
   {
@@ -104,7 +104,7 @@ const exercises = [
   {
     id: "hip-thrust",
     name: "Hip thrust",
-    muscle: "Gluteo",
+    muscle: "Glúteo",
     equipment: "Barra",
     type: "legs",
     cues: ["Menton ligeramente recogido.", "Pausa arriba.", "Costillas abajo al bloquear."],
@@ -113,24 +113,24 @@ const exercises = [
 ];
 
 exercises.push(
-  { id: "overhead-press", name: "Press militar", muscle: "Hombro", equipment: "Barra", type: "push", cues: ["Gluteos apretados.", "Barra cerca de la cara.", "Bloquea arriba sin arquear."], description: "Empuje vertical basico para hombros y triceps." },
+  { id: "overhead-press", name: "Press militar", muscle: "Hombro", equipment: "Barra", type: "push", cues: ["Glúteos apretados.", "Barra cerca de la cara.", "Bloquea arriba sin arquear."], description: "Empuje vertical básico para hombros y tríceps." },
   { id: "pec-deck", name: "Contractora", muscle: "Pecho", equipment: "Maquina", type: "push", cues: ["Antebrazos firmes.", "Pausa al cerrar.", "No adelantes la cabeza."], description: "Aislamiento estable para pecho con tension constante." },
-  { id: "triceps-pushdown", name: "Extension triceps polea", muscle: "Triceps", equipment: "Polea", type: "push", cues: ["Codos pegados.", "Extiende hasta bloquear suave.", "Sube controlado."], description: "Aislamiento de triceps facil de dosificar." },
+  { id: "triceps-pushdown", name: "Extensión tríceps polea", muscle: "Tríceps", equipment: "Polea", type: "push", cues: ["Codos pegados.", "Extiende hasta bloquear suave.", "Sube controlado."], description: "Aislamiento de tríceps fácil de dosificar." },
   { id: "face-pull", name: "Face pull", muscle: "Hombro", equipment: "Polea", type: "pull", cues: ["Tira hacia la frente.", "Abre codos.", "Pausa atras."], description: "Trabajo de deltoide posterior y rotadores externos." },
   { id: "deadlift", name: "Peso muerto", muscle: "Espalda", equipment: "Barra", type: "pull", cues: ["Barra sobre medio pie.", "Dorsales tensos.", "Empuja el suelo."], description: "Bisagra pesada para fuerza total." },
   { id: "tbar-row", name: "Remo T", muscle: "Espalda", equipment: "Maquina", type: "pull", cues: ["Pecho apoyado si es posible.", "Codos atras.", "No rebotes."], description: "Remo pesado para densidad de espalda." },
-  { id: "hammer-curl", name: "Curl martillo", muscle: "Biceps", equipment: "Mancuernas", type: "pull", cues: ["Muneca neutra.", "Codos estables.", "Bajada lenta."], description: "Biceps y braquial con agarre neutro." },
+  { id: "hammer-curl", name: "Curl martillo", muscle: "Bíceps", equipment: "Mancuernas", type: "pull", cues: ["Muñeca neutra.", "Codos estables.", "Bajada lenta."], description: "Bíceps y braquial con agarre neutro." },
   { id: "leg-press", name: "Prensa", muscle: "Pierna", equipment: "Maquina", type: "legs", cues: ["Espalda pegada.", "Rodillas siguen pies.", "No bloquees agresivo."], description: "Dominante de rodilla con carga alta y buena estabilidad." },
   { id: "lunge", name: "Zancada", muscle: "Pierna", equipment: "Mancuernas", type: "legs", cues: ["Paso firme.", "Torso alto.", "Empuja con la pierna delantera."], description: "Unilateral para cuadriceps, gluteo y estabilidad." },
   { id: "leg-curl", name: "Curl femoral", muscle: "Femoral", equipment: "Maquina", type: "legs", cues: ["Cadera pegada.", "Pausa al flexionar.", "Controla la extension."], description: "Aislamiento directo de isquiosurales." },
   { id: "calf-raise", name: "Elevacion gemelo", muscle: "Gemelo", equipment: "Maquina", type: "legs", cues: ["Estira abajo.", "Sube completo.", "Pausa arriba."], description: "Trabajo de gemelo con recorrido completo." },
-  { id: "plank", name: "Plancha", muscle: "Core", equipment: "Peso corporal", type: "legs", cues: ["Costillas abajo.", "Gluteos activos.", "Respira sin perder posicion."], description: "Anti-extension basica para core." },
+  { id: "plank", name: "Plancha", muscle: "Core", equipment: "Peso corporal", type: "legs", cues: ["Costillas abajo.", "Glúteos activos.", "Respira sin perder posición."], description: "Anti-extensión básica para core." },
   { id: "push-up", name: "Flexion", muscle: "Pecho", equipment: "Peso corporal", type: "push", cues: ["Cuerpo en bloque.", "Pecho al suelo.", "Codos a 45 grados."], description: "Empuje horizontal de peso corporal." },
   { id: "cable-fly", name: "Cruce poleas", muscle: "Pecho", equipment: "Polea", type: "push", cues: ["Paso estable.", "Abrazo amplio.", "Pausa al cerrar."], description: "Aislamiento de pecho con tension continua." },
   { id: "seated-db-press", name: "Press hombro mancuernas", muscle: "Hombro", equipment: "Mancuernas", type: "push", cues: ["Banco firme.", "Mancuernas sobre codos.", "Recorrido controlado."], description: "Empuje vertical con libertad escapular." },
   { id: "wide-pulldown", name: "Jalon agarre amplio", muscle: "Espalda", equipment: "Polea", type: "pull", cues: ["Pecho alto.", "Codos hacia costillas.", "No tires tras nuca."], description: "Variante para dorsales con agarre amplio." },
   { id: "single-row", name: "Remo una mano", muscle: "Espalda", equipment: "Mancuerna", type: "pull", cues: ["Apoyo estable.", "Codo hacia cadera.", "No gires el tronco."], description: "Remo unilateral para equilibrar lados." },
-  { id: "glute-bridge", name: "Puente gluteo", muscle: "Gluteo", equipment: "Peso corporal", type: "legs", cues: ["Pies cerca de gluteos.", "Pausa arriba.", "Pelvis neutra."], description: "Extension de cadera accesible y progresable." }
+  { id: "glute-bridge", name: "Puente glúteo", muscle: "Glúteo", equipment: "Peso corporal", type: "legs", cues: ["Pies cerca de glúteos.", "Pausa arriba.", "Pelvis neutra."], description: "Extensión de cadera accesible y progresable." }
 );
 
 const routineTemplates = [
@@ -155,7 +155,7 @@ const routineTemplates = [
   {
     id: "legs",
     name: "Legs A",
-    focus: "Cuadriceps, femoral y gluteo",
+    focus: "Cuádriceps, femoral y glúteo",
     days: "1 dia por semana",
     difficulty: "Avanzado",
     bars: [94, 74, 62],
@@ -198,14 +198,14 @@ const progressData = {
 
 const muscleGroups = [
   ["Pecho", "Pecho", "front"],
-  ["Biceps", "Biceps", "front"],
-  ["Triceps", "Triceps", "back"],
+  ["Bíceps", "Bíceps", "front"],
+  ["Tríceps", "Tríceps", "back"],
   ["Espalda", "Espalda", "back"],
   ["Hombros", "Hombro", "front"],
   ["Abdominales", "Core", "front"],
-  ["Cuadriceps", "Pierna", "front"],
+  ["Cuádriceps", "Pierna", "front"],
   ["Isquiotibiales", "Femoral", "back"],
-  ["Gluteos", "Gluteo", "back"],
+  ["Glúteos", "Glúteo", "back"],
   ["Gemelos", "Gemelo", "back"],
 ];
 
@@ -257,6 +257,8 @@ const state = {
   activeWorkout: loadWorkout(),
   timer: { remaining: 90, running: false, handle: null },
 };
+
+let dialogFrameTimer = null;
 
 function loadWorkout() {
   const stored = localStorage.getItem("liftlab-workout");
@@ -317,7 +319,7 @@ function setView(view) {
   const titles = {
     dashboard: "Inicio",
     ai: "Entrenador IA",
-    nutrition: "Nutricion",
+    nutrition: "Nutrición",
     workout: "Entrenar",
     routines: "Rutinas",
     library: "Ejercicios",
@@ -583,7 +585,7 @@ function renderWorkoutLog() {
               <strong>${exercise.name}</strong>
               <small>${exercise.muscle} - ${exercise.equipment}</small>
             </div>
-            <button class="text-button" data-demo="${exercise.id}">Ver tecnica</button>
+            <button class="text-button" data-demo="${exercise.id}">Ver técnica</button>
           </div>
           <div class="set-grid">
             ${entry.sets
@@ -599,7 +601,7 @@ function renderWorkoutLog() {
               `)
               .join("")}
           </div>
-          <button class="text-button" data-add-set="${exerciseIndex}">Anadir serie</button>
+          <button class="text-button" data-add-set="${exerciseIndex}">Añadir serie</button>
         </article>
       `;
     })
@@ -645,7 +647,7 @@ function renderLibrary() {
   $("#exercise-library").innerHTML = filtered
     .map((exercise) => `
       <article class="exercise-card">
-        <button class="exercise-visual media-card" data-open-exercise="${exercise.id}" aria-label="Abrir guia de ${exercise.name}">
+        <button class="exercise-visual media-card" data-open-exercise="${exercise.id}" aria-label="Abrir guía de ${exercise.name}">
           <img src="${posterSrc(exercise, 1)}" alt="Foto de ${exercise.name}" loading="lazy">
           <span class="play-dot"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></svg></span>
         </button>
@@ -653,7 +655,7 @@ function renderLibrary() {
           <strong>${exercise.name}</strong>
           <small>${exercise.muscle} - ${exercise.equipment}</small>
         </div>
-        <button class="ghost-button" data-open-exercise-button="${exercise.id}">Abrir guia</button>
+        <button class="ghost-button" data-open-exercise-button="${exercise.id}">Abrir guía</button>
       </article>
     `)
     .join("");
@@ -762,15 +764,29 @@ function drawPlate(ctx, x, y, color) {
 function animateExercise() {
   const phase = performance.now() / 650;
   drawExercise($("#exercise-canvas"), state.selectedExercise, phase);
-  const dialogVideo = $("#dialog-video-frame");
-  if ($("#exercise-dialog").open && dialogVideo) {
-    const frame = String(Math.floor(performance.now() / 650) % 3);
-    if (dialogVideo.dataset.frame !== frame) {
-      dialogVideo.src = posterSrc(state.selectedExercise, Number(frame));
-      dialogVideo.dataset.frame = frame;
-    }
-  }
   requestAnimationFrame(animateExercise);
+}
+
+function stopDialogAnimation() {
+  if (!dialogFrameTimer) return;
+  clearInterval(dialogFrameTimer);
+  dialogFrameTimer = null;
+}
+
+function startDialogAnimation() {
+  stopDialogAnimation();
+  let frame = 0;
+  dialogFrameTimer = setInterval(() => {
+    const dialog = $("#exercise-dialog");
+    const dialogVideo = $("#dialog-video-frame");
+    if (!dialog.open || !dialogVideo) {
+      stopDialogAnimation();
+      return;
+    }
+    frame = (frame + 1) % 3;
+    dialogVideo.src = posterSrc(state.selectedExercise, frame);
+    dialogVideo.dataset.frame = String(frame);
+  }, 650);
 }
 
 function drawProgressChart() {
@@ -921,41 +937,41 @@ function runAIAgents() {
     {
       name: "Entrenador",
       score: `${readiness}`,
-      text: `Sesion recomendada para ${goalText}: ${ctx.time} min con ${deload ? "volumen reducido" : "progresion normal"}. Contexto: ${sorenessMap[ctx.soreness]}.`,
+      text: `Sesión recomendada para ${goalText}: ${ctx.time} min con ${deload ? "volumen reducido" : "progresión normal"}. Contexto: ${sorenessMap[ctx.soreness]}.`,
     },
     {
-      name: "Progresion",
+      name: "Progresión",
       score: deload ? "Deload" : "+2,5%",
       text: deload
-        ? "Manten el peso y baja 1 serie por ejercicio. El objetivo de hoy es calidad, no record."
-        : "Sube 2,5 kg en el primer basico si completas todas las series con RPE 8 o menos.",
+        ? "Mantén el peso y baja 1 serie por ejercicio. El objetivo de hoy es calidad, no récord."
+        : "Sube 2,5 kg en el primer básico si completas todas las series con RPE 8 o menos.",
     },
     {
-      name: "Tecnica",
+      name: "Técnica",
       score: "3 cues",
       text: ctx.soreness === "shoulder"
-        ? "Reduce rango si molesta, codos 30-45 grados, escapulas estables y sin rebote."
-        : "Graba la serie top, revisa recorrido completo, velocidad estable y control excentrico.",
+        ? "Reduce rango si molesta, codos 30-45 grados, escápulas estables y sin rebote."
+        : "Graba la serie top, revisa recorrido completo, velocidad estable y control excéntrico.",
     },
     {
-      name: "Recuperacion",
+      name: "Recuperación",
       score: `${ctx.recovery}%`,
       text: ctx.recovery >= 78
-        ? "Puedes entrenar fuerte, pero deja 1 repeticion en recamara en accesorios."
-        : "Prioriza sueno, descansos largos y evita llegar al fallo en mas de una serie.",
+        ? "Puedes entrenar fuerte, pero deja 1 repetición en recámara en accesorios."
+        : "Prioriza sueño, descansos largos y evita llegar al fallo en más de una serie.",
     },
     {
-      name: "Nutricion",
-      score: ctx.goal === "fatloss" ? "Deficit" : "Proteina",
+      name: "Nutrición",
+      score: ctx.goal === "fatloss" ? "Déficit" : "Proteína",
       text: ctx.goal === "fatloss"
-        ? "Manten proteina alta y deja carbohidratos alrededor del entreno para rendir."
-        : "Apunta a 1,8-2,2 g/kg de proteina y carbohidratos antes de la sesion.",
+        ? "Mantén proteína alta y deja carbohidratos alrededor del entreno para rendir."
+        : "Apunta a 1,8-2,2 g/kg de proteína y carbohidratos antes de la sesión.",
     },
     {
       name: "Riesgo",
       score: deload ? "Alerta" : "OK",
       text: deload
-        ? "Senal de fatiga: hoy conviene recortar volumen y no perseguir marcas."
+        ? "Señal de fatiga: hoy conviene recortar volumen y no perseguir marcas."
         : "Riesgo bajo. Calienta progresivo y respeta el temporizador.",
     },
   ];
@@ -1036,17 +1052,17 @@ function answerAIQuestion(question) {
   const ctx = collectTrainingContext();
   const q = question.toLowerCase();
   if (q.includes("dolor") || q.includes("hombro") || q.includes("rodilla") || q.includes("espalda")) {
-    return "Reduce rango, baja carga un 10-20% y cambia a variante estable. Si el dolor es punzante o cambia tu tecnica, corta esa serie.";
+    return "Reduce rango, baja carga un 10-20% y cambia a variante estable. Si el dolor es punzante o cambia tu técnica, corta esa serie.";
   }
   if (q.includes("peso") || q.includes("subo") || q.includes("progres")) {
     return ctx.recovery >= 75
-      ? "Si: sube poco, 2-2,5 kg en basicos o una repeticion por serie en accesorios. Si pasas de RPE 9, vuelve al peso anterior."
-      : "Hoy no subiria peso. Manten carga, mejora tecnica y busca repetir rendimiento con menos fatiga.";
+      ? "Sí: sube poco, 2-2,5 kg en básicos o una repetición por serie en accesorios. Si pasas de RPE 9, vuelve al peso anterior."
+      : "Hoy no subiría peso. Mantén carga, mejora técnica y busca repetir rendimiento con menos fatiga.";
   }
   if (q.includes("comer") || q.includes("prote") || q.includes("nutri")) {
-    return "Base simple: proteina alta, sal e hidratacion antes de entrenar, carbohidrato facil 60-120 min antes si la sesion es dura.";
+    return "Base simple: proteína alta, sal e hidratación antes de entrenar, carbohidrato fácil 60-120 min antes si la sesión es dura.";
   }
-  return "Para hoy prioriza adherencia: elige 4 ejercicios, deja 1-2 repeticiones en recamara y registra todo. Manana ajusto progresion con lo que completes.";
+  return "Para hoy prioriza adherencia: elige 4 ejercicios, deja 1-2 repeticiones en recámara y registra todo. Mañana ajusto progresión con lo que completes.";
 }
 
 function loadMealLog() {
@@ -1167,7 +1183,7 @@ function renderNutrition() {
   $("#nutrition-date").textContent = new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "short" }).format(new Date());
   $("#macro-rings").innerHTML = [
     ["Kcal", totals.kcal, targets.kcal],
-    ["Proteina", totals.protein, targets.protein, "g"],
+    ["Proteína", totals.protein, targets.protein, "g"],
     ["Carbos", totals.carbs, targets.carbs, "g"],
     ["Grasas", totals.fat, targets.fat, "g"],
   ]
@@ -1179,7 +1195,7 @@ function renderNutrition() {
   $("#daily-summary").innerHTML = `
     <div><span>Consumido</span><strong>${totals.kcal} kcal</strong></div>
     <div><span>Restante</span><strong>${Math.max(0, targets.kcal - totals.kcal)} kcal</strong></div>
-    <div><span>Proteina</span><strong>${totals.protein} / ${targets.protein} g</strong></div>
+    <div><span>Proteína</span><strong>${totals.protein} / ${targets.protein} g</strong></div>
   `;
   $("#meal-log").innerHTML = meals.length
     ? meals
@@ -1199,9 +1215,9 @@ function renderNutritionCoach(totals, targets) {
   const remaining = targets.kcal - totals.kcal;
   const proteinLeft = targets.protein - totals.protein;
   const messages = [
-    remaining > 500 ? `Te quedan ${remaining} kcal. Prioriza una comida con proteina y carbohidrato si vas a entrenar.` : `Vas cerca del objetivo. Manten comidas simples para no pasarte.`,
-    proteinLeft > 25 ? `Faltan ${Math.round(proteinLeft)} g de proteina. Buena opcion: pollo, yogur griego, whey o atun.` : "Proteina bien encaminada.",
-    totals.fat > targets.fat ? "Grasas por encima del objetivo: el resto del dia usa carnes magras y evita aceite/frutos secos." : "Grasas bajo control.",
+    remaining > 500 ? `Te quedan ${remaining} kcal. Prioriza una comida con proteína y carbohidrato si vas a entrenar.` : `Vas cerca del objetivo. Mantén comidas simples para no pasarte.`,
+    proteinLeft > 25 ? `Faltan ${Math.round(proteinLeft)} g de proteína. Buena opción: pollo, yogur griego, whey o atún.` : "Proteína bien encaminada.",
+    totals.fat > targets.fat ? "Grasas por encima del objetivo: el resto del día usa carnes magras y evita aceite/frutos secos." : "Grasas bajo control.",
   ];
   $("#nutrition-coach").innerHTML = messages.map((msg) => `<div class="coach-note">${msg}</div>`).join("");
 }
@@ -1264,6 +1280,7 @@ function openExercise(id) {
   `;
   renderCues();
   $("#exercise-dialog").showModal();
+  startDialogAnimation();
 }
 
 function renderMuscleAtlas() {
@@ -1297,11 +1314,11 @@ function muscleDataUri(muscle, side = "front") {
         <path d="M150 102c28 16 42 50 48 86l-32 7c-6-30-14-50-28-62z" fill="${mark(isBack ? "Espalda" : "Pecho")}"/>
         <path d="M72 96h66c18 38 18 90 0 132H72c-18-42-18-94 0-132z" fill="${mark(isBack ? "Espalda" : "Pecho")}"/>
         <path d="M88 112c10 40 10 78 0 112M122 112c-10 40-10 78 0 112" stroke="#050505" stroke-opacity=".35" stroke-width="4"/>
-        <path d="M48 186c-9 34-12 68-8 100l30 1c2-33 5-63 14-90z" fill="${mark("Biceps")}"/>
-        <path d="M162 186c9 34 12 68 8 100l-30 1c-2-33-5-63-14-90z" fill="${mark("Triceps")}"/>
-        <path d="M74 230h30v124H56c0-42 7-84 18-124z" fill="${mark("Cuadriceps")}"/>
-        <path d="M106 230h30c11 40 18 82 18 124h-48z" fill="${mark(isBack ? "Isquiotibiales" : "Cuadriceps")}"/>
-        <path d="M75 230c20 18 40 18 60 0l-8 54H83z" fill="${mark("Gluteos")}" opacity="${isBack ? "1" : ".28"}"/>
+        <path d="M48 186c-9 34-12 68-8 100l30 1c2-33 5-63 14-90z" fill="${mark("Bíceps")}"/>
+        <path d="M162 186c9 34 12 68 8 100l-30 1c-2-33-5-63-14-90z" fill="${mark("Tríceps")}"/>
+        <path d="M74 230h30v124H56c0-42 7-84 18-124z" fill="${mark("Cuádriceps")}"/>
+        <path d="M106 230h30c11 40 18 82 18 124h-48z" fill="${mark(isBack ? "Isquiotibiales" : "Cuádriceps")}"/>
+        <path d="M75 230c20 18 40 18 60 0l-8 54H83z" fill="${mark("Glúteos")}" opacity="${isBack ? "1" : ".28"}"/>
         <path d="M82 106h46v118H82z" fill="${mark("Abdominales")}" opacity="${!isBack && muscle === "Abdominales" ? "1" : "0"}"/>
         <path d="M48 96c16-18 34-26 54-26s38 8 60 26l-18 42c-16-18-28-26-42-26s-26 8-38 26z" fill="${mark("Hombros")}" opacity=".96"/>
         <path d="M58 354h42l-4 42H60zM110 354h42l-2 42h-36z" fill="${muscle === "Gemelo" || muscle === "Gemelos" ? active : base}"/>
@@ -1379,7 +1396,7 @@ function bindEvents() {
     if (demoButton) {
       state.selectedExercise = findExercise(demoButton.dataset.demo);
       renderCues();
-      showToast(`${state.selectedExercise.name}: guia cargada.`);
+      showToast(`${state.selectedExercise.name}: guía cargada.`);
     }
 
     const addSetButton = event.target.closest("[data-add-set]");
@@ -1431,6 +1448,7 @@ function bindEvents() {
     renderCues();
   });
   $("#close-dialog").addEventListener("click", () => $("#exercise-dialog").close());
+  $("#exercise-dialog").addEventListener("close", stopDialogAnimation);
   $("#add-to-workout").addEventListener("click", () => {
     addExerciseToWorkout(state.selectedExercise.id);
     $("#exercise-dialog").close();
