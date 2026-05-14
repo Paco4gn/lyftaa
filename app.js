@@ -1802,8 +1802,25 @@ function renderHealthInputs() {
 function renderAuthStatus() {
   const status = $("#auth-status");
   if (!status) return;
-  const mode = apiOnline ? "backend conectado" : "modo local";
-  status.textContent = appData.account ? `Cuenta iniciada (${mode}): ${appData.account.email}` : `Sin iniciar sesion (${mode})`;
+  const help = $("#auth-help");
+  const isRealAccount = appData.account?.mode === "api" && apiOnline;
+  if (isRealAccount) {
+    status.textContent = `Cuenta real iniciada (SQLite): ${appData.account.email}`;
+    if (help) help.textContent = "Tus datos se guardan en la base de datos del backend y se separan por usuario.";
+    return;
+  }
+  if (apiOnline) {
+    status.textContent = "Backend conectado. Puedes crear cuenta o iniciar sesion real.";
+    if (help) help.textContent = "Registro, login, rutinas, comidas, entrenos y perfil se guardaran en SQLite.";
+    return;
+  }
+  status.textContent = "Sin backend conectado. No hay cuenta real ni sincronizacion.";
+  if (help) help.textContent = "Abre la app con npm start y entra en http://127.0.0.1:5174/ para usar usuarios reales y base de datos.";
+}
+
+function showBackendRequired() {
+  showToast("No hay backend conectado. Ejecuta npm start y abre http://127.0.0.1:5174/ para cuenta real.");
+  renderAuthStatus();
 }
 
 function renderProfileInputs() {
@@ -2134,8 +2151,8 @@ async function registerLocalAccount() {
       return;
     }
   } else {
-    appData.account = { email, createdAt: new Date().toISOString(), mode: "local-demo" };
-    showToast("Cuenta local creada. Arranca npm start para cuenta con backend.");
+    showBackendRequired();
+    return;
   }
   saveAppData();
   renderAuthStatus();
@@ -2163,10 +2180,7 @@ async function loginLocalAccount() {
       return;
     }
   }
-  appData.account = { email, lastLogin: new Date().toISOString(), mode: "local-demo" };
-  saveAppData();
-  renderAuthStatus();
-  showToast("Sesion local iniciada.");
+  showBackendRequired();
 }
 
 async function deleteLocalAccount() {
