@@ -257,6 +257,8 @@ const weeklyRoutinePlan = [
   },
 ];
 
+const defaultRoutinePlan = cloneData(weeklyRoutinePlan);
+
 const progressData = {
   volume: [22400, 24750, 23820, 26800, 30340, 31800, 34820],
   orm: [98, 101, 102, 105, 108, 110, 112],
@@ -462,14 +464,29 @@ async function loadApiUserData() {
   if (!firebaseOnline && !apiToken) return;
   try {
     const data = await apiRequest("/api/export");
-    appData.profile = { ...appData.profile, ...data.profile };
-    appData.health = { ...appData.health, ...data.health };
-    if (Array.isArray(data.habits) && data.habits.length) appData.habits = data.habits;
-    if (Array.isArray(data.routines) && data.routines.length) weeklyRoutinePlan.splice(0, weeklyRoutinePlan.length, ...data.routines);
+    const currentAccount = appData.account;
+    appData = {
+      ...cloneData(defaultAppData),
+      account: currentAccount,
+      profile: { ...cloneData(defaultAppData.profile), ...(data.profile || {}) },
+      health: { ...cloneData(defaultAppData.health), ...(data.health || {}) },
+      habits: Array.isArray(data.habits) ? data.habits : cloneData(defaultAppData.habits),
+      photoItems: Array.isArray(data.foodPhotoResults?.[0]?.items) ? data.foodPhotoResults[0].items : cloneData(defaultAppData.photoItems),
+    };
+    weeklyRoutinePlan.splice(
+      0,
+      weeklyRoutinePlan.length,
+      ...(Array.isArray(data.routines) && data.routines.length ? data.routines : cloneData(defaultRoutinePlan))
+    );
     if (Array.isArray(data.meals)) {
       mealLog = data.meals.map((meal) => ({ ...meal, date: meal.date || new Date().toISOString().slice(0, 10) }));
       saveMealLog();
+    } else {
+      mealLog = [];
+      saveMealLog();
     }
+    state.activeWorkout = createWorkout("push");
+    saveWorkout();
     saveAppData();
     renderAllAppData();
   } catch {
@@ -477,6 +494,15 @@ async function loadApiUserData() {
     localStorage.removeItem("liftlab-api-token");
     firebaseOnline = false;
   }
+}
+
+function resetLocalUserState(account = null) {
+  appData = { ...cloneData(defaultAppData), account };
+  mealLog = [];
+  state.activeWorkout = createWorkout("push");
+  localStorage.setItem("liftlab-app-data", JSON.stringify(appData));
+  localStorage.setItem("liftlab-meals", JSON.stringify(mealLog));
+  localStorage.setItem("liftlab-workout", JSON.stringify(state.activeWorkout));
 }
 
 async function pushApi(path, data) {
@@ -2227,6 +2253,7 @@ async function registerLocalAccount() {
       await pushApi("/api/health", appData.health);
       await pushApi("/api/habits", appData.habits);
       await pushApi("/api/routines", weeklyRoutinePlan);
+      await loadApiUserData();
       showToast(firebaseOnline ? "Cuenta real creada en Firebase." : "Cuenta real creada en backend local.");
     } catch (error) {
       showToast(authErrorMessage(error));
@@ -2565,10 +2592,10 @@ function bindEvents() {
   });
   $("#mock-logout")?.addEventListener("click", async () => {
     if (firebaseOnline) await apiRequest("/api/auth/logout", { method: "POST" }).catch(() => {});
-    appData.account = null;
     apiToken = "";
     localStorage.removeItem("liftlab-api-token");
-    saveAppData();
+    resetLocalUserState(null);
+    renderAllAppData();
     renderAuthStatus();
     showToast("Sesion cerrada.");
   });
