@@ -9,10 +9,17 @@
     "public": ".",
     "ignore": [
       "firebase.json",
+      "firestore.rules",
+      "storage.rules",
+      "README.md",
+      "package.json",
+      "package-lock.json",
       "**/.*",
       "**/node_modules/**",
       "server/**",
-      "data/**"
+      "data/**",
+      "docs/**",
+      "scripts/**"
     ],
     "headers": [
       {

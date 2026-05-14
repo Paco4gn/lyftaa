@@ -1886,6 +1886,21 @@ function showBackendRequired() {
   renderAuthStatus();
 }
 
+function authErrorMessage(error) {
+  const message = String(error?.message || error || "");
+  if (message.includes("auth/configuration-not-found") || message.includes("CONFIGURATION_NOT_FOUND")) {
+    return "Firebase Auth aun no esta activado. En Firebase Console activa Authentication > Email/Password.";
+  }
+  if (message.includes("auth/operation-not-allowed")) {
+    return "Activa el proveedor Email/Password en Firebase Authentication.";
+  }
+  if (message.includes("auth/email-already-in-use")) return "Ese email ya tiene cuenta. Inicia sesion.";
+  if (message.includes("auth/invalid-credential") || message.includes("auth/wrong-password")) return "Email o contrasena incorrectos.";
+  if (message.includes("auth/weak-password")) return "La contrasena debe tener al menos 6 caracteres.";
+  if (message.includes("auth/invalid-email")) return "El email no es valido.";
+  return message || "No se pudo completar la accion de cuenta.";
+}
+
 function renderProfileInputs() {
   const profile = appData.profile;
   const fields = {
@@ -2213,7 +2228,7 @@ async function registerLocalAccount() {
       await pushApi("/api/routines", weeklyRoutinePlan);
       showToast(firebaseOnline ? "Cuenta real creada en Firebase." : "Cuenta real creada en backend local.");
     } catch (error) {
-      showToast(error.message);
+      showToast(authErrorMessage(error));
       return;
     }
   } else {
@@ -2242,7 +2257,7 @@ async function loginLocalAccount() {
       showToast(firebaseOnline ? "Sesion iniciada con Firebase." : "Sesion iniciada con backend.");
       return;
     } catch (error) {
-      showToast(error.message);
+      showToast(authErrorMessage(error));
       return;
     }
   }
@@ -2526,7 +2541,7 @@ function bindEvents() {
     if (await detectApi()) {
       await apiRequest("/api/auth/reset", { method: "POST", body: { email } })
         .then(() => showToast(firebaseOnline ? "Email de recuperacion enviado por Firebase." : "Recuperacion preparada por backend."))
-        .catch((error) => showToast(error.message));
+        .catch((error) => showToast(authErrorMessage(error)));
     } else {
       showBackendRequired();
     }

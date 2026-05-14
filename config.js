@@ -6,12 +6,12 @@ window.LIFTLAB_CONFIG = {
   // 4. Enable Storage if you want progress/food photos.
   // 5. Replace these values with your Firebase web app config.
   firebase: {
-    apiKey: "",
-    authDomain: "",
-    projectId: "",
-    storageBucket: "",
-    messagingSenderId: "",
-    appId: "",
+    apiKey: "AIzaSyDzoVpQbygSRocISGJyJaSjrlgfJ_x_W9o",
+    authDomain: "lyftaa-liftlab.firebaseapp.com",
+    projectId: "lyftaa-liftlab",
+    storageBucket: "lyftaa-liftlab.firebasestorage.app",
+    messagingSenderId: "378122603344",
+    appId: "1:378122603344:web:e4756d448259d37394ba55",
   },
 
   // Optional local/API fallback. Empty means "same origin", useful when `npm start`

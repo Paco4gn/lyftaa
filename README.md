@@ -40,6 +40,18 @@ Con Firebase configurado, LiftLab guarda por usuario:
 
 Los datos se guardan bajo `users/{uid}` y las reglas incluidas permiten leer/escribir solo al usuario autenticado.
 
+Proyecto creado y enlazado para LiftLab:
+
+- Firebase project ID: `lyftaa-liftlab`
+- Firebase Hosting: https://lyftaa-liftlab.web.app
+- Firebase Console: https://console.firebase.google.com/project/lyftaa-liftlab/overview
+
+Pendiente manual en Firebase Console:
+
+1. Abre Authentication > Sign-in method.
+2. Activa Email/Password y guarda.
+3. Si quieres guardar fotos reales en Firebase Storage, abre Storage > Get started. En proyectos nuevos Firebase puede pedir plan Blaze para crear el bucket; la app sigue funcionando sin pagos guardando la estimacion y los datos nutricionales sin subir foto.
+
 ## Configuracion
 
 Edita `config.js`:
