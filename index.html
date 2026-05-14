@@ -658,34 +658,34 @@
           <div class="community-grid">
             <section class="panel">
               <div class="panel-heading">
-                <h3>Reto mensual</h3>
-                <span class="pill">100.000 lb</span>
+                <h3>Reto privado mensual</h3>
+                <span class="pill" id="community-target-pill">45.000 kg</span>
               </div>
               <div class="challenge">
-                <div class="ring" style="--progress: 72">
-                  <strong>72%</strong>
+                <div class="ring" id="community-ring" style="--progress: 0">
+                  <strong id="community-ring-value">0%</strong>
                   <span>completado</span>
                 </div>
                 <div>
-                  <h4>Reto de fuerza de mayo</h4>
-                  <p class="subtle">Suma volumen total con tus sesiones registradas. Tu proyección supera el objetivo por 11%.</p>
-                  <button class="primary-button" id="share-progress-btn">Compartir avance</button>
+                  <h4>Reto privado de fuerza de mayo</h4>
+                  <p class="subtle" id="community-challenge-copy">Suma volumen solo con tus sesiones registradas. Estos datos no se comparten con otros usuarios.</p>
+                  <button class="primary-button" id="share-progress-btn">Guardar avance privado</button>
                 </div>
               </div>
             </section>
             <section class="panel">
               <div class="panel-heading">
-                <h3>Clasificacion</h3>
+                <h3>Mi progreso privado</h3>
               </div>
               <div class="leaderboard" id="leaderboard"></div>
             </section>
           </div>
           <section class="panel">
             <div class="panel-heading">
-              <h3>Amigos</h3>
+              <h3>Actividad privada</h3>
               <button class="ghost-button" id="add-friend-btn">
                 <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-                Seguir
+                Nota privada
               </button>
             </div>
             <div class="feed-list wide" id="community-feed"></div>
@@ -708,19 +708,19 @@
               </div>
               <label class="switch-row">
                 Perfil publico
-                <input type="checkbox" checked />
+                <input type="checkbox" id="public-profile-toggle" />
               </label>
               <label class="switch-row">
                 Descansos automaticos
-                <input type="checkbox" checked />
+                <input type="checkbox" id="auto-rest-toggle" checked />
               </label>
               <label class="switch-row">
                 Sincronizar con Salud
-                <input type="checkbox" />
+                <input type="checkbox" id="health-sync-toggle" />
               </label>
               <label class="switch-row">
                 Notificaciones de marcas
-                <input type="checkbox" checked />
+                <input type="checkbox" id="record-notifications-toggle" checked />
               </label>
             </section>
             <section class="panel">

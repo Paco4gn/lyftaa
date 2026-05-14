@@ -279,10 +279,9 @@ const muscleGroups = [
 ];
 
 const feed = [
-  ["MR", "Marta completo Tiron A", "9.430 kg - 58 min", "Marca"],
-  ["AL", "Alex supero el reto semanal", "14 entrenos este mes", "Reto"],
-  ["JS", "Jose guardo una rutina nueva", "Torso fuerza", "Rutina"],
-  ["LL", "Tu siguiente marca aparecera aqui", "Registra un entreno", "Marca"],
+  ["LL", "Tus marcas apareceran aqui", "Registra un entreno para crear historial privado", "Privado"],
+  ["LL", "Tu resumen semanal aparecera aqui", "Solo se carga con datos de tu cuenta", "Privado"],
+  ["LL", "Tus rutinas guardadas apareceran aqui", "Nadie ve esta actividad salvo tu", "Privado"],
 ];
 
 const foodDb = [
@@ -364,6 +363,17 @@ const defaultAppData = {
     workouts: 0,
     activityMinutes: 0,
   },
+  privacySettings: {
+    publicProfile: false,
+    autoRest: true,
+    healthSync: false,
+    recordNotifications: true,
+  },
+  communityProfile: {
+    public: false,
+    displayName: "Usuario",
+  },
+  communityPosts: [],
   habits: [
     { id: "water", label: "Beber 2 vasos de agua", done: false },
     { id: "steps", label: "Llegar al objetivo de pasos", done: false },
@@ -407,6 +417,9 @@ function loadAppData() {
       ...(stored || {}),
       profile: { ...defaultAppData.profile, ...(stored?.profile || {}) },
       health: { ...defaultAppData.health, ...(stored?.health || {}) },
+      privacySettings: { ...defaultAppData.privacySettings, ...(stored?.privacySettings || {}) },
+      communityProfile: { ...defaultAppData.communityProfile, ...(stored?.communityProfile || {}) },
+      communityPosts: Array.isArray(stored?.communityPosts) ? stored.communityPosts : [],
       habits: stored?.habits?.length ? stored.habits : cloneData(defaultAppData.habits),
       photoItems: stored?.photoItems?.length ? stored.photoItems : cloneData(defaultAppData.photoItems),
     };
@@ -476,6 +489,9 @@ async function loadApiUserData() {
       account: currentAccount,
       profile: { ...cloneData(defaultAppData.profile), ...(data.profile || {}) },
       health: { ...cloneData(defaultAppData.health), ...(data.health || {}) },
+      privacySettings: { ...cloneData(defaultAppData.privacySettings), ...(data.privacySettings || {}), publicProfile: Boolean(data.communityProfile?.public) },
+      communityProfile: { ...cloneData(defaultAppData.communityProfile), ...(data.communityProfile || {}) },
+      communityPosts: Array.isArray(data.communityPosts) ? data.communityPosts : [],
       habits: Array.isArray(data.habits) ? data.habits : cloneData(defaultAppData.habits),
       photoItems: Array.isArray(data.foodPhotoResults?.[0]?.items) ? data.foodPhotoResults[0].items : cloneData(defaultAppData.photoItems),
     };
@@ -1247,21 +1263,51 @@ function renderMilestones() {
 }
 
 function renderCommunity() {
+  const sets = state.activeWorkout.exercises.flatMap((entry) => entry.sets || []);
+  const completedSets = sets.filter((set) => set.done);
+  const volumeKg = completedSets.reduce((total, set) => total + Number(set.weight || 0) * Number(set.reps || 0), 0);
+  const targetKg = 45000;
+  const progress = Math.min(100, Math.round((volumeKg / targetKg) * 100));
+  const publicProfile = Boolean(appData.privacySettings?.publicProfile || appData.communityProfile?.public);
+  const ring = $("#community-ring");
+  const ringValue = $("#community-ring-value");
+  const challengeCopy = $("#community-challenge-copy") || $(".challenge .subtle");
+  if (ring) ring.style.setProperty("--progress", progress);
+  if (ringValue) ringValue.textContent = `${progress}%`;
+  if ($("#community-target-pill")) $("#community-target-pill").textContent = `${targetKg.toLocaleString("es-ES")} kg`;
+  if (challengeCopy) {
+    challengeCopy.textContent = "Suma volumen solo con tus sesiones registradas. Estos datos son privados por defecto y no se mezclan con otros usuarios.";
+  }
+
   $("#leaderboard").innerHTML = [
-    ["1", "Marta R.", "128.400 lb"],
-    ["2", appData.profile.name || "Tu perfil", `${Math.round(appData.profile.weight * 2.20462 * 1480).toLocaleString("es-ES")} lb`],
-    ["3", "Alex L.", "109.200 lb"],
-    ["4", "Jose S.", "96.850 lb"],
+    ["Volumen guardado", `${Math.round(volumeKg).toLocaleString("es-ES")} kg`, "Solo tu cuenta"],
+    ["Series completadas", `${completedSets.length}`, "Entreno actual"],
+    ["Pasos de hoy", `${Number(appData.health.steps || 0).toLocaleString("es-ES")}`, "Dato privado"],
+    ["Perfil publico", publicProfile ? "Activado" : "Desactivado", publicProfile ? "Solo si tu lo decides" : "Nadie ve tus datos"],
   ]
-    .map(([rank, name, score]) => `
+    .map(([metric, value, note]) => `
       <div class="leader-row">
-        <strong>${rank}</strong>
-        <span>${name}</span>
-        <small>${score}</small>
+        <strong>LL</strong>
+        <span>${escapeHtml(metric)}</span>
+        <small>${escapeHtml(value)} · ${escapeHtml(note)}</small>
       </div>
     `)
     .join("");
-  renderFeed("#community-feed");
+  const posts = Array.isArray(appData.communityPosts) ? appData.communityPosts.slice().reverse() : [];
+  $("#community-feed").innerHTML = posts.length
+    ? posts
+        .map((post) => `
+          <article class="feed-item">
+            <span class="thumb">${escapeHtml(initialsFromName(appData.profile.name))}</span>
+            <div>
+              <strong>${escapeHtml(post.title || "Avance privado")}</strong>
+              <small>${escapeHtml(post.text || "")}</small>
+            </div>
+            <span class="pill">${escapeHtml(post.privacy === "public" ? "Publico" : "Privado")}</span>
+          </article>
+        `)
+        .join("")
+    : `<div class="empty-state">No hay actividad compartida. Esta pantalla solo muestra tus propios datos y no enseña personas de ejemplo.</div>`;
 }
 
 function renderMeasures() {
@@ -2074,6 +2120,10 @@ function renderProfileInputs() {
   if ($("#nutri-age")) $("#nutri-age").value = profile.age;
   if ($("#nutri-sex")) $("#nutri-sex").value = profile.sex;
   if ($("#nutri-training-min")) $("#nutri-training-min").value = profile.sessionTime;
+  if ($("#public-profile-toggle")) $("#public-profile-toggle").checked = Boolean(appData.privacySettings?.publicProfile);
+  if ($("#auto-rest-toggle")) $("#auto-rest-toggle").checked = Boolean(appData.privacySettings?.autoRest);
+  if ($("#health-sync-toggle")) $("#health-sync-toggle").checked = Boolean(appData.privacySettings?.healthSync);
+  if ($("#record-notifications-toggle")) $("#record-notifications-toggle").checked = Boolean(appData.privacySettings?.recordNotifications);
 }
 
 function initialsFromName(name) {
@@ -2618,20 +2668,51 @@ function bindEvents() {
     drawProgressChart();
   });
   $("#add-friend-btn").addEventListener("click", async () => {
-    const friendship = { user: appData.profile.name, target: "Comunidad LiftLab", status: "following", createdAtLocal: new Date().toISOString() };
-    if (hasRealBackend()) await apiRequest("/api/community/friends", { method: "POST", body: friendship }).catch(() => {});
-    showToast(hasRealBackend() ? "Seguimiento guardado en tu cuenta." : "Seguimiento pendiente de sincronizacion.");
-  });
-  $("#share-progress-btn").addEventListener("click", async () => {
     const post = {
-      author: appData.profile.name,
-      text: `Semana al ${Math.round((appData.health.steps / appData.profile.steps) * 100)}% de pasos y ${Math.min(appData.profile.days, 5)} entrenos planificados.`,
-      privacy: appData.privacySettings?.publicProfile ? "public" : "private",
+      title: "Nota privada",
+      text: "Espacio reservado para tus avances. No se muestra a otros usuarios.",
+      privacy: "private",
       createdAtLocal: new Date().toISOString(),
     };
+    appData.communityPosts = [...(appData.communityPosts || []), post];
+    saveAppData();
+    renderCommunity();
     if (hasRealBackend()) await apiRequest("/api/community/posts", { method: "POST", body: post }).catch(() => {});
-    showToast(hasRealBackend() ? "Avance guardado en comunidad." : "Avance pendiente de sincronizacion.");
+    showToast(hasRealBackend() ? "Nota privada guardada en tu cuenta." : "Nota privada guardada en este dispositivo.");
+  });
+  $("#share-progress-btn").addEventListener("click", async () => {
+    const privacy = appData.privacySettings?.publicProfile ? "public" : "private";
+    const post = {
+      title: privacy === "public" ? "Avance listo para publicar" : "Avance privado",
+      text: `Semana al ${Math.round((appData.health.steps / appData.profile.steps) * 100)}% de pasos y ${Math.min(appData.profile.days, 5)} entrenos planificados.`,
+      privacy,
+      createdAtLocal: new Date().toISOString(),
+    };
+    appData.communityPosts = [...(appData.communityPosts || []), post];
+    saveAppData();
+    if (hasRealBackend()) await apiRequest("/api/community/posts", { method: "POST", body: post }).catch(() => {});
+    showToast(privacy === "public" ? "Avance guardado como publico en tu cuenta." : "Avance guardado privado. Nadie mas lo ve.");
     setView("community");
+  });
+  $("#public-profile-toggle")?.addEventListener("change", async (event) => {
+    appData.privacySettings.publicProfile = event.target.checked;
+    appData.communityProfile = { ...(appData.communityProfile || {}), public: event.target.checked, displayName: appData.profile.name };
+    saveAppData();
+    renderCommunity();
+    if (hasRealBackend()) await apiRequest("/api/community/profile", { method: "PUT", body: appData.communityProfile }).catch(() => {});
+    showToast(event.target.checked ? "Perfil publico activado por decision tuya." : "Perfil publico desactivado. Tus datos quedan privados.");
+  });
+  $("#auto-rest-toggle")?.addEventListener("change", (event) => {
+    appData.privacySettings.autoRest = event.target.checked;
+    saveAppData();
+  });
+  $("#health-sync-toggle")?.addEventListener("change", (event) => {
+    appData.privacySettings.healthSync = event.target.checked;
+    saveAppData();
+  });
+  $("#record-notifications-toggle")?.addEventListener("change", (event) => {
+    appData.privacySettings.recordNotifications = event.target.checked;
+    saveAppData();
   });
   $("#quick-log-workout")?.addEventListener("click", () => setView("workout"));
   $("#quick-log-meal")?.addEventListener("click", () => setView("nutrition"));

@@ -2150,6 +2150,14 @@ dialog canvas {
   padding: 10px;
 }
 
+.empty-state {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-strong);
+  color: var(--muted);
+  padding: 16px;
+}
+
 .profile-grid {
   grid-template-columns: 1fr 1fr;
 }
