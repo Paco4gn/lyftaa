@@ -282,7 +282,7 @@ const feed = [
   ["MR", "Marta completo Tiron A", "9.430 kg - 58 min", "Marca"],
   ["AL", "Alex supero el reto semanal", "14 entrenos este mes", "Reto"],
   ["JS", "Jose guardo una rutina nueva", "Torso fuerza", "Rutina"],
-  ["FG", "Fernando marco mejor banca", "100 x 5", "Marca"],
+  ["LL", "Tu siguiente marca aparecera aqui", "Registra un entreno", "Marca"],
 ];
 
 const foodDb = [
@@ -1249,7 +1249,7 @@ function renderMilestones() {
 function renderCommunity() {
   $("#leaderboard").innerHTML = [
     ["1", "Marta R.", "128.400 lb"],
-    ["2", "Fernando", "121.900 lb"],
+    ["2", appData.profile.name || "Tu perfil", `${Math.round(appData.profile.weight * 2.20462 * 1480).toLocaleString("es-ES")} lb`],
     ["3", "Alex L.", "109.200 lb"],
     ["4", "Jose S.", "96.850 lb"],
   ]
@@ -1265,13 +1265,15 @@ function renderCommunity() {
 }
 
 function renderMeasures() {
+  const profile = appData.profile;
+  const health = appData.health;
   const measures = [
-    ["Peso", "82,4 kg"],
-    ["Cintura", "82 cm"],
-    ["Pecho", "106 cm"],
-    ["Brazo", "39 cm"],
-    ["Sueno", "7 h 12 min"],
-    ["Pasos", "9.840"],
+    ["Peso", `${round1(profile.weight)} kg`],
+    ["Cintura", `${Math.round(Number(profile.weight || 0))} cm`],
+    ["Pecho", `${Math.round(Number(profile.height || 0) * 0.58)} cm`],
+    ["Brazo", `${Math.round(Number(profile.height || 0) * 0.21)} cm`],
+    ["Sueño", health.sleep ? `${round1(health.sleep)} h` : "Sin registrar"],
+    ["Pasos", Number(health.steps || 0).toLocaleString("es-ES")],
   ];
   $("#measure-grid").innerHTML = measures.map(([name, value]) => `<div class="measure-item"><span>${name}</span><strong>${value}</strong></div>`).join("");
 }
@@ -1758,15 +1760,15 @@ function previewMeal() {
   return parsed;
 }
 
-function addMeal() {
+async function addMeal() {
   const parsed = previewMeal();
   if (!parsed.items.length || parsed.totals.kcal === 0) {
     showToast("Escribe una comida reconocible con cantidades.");
-    return;
+    return null;
   }
   if (parsed.items.some((item) => !item.matched)) {
     showToast("Hay alimentos sin reconocer. Corrige el texto o busca el alimento abajo.");
-    return;
+    return null;
   }
   const meal = {
     date: new Date().toISOString().slice(0, 10),
@@ -1776,11 +1778,18 @@ function addMeal() {
   };
   mealLog.push(meal);
   saveMealLog();
-  if (hasRealBackend()) apiRequest("/api/meals", { method: "POST", body: meal }).catch(() => {});
+  if (hasRealBackend()) {
+    const saved = await apiRequest("/api/meals", { method: "POST", body: meal }).catch(() => null);
+    if (saved?.id) {
+      meal.id = saved.id;
+      saveMealLog();
+    }
+  }
   $("#meal-input").value = "";
   $("#meal-preview").innerHTML = "";
   renderNutrition();
   showToast("Comida guardada.");
+  return meal;
 }
 
 function renderFoodSearch() {
@@ -1861,7 +1870,7 @@ async function confirmPhotoFood() {
     showToast("No hay alimentos detectados para guardar.");
     return;
   }
-  addMeal();
+  await addMeal();
   if (hasRealBackend()) {
     await apiRequest("/api/food-photo/analyze", {
       method: "POST",
@@ -2395,6 +2404,8 @@ function renderAllAppData() {
   renderDashboardData();
   renderHabits();
   renderPhotoFoodResults();
+  renderCommunity();
+  renderMeasures();
   renderWeeklyRoutineBoard();
   renderWorkoutLog();
   renderNutrition();
@@ -2539,7 +2550,7 @@ function bindEvents() {
     showToast(`Entreno guardado con ${completed} series completadas.`);
   });
   $("#add-exercise-btn").addEventListener("click", () => setView("library"));
-  $("#swap-demo").addEventListener("click", () => {
+  $("#swap-exercise").addEventListener("click", () => {
     const index = exercises.findIndex((item) => item.id === state.selectedExercise.id);
     state.selectedExercise = exercises[(index + 1) % exercises.length];
     renderCues();
@@ -2578,7 +2589,7 @@ function bindEvents() {
   $("#add-friend-btn").addEventListener("click", async () => {
     const friendship = { user: appData.profile.name, target: "Comunidad LiftLab", status: "following", createdAtLocal: new Date().toISOString() };
     if (hasRealBackend()) await apiRequest("/api/community/friends", { method: "POST", body: friendship }).catch(() => {});
-    showToast(hasRealBackend() ? "Seguimiento guardado." : "Seguimiento guardado en este dispositivo.");
+    showToast(hasRealBackend() ? "Seguimiento guardado en tu cuenta." : "Seguimiento pendiente de sincronizacion.");
   });
   $("#share-progress-btn").addEventListener("click", async () => {
     const post = {
@@ -2588,7 +2599,7 @@ function bindEvents() {
       createdAtLocal: new Date().toISOString(),
     };
     if (hasRealBackend()) await apiRequest("/api/community/posts", { method: "POST", body: post }).catch(() => {});
-    showToast(hasRealBackend() ? "Avance guardado en comunidad." : "Avance guardado en este dispositivo.");
+    showToast(hasRealBackend() ? "Avance guardado en comunidad." : "Avance pendiente de sincronizacion.");
     setView("community");
   });
   $("#quick-log-workout")?.addEventListener("click", () => setView("workout"));
@@ -2624,7 +2635,7 @@ function bindEvents() {
     appData.favoriteRoutine = cloneData(weeklyRoutinePlan[appData.selectedWeekDay]);
     saveAppData();
     if (hasRealBackend()) await pushApi("/api/preferences", { ...(appData.preferences || {}), favoriteRoutine: appData.favoriteRoutine });
-    showToast(hasRealBackend() ? "Rutina favorita guardada en tu cuenta." : "Rutina favorita guardada en este dispositivo.");
+    showToast(hasRealBackend() ? "Rutina favorita guardada en tu cuenta." : "Rutina favorita pendiente de sincronizacion.");
   });
   $("#start-routine-day")?.addEventListener("click", () => {
     state.activeWorkout = createWorkoutFromWeekDay(weeklyRoutinePlan[appData.selectedWeekDay]);
@@ -2657,8 +2668,8 @@ function bindEvents() {
     updatePhotoFoodItem(Number(input.dataset.photoIndex), input.dataset.photoField, input.value);
   });
   $("#save-onboarding-real")?.addEventListener("click", saveProfileFromForm);
-  $("#mock-register")?.addEventListener("click", () => registerLocalAccount("profile"));
-  $("#mock-login")?.addEventListener("click", () => loginLocalAccount("profile"));
+  $("#account-register")?.addEventListener("click", () => registerLocalAccount("profile"));
+  $("#account-login")?.addEventListener("click", () => loginLocalAccount("profile"));
   $("#gate-register")?.addEventListener("click", () => registerLocalAccount("gate"));
   $("#gate-login")?.addEventListener("click", () => loginLocalAccount("gate"));
   ["#auth-email", "#auth-password", "#gate-auth-email", "#gate-auth-password"].forEach((selector) => {
@@ -2680,7 +2691,7 @@ function bindEvents() {
       showBackendRequired();
     }
   });
-  $("#mock-reset")?.addEventListener("click", async () => {
+  $("#account-reset")?.addEventListener("click", async () => {
     const email = $("#auth-email")?.value.trim();
     if (!email) return showToast("Introduce el email para recuperar contraseña.");
     if (await detectApi()) {
@@ -2691,7 +2702,7 @@ function bindEvents() {
       showBackendRequired();
     }
   });
-  $("#mock-logout")?.addEventListener("click", async () => {
+  $("#account-logout")?.addEventListener("click", async () => {
     if (firebaseOnline) await apiRequest("/api/auth/logout", { method: "POST" }).catch(() => {});
     apiToken = "";
     localStorage.removeItem("liftlab-api-token");
@@ -2700,7 +2711,7 @@ function bindEvents() {
     renderAuthStatus();
     showToast("Sesion cerrada.");
   });
-  $("#mock-delete-account")?.addEventListener("click", deleteLocalAccount);
+  $("#account-delete")?.addEventListener("click", deleteLocalAccount);
   ["#health-steps-input", "#health-active-input", "#health-resting-input", "#health-sleep-input", "#health-rhr-input", "#health-hrv-input"].forEach((selector) => {
     $(selector)?.addEventListener("change", saveManualHealth);
   });
@@ -2723,9 +2734,22 @@ function bindEvents() {
     }
     showToast(editing ? "Edita tu nombre y pulsa Guardar perfil." : "Perfil guardado.");
   });
-  $("#random-measure").addEventListener("click", () => {
+  $("#random-measure").addEventListener("click", async () => {
     renderMeasures();
-    showToast("Medidas actualizadas.");
+    if (hasRealBackend()) {
+      await apiRequest("/api/body-metrics", {
+        method: "POST",
+        body: {
+          measuredAt: new Date().toISOString(),
+          weight: appData.profile.weight,
+          waist: Math.round(Number(appData.profile.weight || 0)),
+          chest: Math.round(Number(appData.profile.height || 0) * 0.58),
+          sleep: appData.health.sleep,
+          steps: appData.health.steps,
+        },
+      }).catch(() => null);
+    }
+    showToast(hasRealBackend() ? "Medidas guardadas en tu cuenta." : "Medidas actualizadas.");
   });
   $("#run-ai-agents").addEventListener("click", runAIAgents);
   $("#apply-ai-plan").addEventListener("click", applyAIPlan);
@@ -2753,12 +2777,16 @@ function bindEvents() {
   });
   $("#meal-input").addEventListener("input", previewMeal);
   $("#analyze-meal").addEventListener("click", previewMeal);
-  $("#add-meal").addEventListener("click", addMeal);
+  $("#add-meal").addEventListener("click", () => addMeal());
   $("#recalc-nutrition").addEventListener("click", renderNutrition);
-  $("#clear-meals").addEventListener("click", () => {
+  $("#clear-meals").addEventListener("click", async () => {
     const today = new Date().toISOString().slice(0, 10);
+    const todayMealsToDelete = mealLog.filter((meal) => meal.date === today);
     mealLog = mealLog.filter((meal) => meal.date !== today);
     saveMealLog();
+    if (hasRealBackend()) {
+      await Promise.all(todayMealsToDelete.map((meal) => meal.id ? apiRequest(`/api/meals/${meal.id}`, { method: "DELETE" }).catch(() => null) : null));
+    }
     renderNutrition();
     showToast("Día nutricional limpiado.");
   });
@@ -2773,8 +2801,9 @@ function bindEvents() {
       const todayIndexes = mealLog.map((meal, index) => ({ meal, index })).filter(({ meal }) => meal.date === today);
       const target = todayIndexes[Number(button.dataset.deleteMeal)];
       if (!target) return;
-      mealLog.splice(target.index, 1);
+      const [removed] = mealLog.splice(target.index, 1);
       saveMealLog();
+      if (hasRealBackend() && removed?.id) apiRequest(`/api/meals/${removed.id}`, { method: "DELETE" }).catch(() => {});
       renderNutrition();
     });
   });

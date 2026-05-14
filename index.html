@@ -308,30 +308,30 @@
             <div class="panel-heading">
               <div>
                 <h3>Cuestionario inicial funcional</h3>
-                <p class="subtle">Estos datos se guardan en este dispositivo y personalizan dashboard, rutina y nutricion.</p>
+                <p class="subtle">Estos datos se guardan en Firebase para tu usuario y personalizan dashboard, rutina y nutricion.</p>
               </div>
               <button class="primary-button" id="save-onboarding-real">Guardar y personalizar</button>
             </div>
             <div class="onboarding-real-grid">
-              <label>Nombre<input id="profile-name-input" value="Fernando"></label>
-              <label>Edad<input id="profile-age-input" type="number" value="35"></label>
+              <label>Nombre<input id="profile-name-input" value="Usuario"></label>
+              <label>Edad<input id="profile-age-input" type="number" value="30"></label>
               <label>Sexo<select id="profile-sex-input"><option value="male">Hombre</option><option value="female">Mujer</option></select></label>
               <label>Altura cm<input id="profile-height-input" type="number" value="178"></label>
               <label>Peso kg<input id="profile-weight-input" type="number" value="82"></label>
               <label>Objetivo principal<select id="profile-goal-input"><option>Ganar músculo</option><option>Perder grasa</option><option>Mantenerse</option><option>Recomposición corporal</option><option>Mejorar fuerza</option><option>Mejorar resistencia</option><option>Salud general</option><option>Tonificar</option><option>Volver tras pausa</option></select></label>
               <label>Objetivo secundario<input id="profile-secondary-goal-input" value="Mejorar salud general"></label>
-              <label>Nivel<select id="profile-level-input"><option>Principiante</option><option selected>Intermedio</option><option>Avanzado</option></select></label>
-              <label>Dias disponibles<input id="profile-days-input" type="number" value="5" min="1" max="7"></label>
+              <label>Nivel<select id="profile-level-input"><option selected>Principiante</option><option>Intermedio</option><option>Avanzado</option></select></label>
+              <label>Dias disponibles<input id="profile-days-input" type="number" value="3" min="1" max="7"></label>
               <label>Tiempo por sesion<input id="profile-session-time-input" type="number" value="60"></label>
               <label>Lugar<select id="profile-place-input"><option>Gimnasio</option><option>Casa</option><option>Exterior</option></select></label>
-              <label>Material<input id="profile-equipment-input" value="Barra, mancuernas, polea, maquinas"></label>
+              <label>Material<input id="profile-equipment-input" placeholder="Barra, mancuernas, polea, maquinas"></label>
               <label>Lesiones o molestias<input id="profile-injuries-input" placeholder="Hombro, rodilla, espalda..."></label>
               <label>Enfermedades relevantes<input id="profile-medical-input" placeholder="Opcional"></label>
               <label>Sueño<select id="profile-sleep-input"><option>Malo</option><option selected>Normal</option><option>Bueno</option></select></label>
               <label>Estrés<select id="profile-stress-input"><option>Bajo</option><option selected>Medio</option><option>Alto</option></select></label>
               <label>Trabajo<select id="profile-work-input"><option>Sedentario</option><option selected>Mixto</option><option>Activo</option></select></label>
               <label>Pasos diarios<input id="profile-steps-input" type="number" value="8000"></label>
-              <label>Preferencia alimentaria<input id="profile-diet-input" value="Alta en proteina"></label>
+              <label>Preferencia alimentaria<input id="profile-diet-input" placeholder="Alta en proteina, vegetariana, sin lactosa..."></label>
               <label>Alergias<input id="profile-allergies-input" placeholder="Sin alergias"></label>
               <label>Intolerancias<input id="profile-intolerances-input" placeholder="Sin intolerancias"></label>
               <label>No me gusta<input id="profile-dislikes-input" placeholder="Alimentos a evitar"></label>
@@ -565,7 +565,7 @@
             <aside class="panel coach-panel">
               <div class="panel-heading">
                 <h3>Guia visual</h3>
-                <button class="icon-button" id="swap-demo" title="Cambiar ejercicio" aria-label="Cambiar ejercicio">
+                <button class="icon-button" id="swap-exercise" title="Cambiar ejercicio" aria-label="Cambiar ejercicio">
                   <svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>
                 </button>
               </div>
@@ -737,13 +737,13 @@
               <div class="account-actions">
                 <input id="auth-email" type="text" inputmode="email" autocomplete="email" placeholder="email@liftlab.app" />
                 <input id="auth-password" type="password" placeholder="contraseña" />
-                <button class="ghost-button" id="mock-register">Crear cuenta</button>
-                <button class="ghost-button" id="mock-login">Iniciar sesion</button>
-                <button class="ghost-button" id="mock-reset">Recuperar contraseña</button>
-                <button class="ghost-button" id="mock-logout">Cerrar sesion</button>
-                <button class="ghost-button danger" id="mock-delete-account">Eliminar cuenta y datos</button>
+                <button class="ghost-button" id="account-register">Crear cuenta</button>
+                <button class="ghost-button" id="account-login">Iniciar sesion</button>
+                <button class="ghost-button" id="account-reset">Recuperar contraseña</button>
+                <button class="ghost-button" id="account-logout">Cerrar sesion</button>
+                <button class="ghost-button danger" id="account-delete">Eliminar cuenta y datos</button>
               </div>
-              <div class="auth-status" id="auth-status">Cuenta real: sin iniciar sesion</div>
+              <div class="auth-status" id="auth-status">Sesion privada pendiente</div>
               <p class="subtle" id="auth-help">Para cuenta real configura Firebase en config.js. El backend local queda como respaldo con npm start.</p>
             </section>
             <section class="panel health-panel">
