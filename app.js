@@ -564,6 +564,14 @@ function setView(view) {
   if (view === "progress") drawProgressChart();
 }
 
+function openAccountPanel() {
+  setView("profile");
+  requestAnimationFrame(() => {
+    $(".account-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    $("#auth-email")?.focus();
+  });
+}
+
 function renderDate() {
   $("#today-label").textContent = new Intl.DateTimeFormat("es-ES", {
     weekday: "long",
@@ -2311,6 +2319,7 @@ function bindEvents() {
   });
 
   $("#timer-btn").addEventListener("click", () => startTimer(90));
+  $$(".account-shortcut").forEach((button) => button.addEventListener("click", openAccountPanel));
   $("#finish-workout-btn").addEventListener("click", () => {
     const completed = state.activeWorkout.exercises.flatMap((item) => item.sets).filter((set) => set.done).length;
     const durationMin = Number($("#ai-time")?.value || appData.profile.sessionTime || 60);
