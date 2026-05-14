@@ -1995,7 +1995,38 @@ function authErrorMessage(error) {
   if (message.includes("auth/invalid-credential") || message.includes("auth/wrong-password")) return "Email o contrasena incorrectos.";
   if (message.includes("auth/weak-password")) return "La contrasena debe tener al menos 6 caracteres.";
   if (message.includes("auth/invalid-email")) return "El email no es valido.";
+  if (message.includes("auth/network-request-failed")) return "Firebase no ha confirmado el envio. Comprueba conexion, espera un minuto y vuelve a probar con el email exacto.";
+  if (message.includes("auth/too-many-requests")) return "Firebase ha bloqueado temporalmente demasiados intentos. Espera unos minutos y vuelve a probar.";
+  if (message.includes("auth/user-not-found")) return "No existe cuenta con ese email. Revisa que este escrito exactamente igual.";
   return message || "No se pudo completar la accion de cuenta.";
+}
+
+async function sendPasswordReset(source = "profile") {
+  syncAuthInputs(source);
+  const inputEmail = source === "gate" ? $("#gate-auth-email")?.value.trim() : $("#auth-email")?.value.trim();
+  const email = inputEmail || appData.account?.email || "";
+  if (!email) return showToast("Introduce el email para recuperar contraseña.");
+  if (appData.account?.email && normalizeText(email) !== normalizeText(appData.account.email)) {
+    showToast(`Ojo: estas enviando el correo a ${email}, no a la cuenta iniciada ${appData.account.email}.`);
+  }
+  if (await detectApi()) {
+    await apiRequest("/api/auth/reset", { method: "POST", body: { email } })
+      .then((result) => showToast(`Correo solicitado para ${result.email || email}. Mira Spam/Promociones y comprueba que el email este bien escrito.`))
+      .catch((error) => showToast(authErrorMessage(error)));
+  } else {
+    showBackendRequired();
+  }
+}
+
+async function sendVerificationEmail() {
+  if (!isSignedIn()) return showToast("Inicia sesion para verificar tu email.");
+  if (await detectApi()) {
+    await apiRequest("/api/auth/verify-email", { method: "POST" })
+      .then((result) => showToast(`Correo de verificacion solicitado para ${result.email || appData.account.email}. Revisa Spam/Promociones.`))
+      .catch((error) => showToast(authErrorMessage(error)));
+  } else {
+    showBackendRequired();
+  }
 }
 
 function renderProfileInputs() {
@@ -2680,28 +2711,12 @@ function bindEvents() {
     });
   });
   $("#gate-reset")?.addEventListener("click", async () => {
-    syncAuthInputs("gate");
-    const email = $("#gate-auth-email")?.value.trim();
-    if (!email) return showToast("Introduce el email para recuperar contraseña.");
-    if (await detectApi()) {
-      await apiRequest("/api/auth/reset", { method: "POST", body: { email } })
-        .then(() => showToast(firebaseOnline ? "Email de recuperacion enviado por Firebase." : "Recuperacion preparada por backend."))
-        .catch((error) => showToast(authErrorMessage(error)));
-    } else {
-      showBackendRequired();
-    }
+    await sendPasswordReset("gate");
   });
   $("#account-reset")?.addEventListener("click", async () => {
-    const email = $("#auth-email")?.value.trim();
-    if (!email) return showToast("Introduce el email para recuperar contraseña.");
-    if (await detectApi()) {
-      await apiRequest("/api/auth/reset", { method: "POST", body: { email } })
-        .then(() => showToast(firebaseOnline ? "Email de recuperacion enviado por Firebase." : "Recuperacion preparada por backend."))
-        .catch((error) => showToast(authErrorMessage(error)));
-    } else {
-      showBackendRequired();
-    }
+    await sendPasswordReset("profile");
   });
+  $("#account-verify-email")?.addEventListener("click", sendVerificationEmail);
   $("#account-logout")?.addEventListener("click", async () => {
     if (firebaseOnline) await apiRequest("/api/auth/logout", { method: "POST" }).catch(() => {});
     apiToken = "";

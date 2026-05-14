@@ -4,6 +4,7 @@ import {
   deleteUser,
   getAuth,
   onAuthStateChanged,
+  sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
@@ -65,6 +66,7 @@ export async function createFirebaseBackend() {
 
   const app = initializeApp(config);
   const auth = getAuth(app);
+  auth.languageCode = "es";
   const db = getFirestore(app);
   const storage = getStorage(app);
   await waitForAuth(auth);
@@ -145,8 +147,16 @@ async function requestFirebase(ctx, path, options = {}) {
   }
 
   if (method === "POST" && path === "/api/auth/reset") {
-    await sendPasswordResetEmail(ctx.auth, body.email);
-    return { ok: true, message: "Email de recuperacion enviado por Firebase Auth." };
+    const email = String(body.email || ctx.auth.currentUser?.email || "").trim();
+    if (!email) throw new Error("Email requerido para recuperar contraseña");
+    await sendPasswordResetEmail(ctx.auth, email, actionCodeSettings());
+    return { ok: true, email, message: `Email de recuperacion solicitado para ${email}.` };
+  }
+
+  if (method === "POST" && path === "/api/auth/verify-email") {
+    const user = requireFirebaseUser(ctx.auth);
+    await sendEmailVerification(user, actionCodeSettings());
+    return { ok: true, email: user.email, message: `Email de verificacion solicitado para ${user.email}.` };
   }
 
   if (method === "POST" && path === "/api/auth/logout") {
@@ -192,7 +202,15 @@ async function sessionPayload(db, user) {
 }
 
 function publicUser(user) {
-  return user ? { id: user.uid, email: user.email, createdAt: user.metadata?.creationTime || null } : null;
+  return user ? { id: user.uid, email: user.email, emailVerified: Boolean(user.emailVerified), createdAt: user.metadata?.creationTime || null } : null;
+}
+
+function actionCodeSettings() {
+  const origin = window.location.origin || "https://lyftaa-liftlab.web.app";
+  return {
+    url: `${origin}/`,
+    handleCodeInApp: false,
+  };
 }
 
 function requireFirebaseUser(auth) {
