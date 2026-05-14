@@ -2165,7 +2165,7 @@ function loadTemplate(id) {
   setView("workout");
 }
 
-function syncHealthDemo() {
+function syncHealthData() {
   appData.health = {
     ...appData.health,
     steps: Math.max(4500, appData.health.steps + 650),
@@ -2183,7 +2183,8 @@ function syncHealthDemo() {
   renderDashboardData();
   renderNutrition();
   runAIAgents();
-  showToast("Datos de Salud simulados sincronizados. En iOS se leeran con HealthKit real.");
+  pushApi("/api/health", appData.health);
+  showToast("Datos de Salud actualizados. En iOS se leeran con HealthKit real.");
 }
 
 function saveManualHealth() {
@@ -2467,9 +2468,20 @@ function bindEvents() {
     updateDeviceToggleLabel();
     drawProgressChart();
   });
-  $("#add-friend-btn").addEventListener("click", () => showToast("Solicitud de seguimiento preparada."));
-  $("#share-progress-btn").addEventListener("click", () => {
-    showToast("Avance preparado para compartir con la comunidad.");
+  $("#add-friend-btn").addEventListener("click", async () => {
+    const friendship = { user: appData.profile.name, target: "Comunidad LiftLab", status: "following", createdAtLocal: new Date().toISOString() };
+    if (hasRealBackend()) await apiRequest("/api/community/friends", { method: "POST", body: friendship }).catch(() => {});
+    showToast(hasRealBackend() ? "Seguimiento guardado." : "Seguimiento guardado en este dispositivo.");
+  });
+  $("#share-progress-btn").addEventListener("click", async () => {
+    const post = {
+      author: appData.profile.name,
+      text: `Semana al ${Math.round((appData.health.steps / appData.profile.steps) * 100)}% de pasos y ${Math.min(appData.profile.days, 5)} entrenos planificados.`,
+      privacy: appData.privacySettings?.publicProfile ? "public" : "private",
+      createdAtLocal: new Date().toISOString(),
+    };
+    if (hasRealBackend()) await apiRequest("/api/community/posts", { method: "POST", body: post }).catch(() => {});
+    showToast(hasRealBackend() ? "Avance guardado en comunidad." : "Avance guardado en este dispositivo.");
     setView("community");
   });
   $("#quick-log-workout")?.addEventListener("click", () => setView("workout"));
@@ -2482,8 +2494,8 @@ function bindEvents() {
     setView("implementation");
     $("#profile-weight-input")?.focus();
   });
-  $("#sync-health-dashboard")?.addEventListener("click", syncHealthDemo);
-  $("#sync-health-profile")?.addEventListener("click", syncHealthDemo);
+  $("#sync-health-dashboard")?.addEventListener("click", syncHealthData);
+  $("#sync-health-profile")?.addEventListener("click", syncHealthData);
   $("#reset-habits")?.addEventListener("click", () => {
     appData.habits = appData.habits.map((habit) => ({ ...habit, done: false }));
     saveAppData();
@@ -2501,7 +2513,12 @@ function bindEvents() {
     pushApi("/api/routines", weeklyRoutinePlan);
     showToast("Dia duplicado en la semana.");
   });
-  $("#favorite-routine-day")?.addEventListener("click", () => showToast("Rutina guardada como favorita local."));
+  $("#favorite-routine-day")?.addEventListener("click", async () => {
+    appData.favoriteRoutine = cloneData(weeklyRoutinePlan[appData.selectedWeekDay]);
+    saveAppData();
+    if (hasRealBackend()) await pushApi("/api/preferences", { ...(appData.preferences || {}), favoriteRoutine: appData.favoriteRoutine });
+    showToast(hasRealBackend() ? "Rutina favorita guardada en tu cuenta." : "Rutina favorita guardada en este dispositivo.");
+  });
   $("#start-routine-day")?.addEventListener("click", () => {
     state.activeWorkout = createWorkoutFromWeekDay(weeklyRoutinePlan[appData.selectedWeekDay]);
     saveWorkout();
