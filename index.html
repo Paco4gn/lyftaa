@@ -196,7 +196,7 @@
             <div>
               <span class="pill">LiftLab 100% gratis</span>
               <h2>De maqueta visual a app real personalizada</h2>
-              <p>Esta es la hoja de trabajo visible dentro de la app: usuarios reales, onboarding, rutinas por dias, HealthKit, comida por foto, privacidad y MVP por fases.</p>
+              <p>Esta es la hoja de trabajo visible dentro de la app: usuarios reales con Firebase, onboarding, rutinas por dias, HealthKit, comida por foto, privacidad y MVP por fases.</p>
               <div class="hero-actions">
                 <button class="primary-button" data-view-shortcut="routines">Ver rutinas por dias</button>
                 <button class="ghost-button" data-view-shortcut="nutrition">Ver comida por foto</button>
@@ -205,8 +205,8 @@
             <div class="implementation-status">
               <strong>Estado actual</strong>
               <span>Base visual publicada</span>
-              <span>LocalStorage, sin backend real</span>
-              <span>Proximo paso: usuarios + base de datos</span>
+              <span>Firebase Auth, Firestore y Storage</span>
+              <span>Backend local solo como respaldo</span>
             </div>
           </div>
 
@@ -262,8 +262,8 @@
               </div>
               <div class="architecture-list">
                 <span>React + TypeScript</span>
-                <span>Supabase Auth</span>
-                <span>PostgreSQL con RLS</span>
+                <span>Firebase Auth</span>
+                <span>Firestore por usuario</span>
                 <span>Storage privado para fotos</span>
                 <span>React Native o SwiftUI para HealthKit</span>
                 <span>IA de comida con revision manual obligatoria</span>
@@ -536,7 +536,7 @@
                   <svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>
                 </button>
               </div>
-              <canvas id="exercise-canvas" width="520" height="360" aria-label="Demo animada de técnica"></canvas>
+              <canvas id="exercise-canvas" width="520" height="360" aria-label="Animacion tecnica"></canvas>
               <div class="cue-list" id="cue-list"></div>
             </aside>
           </div>
@@ -702,7 +702,7 @@
                 <h3>Cuenta y privacidad</h3>
               </div>
               <div class="account-actions">
-                <input id="auth-email" type="email" placeholder="email@liftlab.app" />
+                <input id="auth-email" type="text" inputmode="email" autocomplete="email" placeholder="email@liftlab.app" />
                 <input id="auth-password" type="password" placeholder="contraseña" />
                 <button class="ghost-button" id="mock-register">Crear cuenta</button>
                 <button class="ghost-button" id="mock-login">Iniciar sesion</button>
@@ -710,13 +710,13 @@
                 <button class="ghost-button" id="mock-logout">Cerrar sesion</button>
                 <button class="ghost-button danger" id="mock-delete-account">Eliminar cuenta y datos</button>
               </div>
-              <div class="auth-status" id="auth-status">Cuenta local: sin iniciar sesion</div>
-              <p class="subtle" id="auth-help">Para cuenta real usa la app con backend: npm start y abre http://127.0.0.1:5174/.</p>
+              <div class="auth-status" id="auth-status">Cuenta real: sin iniciar sesion</div>
+              <p class="subtle" id="auth-help">Para cuenta real configura Firebase en config.js. El backend local queda como respaldo con npm start.</p>
             </section>
             <section class="panel health-panel">
               <div class="panel-heading">
                 <h3>Salud del iPhone</h3>
-                <button class="text-button" id="sync-health-profile">Sincronizar demo</button>
+                <button class="text-button" id="sync-health-profile">Actualizar datos</button>
               </div>
               <div class="health-permission-list">
                 <span>Pasos</span>
@@ -841,6 +841,7 @@
         </div>
       </div>
     </div>
+    <script src="config.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

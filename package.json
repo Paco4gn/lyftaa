@@ -6,8 +6,10 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
-    "check": "node --check app.js && node --check server/index.js && node --check server/database.js && node --check server/security.js",
-    "test:api": "node server/api-smoke-test.js"
+    "check": "node --check app.js && node --check firebase-client.js && node --check server/index.js && node --check server/database.js && node --check server/security.js",
+    "test:api": "node server/api-smoke-test.js",
+    "firebase:deploy": "npx firebase-tools deploy",
+    "firebase:emulators": "npx firebase-tools emulators:start"
   },
   "engines": {
     "node": ">=24.0.0"

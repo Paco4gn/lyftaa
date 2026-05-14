@@ -379,6 +379,8 @@ const defaultAppData = {
 let appData = loadAppData();
 let apiToken = localStorage.getItem("liftlab-api-token") || "";
 let apiOnline = false;
+let firebaseOnline = false;
+let firebaseBackend = null;
 
 const state = {
   view: "dashboard",
@@ -416,7 +418,10 @@ function saveAppData() {
 }
 
 async function apiRequest(path, options = {}) {
-  const response = await fetch(path, {
+  if (firebaseOnline && firebaseBackend?.configured) {
+    return firebaseBackend.request(path, options);
+  }
+  const response = await fetch(apiUrl(path), {
     ...options,
     headers: {
       "content-type": "application/json",
@@ -431,6 +436,17 @@ async function apiRequest(path, options = {}) {
 }
 
 async function detectApi() {
+  firebaseBackend = await loadFirebaseBackend();
+  firebaseOnline = Boolean(firebaseBackend?.configured);
+  if (firebaseOnline) {
+    apiOnline = false;
+    if (firebaseBackend.user) {
+      appData.account = { email: firebaseBackend.user.email, id: firebaseBackend.user.uid, mode: "firebase" };
+      saveAppData();
+    }
+    renderAuthStatus();
+    return true;
+  }
   try {
     await apiRequest("/api/status");
     apiOnline = true;
@@ -442,7 +458,8 @@ async function detectApi() {
 }
 
 async function loadApiUserData() {
-  if (!apiToken || !(await detectApi())) return;
+  if (!(await detectApi())) return;
+  if (!firebaseOnline && !apiToken) return;
   try {
     const data = await apiRequest("/api/export");
     appData.profile = { ...appData.profile, ...data.profile };
@@ -458,17 +475,51 @@ async function loadApiUserData() {
   } catch {
     apiToken = "";
     localStorage.removeItem("liftlab-api-token");
+    firebaseOnline = false;
   }
 }
 
 async function pushApi(path, data) {
-  if (!apiToken || !apiOnline) return;
+  if (!firebaseOnline && (!apiToken || !apiOnline)) return;
   try {
     await apiRequest(path, { method: "PUT", body: data });
   } catch {
     apiOnline = false;
     renderAuthStatus();
   }
+}
+
+function apiUrl(path) {
+  const base = String(window.LIFTLAB_CONFIG?.apiBaseUrl || localStorage.getItem("liftlab-api-base-url") || "").replace(/\/$/, "");
+  return `${base}${path}`;
+}
+
+async function loadFirebaseBackend() {
+  if (firebaseBackend) return firebaseBackend;
+  if (!hasFirebaseConfig()) return { configured: false, mode: "firebase-missing-config" };
+  try {
+    const module = await import("./firebase-client.js");
+    return module.createFirebaseBackend();
+  } catch {
+    return { configured: false, mode: "firebase-unavailable" };
+  }
+}
+
+function hasFirebaseConfig() {
+  const config = window.LIFTLAB_CONFIG?.firebase || {};
+  return ["apiKey", "authDomain", "projectId", "appId"].every((key) => Boolean(String(config[key] || "").trim()));
+}
+
+function hasRealBackend() {
+  return firebaseOnline || (apiOnline && Boolean(apiToken));
+}
+
+async function uploadFoodPhotoToFirebase(file) {
+  if (!file || !firebaseOnline || !firebaseBackend?.uploadFoodPhoto) return null;
+  const upload = await firebaseBackend.uploadFoodPhoto(file);
+  appData.lastFoodPhoto = upload;
+  saveAppData();
+  return upload;
 }
 
 function loadWorkout() {
@@ -1638,7 +1689,7 @@ function addMeal() {
   };
   mealLog.push(meal);
   saveMealLog();
-  if (apiToken && apiOnline) apiRequest("/api/meals", { method: "POST", body: meal }).catch(() => {});
+  if (hasRealBackend()) apiRequest("/api/meals", { method: "POST", body: meal }).catch(() => {});
   $("#meal-input").value = "";
   $("#meal-preview").innerHTML = "";
   renderNutrition();
@@ -1724,7 +1775,7 @@ async function confirmPhotoFood() {
     return;
   }
   addMeal();
-  if (apiToken && apiOnline) {
+  if (hasRealBackend()) {
     await apiRequest("/api/food-photo/analyze", {
       method: "POST",
       body: {
@@ -1732,6 +1783,7 @@ async function confirmPhotoFood() {
         cookingMethod: $("#photo-cooking-method")?.value,
         extraFat: $("#photo-extra-fat")?.value,
         confirmedItems: appData.photoItems,
+        photo: appData.lastFoodPhoto || null,
       },
     }).catch(() => {});
   }
@@ -1803,6 +1855,17 @@ function renderAuthStatus() {
   const status = $("#auth-status");
   if (!status) return;
   const help = $("#auth-help");
+  const isFirebaseAccount = appData.account?.mode === "firebase" && firebaseOnline;
+  if (isFirebaseAccount) {
+    status.textContent = `Cuenta real iniciada (Firebase): ${appData.account.email}`;
+    if (help) help.textContent = "Tus datos se guardan en Firebase Auth, Firestore y Storage, separados por usuario.";
+    return;
+  }
+  if (firebaseOnline) {
+    status.textContent = "Firebase conectado. Puedes crear cuenta o iniciar sesion real.";
+    if (help) help.textContent = "Registro, login, rutinas, comidas, entrenos y perfil se guardaran en Firebase.";
+    return;
+  }
   const isRealAccount = appData.account?.mode === "api" && apiOnline;
   if (isRealAccount) {
     status.textContent = `Cuenta real iniciada (SQLite): ${appData.account.email}`;
@@ -1815,11 +1878,11 @@ function renderAuthStatus() {
     return;
   }
   status.textContent = "Sin backend conectado. No hay cuenta real ni sincronizacion.";
-  if (help) help.textContent = "Abre la app con npm start y entra en http://127.0.0.1:5174/ para usar usuarios reales y base de datos.";
+  if (help) help.textContent = "Configura Firebase en config.js o abre la app con npm start para usar usuarios reales y base de datos.";
 }
 
 function showBackendRequired() {
-  showToast("No hay backend conectado. Ejecuta npm start y abre http://127.0.0.1:5174/ para cuenta real.");
+  showToast("No hay backend real conectado. Configura Firebase en config.js o ejecuta npm start.");
   renderAuthStatus();
 }
 
@@ -2135,17 +2198,20 @@ async function registerLocalAccount() {
   }
   if (await detectApi()) {
     try {
-      const session = await apiRequest("/api/auth/register", { method: "POST", body: { email, password } });
+      const session = await apiRequest("/api/auth/register", {
+        method: "POST",
+        body: { email, password, seed: { profile: appData.profile, health: appData.health, habits: appData.habits, routines: weeklyRoutinePlan } },
+      });
       apiToken = session.token;
       localStorage.setItem("liftlab-api-token", apiToken);
-      appData.account = { email: session.user.email, id: session.user.id, mode: "api" };
+      appData.account = { email: session.user.email, id: session.user.id, mode: firebaseOnline ? "firebase" : "api" };
       appData.profile = { ...appData.profile, ...session.data.profile, email };
       await pushApi("/api/profile", appData.profile);
       await pushApi("/api/onboarding", appData.profile);
       await pushApi("/api/health", appData.health);
       await pushApi("/api/habits", appData.habits);
       await pushApi("/api/routines", weeklyRoutinePlan);
-      showToast("Cuenta real creada en backend local.");
+      showToast(firebaseOnline ? "Cuenta real creada en Firebase." : "Cuenta real creada en backend local.");
     } catch (error) {
       showToast(error.message);
       return;
@@ -2170,10 +2236,10 @@ async function loginLocalAccount() {
       const session = await apiRequest("/api/auth/login", { method: "POST", body: { email, password } });
       apiToken = session.token;
       localStorage.setItem("liftlab-api-token", apiToken);
-      appData.account = { email: session.user.email, id: session.user.id, mode: "api" };
+      appData.account = { email: session.user.email, id: session.user.id, mode: firebaseOnline ? "firebase" : "api" };
       saveAppData();
       await loadApiUserData();
-      showToast("Sesion iniciada con backend.");
+      showToast(firebaseOnline ? "Sesion iniciada con Firebase." : "Sesion iniciada con backend.");
       return;
     } catch (error) {
       showToast(error.message);
@@ -2184,12 +2250,14 @@ async function loginLocalAccount() {
 }
 
 async function deleteLocalAccount() {
-  if (apiToken && apiOnline) await apiRequest("/api/account", { method: "DELETE" }).catch(() => {});
+  if (firebaseOnline || (apiToken && apiOnline)) await apiRequest("/api/account", { method: "DELETE" }).catch(() => {});
   localStorage.removeItem("liftlab-app-data");
   localStorage.removeItem("liftlab-meals");
   localStorage.removeItem("liftlab-workout");
   localStorage.removeItem("liftlab-api-token");
   apiToken = "";
+  firebaseOnline = false;
+  firebaseBackend = null;
   appData = cloneData(defaultAppData);
   mealLog = [];
   state.activeWorkout = createWorkout("push");
@@ -2344,7 +2412,7 @@ function bindEvents() {
       calories: Math.round((durationMin * appData.profile.weight * 5.5) / 60),
       source: "LiftLab modo entrenamiento",
     };
-    if (apiToken && apiOnline) apiRequest("/api/workouts", { method: "POST", body: finishedWorkout }).catch(() => {});
+    if (hasRealBackend()) apiRequest("/api/workouts", { method: "POST", body: finishedWorkout }).catch(() => {});
     showToast(`Entreno guardado con ${completed} series completadas.`);
   });
   $("#add-exercise-btn").addEventListener("click", () => setView("library"));
@@ -2433,8 +2501,15 @@ function bindEvents() {
     saveAppData();
     renderPhotoFoodResults();
   });
-  $("#food-photo-input")?.addEventListener("change", () => {
+  $("#food-photo-input")?.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
     simulatePhotoFood();
+    if (file && (await detectApi()) && firebaseOnline) {
+      await uploadFoodPhotoToFirebase(file)
+        .then(() => showToast("Foto subida a Firebase Storage. Analisis aproximado listo para revisar."))
+        .catch(() => showToast("No se pudo subir la foto. Puedes revisar y guardar la estimacion manual."));
+      return;
+    }
     showToast("Foto cargada. Analisis aproximado listo para revisar.");
   });
   $("#photo-food-results")?.addEventListener("change", (event) => {
@@ -2445,14 +2520,25 @@ function bindEvents() {
   $("#save-onboarding-real")?.addEventListener("click", saveProfileFromForm);
   $("#mock-register")?.addEventListener("click", registerLocalAccount);
   $("#mock-login")?.addEventListener("click", loginLocalAccount);
-  $("#mock-reset")?.addEventListener("click", () => showToast("En esta version local se ha preparado el flujo de recuperacion. En backend enviara email seguro."));
-  $("#mock-logout")?.addEventListener("click", () => {
+  $("#mock-reset")?.addEventListener("click", async () => {
+    const email = $("#auth-email")?.value.trim();
+    if (!email) return showToast("Introduce el email para recuperar contraseña.");
+    if (await detectApi()) {
+      await apiRequest("/api/auth/reset", { method: "POST", body: { email } })
+        .then(() => showToast(firebaseOnline ? "Email de recuperacion enviado por Firebase." : "Recuperacion preparada por backend."))
+        .catch((error) => showToast(error.message));
+    } else {
+      showBackendRequired();
+    }
+  });
+  $("#mock-logout")?.addEventListener("click", async () => {
+    if (firebaseOnline) await apiRequest("/api/auth/logout", { method: "POST" }).catch(() => {});
     appData.account = null;
     apiToken = "";
     localStorage.removeItem("liftlab-api-token");
     saveAppData();
     renderAuthStatus();
-    showToast("Sesion local cerrada.");
+    showToast("Sesion cerrada.");
   });
   $("#mock-delete-account")?.addEventListener("click", deleteLocalAccount);
   ["#health-steps-input", "#health-active-input", "#health-resting-input", "#health-sleep-input", "#health-rhr-input", "#health-hrv-input"].forEach((selector) => {
@@ -2564,7 +2650,7 @@ function bindEvents() {
     choice.classList.add("selected");
     const label = choice.textContent.trim();
     if (label.includes("Continuar")) {
-      showToast("Cuenta local preparada gratis.");
+      showToast("Perfil inicial preparado gratis.");
       moveOnboarding(1);
     } else if (label.includes("Entrar gratis")) {
       showToast("Todo listo. Entrenamiento abierto.");

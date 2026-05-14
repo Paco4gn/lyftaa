@@ -1,47 +1,68 @@
 # LiftLab
 
-Aplicacion gratuita de entrenamiento, ejercicios, nutricion, IA local y backend real con usuarios y SQLite.
+Aplicacion gratuita de entrenamiento, ejercicios, nutricion, IA local y backend real con Firebase.
 
 ## Abrir la aplicacion
 
-Cuando GitHub Pages termine de publicar, la app estatica estara aqui:
+Cuando GitHub Pages termine de publicar, la app estara aqui:
 
 [Abrir LiftLab](https://paco4gn.github.io/lyftaa/)
 
-La pagina principal del repositorio de GitHub muestra este README y la lista de archivos. Para usar la aplicacion hay que abrir el enlace anterior, ejecutar `index.html` o levantar el servidor real.
+La app web puede funcionar de dos formas:
 
-## Que incluye
+- **Firebase real**: Auth, Firestore y Storage para usuarios reales en GitHub Pages o Firebase Hosting.
+- **Backend local**: Node + SQLite con `npm start`, util para desarrollo y pruebas locales.
 
-- Biblioteca con 30 ejercicios en espanol.
-- 90 laminas SVG propias para ejercicios, con 3 fases visuales por movimiento.
-- Vista movil y vista PC desde el mismo archivo.
-- Entrenamiento guiado, rutinas, progresion y registro de series.
-- Agentes IA locales para planificacion, tecnica, recuperacion, nutricion y riesgo.
-- Calculadora completa de calorias y macros con base de alimentos local.
-- Registro, login, recuperacion preparada, cierre de sesion y borrado completo de cuenta.
-- Base de datos SQLite con datos separados por usuario.
-- Sin pagos, sin premium, sin claves externas y sin dependencias obligatorias.
+## Firebase real
 
-## Base de datos real
+Firebase es el backend principal recomendado para esta version web. Para activarlo:
 
-Con `npm start`, LiftLab crea `data/liftlab.sqlite` y guarda los datos por usuario. La base incluye tablas para:
+1. Crea un proyecto en Firebase.
+2. Activa Authentication con Email/password.
+3. Activa Firestore Database.
+4. Activa Storage para fotos de comida y progreso.
+5. Copia la configuracion web de Firebase en `config.js`.
+6. Publica reglas:
 
-- Usuarios con contrasenas hasheadas y sesiones por token.
-- Perfil fisico, onboarding, preferencias, privacidad y permisos de salud.
-- Salud manual o sincronizada: pasos, calorias activas, reposo, sueno, frecuencia cardiaca y recuperacion.
-- Rutinas, plan semanal, entrenamientos completados y series por ejercicio.
-- Comidas, macros, resultados de comida por foto, recetas y listas de compra.
-- Peso, medidas corporales y fotos de progreso con consentimiento.
-- Habitos, notificaciones, eventos de consentimiento y comunidad.
-- Exportacion completa del usuario y eliminacion completa de datos.
+```bash
+npm run firebase:deploy -- --only firestore:rules,storage
+```
 
-GitHub Pages no puede ejecutar SQLite ni guardar usuarios reales porque es hosting estatico. Para usuarios reales y sincronizacion entre dispositivos hay que desplegar el servidor Node (`server/index.js`) en un hosting con disco o base de datos persistente.
+7. Publica la web en GitHub Pages o Firebase Hosting.
 
-## Ejecutar
+Con Firebase configurado, LiftLab guarda por usuario:
 
-Para ver la version estatica publicada, abre `index.html` directamente o usa GitHub Pages.
+- Cuenta real con Firebase Auth.
+- Perfil, onboarding, preferencias, privacidad y permisos de salud.
+- Salud manual/sincronizada, rutinas, comidas, comida por foto y entrenamientos.
+- Series por entrenamiento, metricas corporales, recetas, listas de compra, notificaciones y comunidad.
+- Exportacion y borrado de datos del usuario.
 
-Para ejecutar LiftLab como app real local con API, usuarios, contrasenas hasheadas y base de datos SQLite:
+Los datos se guardan bajo `users/{uid}` y las reglas incluidas permiten leer/escribir solo al usuario autenticado.
+
+## Configuracion
+
+Edita `config.js`:
+
+```js
+window.LIFTLAB_CONFIG = {
+  firebase: {
+    apiKey: "TU_API_KEY",
+    authDomain: "TU_PROYECTO.firebaseapp.com",
+    projectId: "TU_PROYECTO",
+    storageBucket: "TU_PROYECTO.appspot.com",
+    messagingSenderId: "TU_SENDER_ID",
+    appId: "TU_APP_ID",
+  },
+  apiBaseUrl: "",
+};
+```
+
+Si `firebase` esta vacio, la app no crea cuentas falsas: avisa de que falta backend real.
+
+## Ejecutar local
+
+Para ejecutar LiftLab con Node + SQLite:
 
 ```bash
 npm start
@@ -60,14 +81,31 @@ npm run check
 npm run test:api
 ```
 
-Servidor estatico simple, sin API:
+Emuladores de Firebase para probar reglas y datos:
+
+```bash
+npm run firebase:emulators
+```
+
+Servidor estatico simple, sin backend real:
 
 ```bash
 python -m http.server 5174
 ```
 
-## Estado real
+## Que incluye
 
-- GitHub Pages: funciona como app estatica con localStorage.
-- `npm start`: anade backend local con SQLite, auth, usuarios separados, API, exportacion y borrado completo.
-- Apple Health real requiere app iOS con HealthKit; la web solo puede guardar datos manuales o simulados.
+- Biblioteca con 30 ejercicios en espanol.
+- Laminas SVG propias para ejercicios con fases visuales.
+- Vista movil y vista PC.
+- Entrenamiento guiado, rutinas, progresion y registro de series.
+- Agentes IA locales para planificacion, tecnica, recuperacion, nutricion y riesgo.
+- Calculadora de calorias y macros con base de alimentos local.
+- Registro, login, recuperacion, cierre de sesion y borrado completo de cuenta con Firebase.
+- Sin pagos, sin premium y sin funciones bloqueadas.
+
+## Limites reales
+
+- Apple Health real requiere una app iOS nativa con HealthKit. La web solo puede guardar datos manuales o importados.
+- El peso exacto de comida por foto no puede saberse con precision solo por imagen; LiftLab lo trata como estimacion editable.
+- Las recomendaciones de nutricion y entrenamiento son orientativas y no sustituyen a profesionales sanitarios.

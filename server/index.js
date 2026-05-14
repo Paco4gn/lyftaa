@@ -29,6 +29,7 @@ import { createToken, verifyToken } from "./security.js";
 
 const rootDir = fileURLToPath(new URL("..", import.meta.url));
 const port = Number(process.env.PORT || 5174);
+const host = process.env.HOST || "127.0.0.1";
 
 migrate();
 
@@ -45,8 +46,8 @@ const server = createServer(async (req, res) => {
   }
 });
 
-server.listen(port, "127.0.0.1", () => {
-  console.log(`LiftLab real backend listo en http://127.0.0.1:${port}`);
+server.listen(port, host, () => {
+  console.log(`LiftLab backend listo en http://${host}:${port}`);
 });
 
 async function handleApi(req, res) {
