@@ -1190,17 +1190,21 @@ dialog canvas {
   gap: 14px;
   margin-bottom: 16px;
   padding: 18px;
+  overflow: hidden;
 }
 
 .weekly-routine-board {
-  grid-template-columns: repeat(5, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  align-items: stretch;
 }
 
 .weekly-day-card {
   display: grid;
   gap: 12px;
+  min-width: 0;
   min-height: 300px;
   padding: 14px;
+  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--surface) 92%, transparent);
@@ -1220,12 +1224,20 @@ dialog canvas {
 .weekly-day-head {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 10px;
+  min-width: 0;
 }
 
 .weekly-day-head div {
   display: grid;
   gap: 4px;
+  min-width: 0;
+}
+
+.weekly-day-head strong {
+  overflow-wrap: anywhere;
+  line-height: 1.25;
 }
 
 .weekly-day-head span,
@@ -1236,11 +1248,16 @@ dialog canvas {
 
 .weekly-day-head small {
   align-self: start;
+  flex: 0 0 auto;
+  max-width: 112px;
   padding: 5px 8px;
   border-radius: 999px;
   background: #fff;
   color: #000;
   font-weight: 900;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.05;
 }
 
 .weekly-day-meta {
@@ -1252,9 +1269,11 @@ dialog canvas {
 }
 
 .weekly-day-meta span {
+  min-width: 0;
   padding: 5px 8px;
   border: 1px solid var(--line);
   border-radius: 999px;
+  overflow-wrap: anywhere;
 }
 
 .routine-blocks {
@@ -1265,10 +1284,17 @@ dialog canvas {
 .routine-block {
   display: grid;
   gap: 4px;
+  min-width: 0;
   padding: 9px;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: #111114;
+}
+
+.routine-block strong,
+.routine-block small {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .weekly-day-actions {
@@ -1281,7 +1307,11 @@ dialog canvas {
 .weekly-day-actions .primary-button,
 .weekly-day-actions .ghost-button {
   min-height: 38px;
+  min-width: 0;
   padding: 0 10px;
+  white-space: normal;
+  line-height: 1.05;
+  font-size: 0.9rem;
 }
 
 .routine-detail-panel {
