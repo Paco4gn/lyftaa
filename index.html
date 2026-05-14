@@ -7,7 +7,40 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23090909'/%3E%3Cpath d='M15 26v12M49 26v12M8 29v6M56 29v6M15 32h34' stroke='%23f7f7f5' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M32 13l3 9 9 3-9 3-3 9-3-9-9-3 9-3 3-9z' fill='%23ff6b35'/%3E%3C/svg%3E" />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body class="dark lyfta-skin device-mobile">
+  <body class="dark lyfta-skin device-mobile auth-loading">
+    <section class="auth-gate" id="auth-gate" aria-label="Acceso a LiftLab">
+      <div class="auth-card">
+        <div class="brand auth-brand">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg>
+          </span>
+          <div>
+            <strong>LiftLab</strong>
+            <small>Entrenador personal gratuito</small>
+          </div>
+        </div>
+        <div class="auth-copy">
+          <span class="pill">Cuenta privada obligatoria</span>
+          <h1>Entra para ver solo tus entrenos, comidas, pesos y progreso.</h1>
+          <p>Cada usuario guarda sus propios datos en Firebase. Nada de demo mezclada, nada de premium, nada compartido con otras cuentas.</p>
+        </div>
+        <div class="auth-form">
+          <label>Email<input id="gate-auth-email" type="text" inputmode="email" autocomplete="email" placeholder="tu@email.com" /></label>
+          <label>Contraseña<input id="gate-auth-password" type="password" autocomplete="current-password" placeholder="mínimo 6 caracteres" /></label>
+          <div class="auth-form-actions">
+            <button class="primary-button" id="gate-login">Iniciar sesión</button>
+            <button class="ghost-button" id="gate-register">Crear cuenta gratis</button>
+          </div>
+          <button class="text-button" id="gate-reset">Recuperar contraseña</button>
+          <div class="auth-status" id="gate-auth-status">Conectando con Firebase...</div>
+        </div>
+        <div class="auth-assurances">
+          <span>Datos separados por usuario</span>
+          <span>Firestore privado por UID</span>
+          <span>Sin funciones de pago</span>
+        </div>
+      </div>
+    </section>
     <div class="app-shell">
       <aside class="sidebar" aria-label="Navegacion principal">
         <div class="brand">
@@ -662,10 +695,10 @@
         <section class="view" id="profile-view" aria-label="Perfil y ajustes">
           <div class="profile-grid">
             <section class="panel profile-card">
-              <div class="avatar">FG</div>
+              <div class="avatar">LL</div>
               <div>
-                <h3>Fernando</h3>
-                <p class="subtle">Objetivo: fuerza e hipertrofia · 5 días/semana</p>
+                <h3>Usuario</h3>
+                <p class="subtle">Objetivo: personalizado por cuenta</p>
               </div>
               <button class="ghost-button" id="edit-profile-btn">Editar perfil</button>
             </section>

@@ -325,25 +325,25 @@ let mealLog = loadMealLog();
 const defaultAppData = {
   account: null,
   profile: {
-    name: "Fernando",
-    age: 35,
+    name: "Usuario",
+    age: 30,
     sex: "male",
     height: 178,
     weight: 82,
     goal: "Ganar músculo",
     secondaryGoal: "Mejorar salud general",
-    level: "Intermedio",
-    days: 5,
+    level: "Principiante",
+    days: 3,
     sessionTime: 60,
     place: "Gimnasio",
-    equipment: "Barra, mancuernas, polea, maquinas",
+    equipment: "",
     injuries: "",
     medical: "",
     sleep: "Normal",
     stress: "Medio",
     work: "Mixto",
     steps: 8000,
-    diet: "Alta en proteina",
+    diet: "",
     allergies: "",
     intolerances: "",
     dislikes: "",
@@ -354,15 +354,15 @@ const defaultAppData = {
     health: "manual",
   },
   health: {
-    steps: 8200,
-    active: 640,
-    resting: 1840,
-    sleep: 7.1,
-    rhr: 58,
-    hrv: 62,
-    distance: 6.4,
-    workouts: 1,
-    activityMinutes: 64,
+    steps: 0,
+    active: 0,
+    resting: 0,
+    sleep: 0,
+    rhr: 0,
+    hrv: 0,
+    distance: 0,
+    workouts: 0,
+    activityMinutes: 0,
   },
   habits: [
     { id: "water", label: "Beber 2 vasos de agua", done: false },
@@ -445,6 +445,11 @@ async function detectApi() {
     if (firebaseBackend.user) {
       appData.account = { email: firebaseBackend.user.email, id: firebaseBackend.user.uid, mode: "firebase" };
       saveAppData();
+    } else {
+      appData.account = null;
+      apiToken = "";
+      localStorage.removeItem("liftlab-api-token");
+      saveAppData();
     }
     renderAuthStatus();
     return true;
@@ -461,6 +466,7 @@ async function detectApi() {
 
 async function loadApiUserData() {
   if (!(await detectApi())) return;
+  if (firebaseOnline && !firebaseBackend?.user) return;
   if (!firebaseOnline && !apiToken) return;
   try {
     const data = await apiRequest("/api/export");
@@ -485,7 +491,7 @@ async function loadApiUserData() {
       mealLog = [];
       saveMealLog();
     }
-    state.activeWorkout = createWorkout("push");
+    state.activeWorkout = data.activeWorkout?.exercises?.length ? data.activeWorkout : createWorkout("push");
     saveWorkout();
     saveAppData();
     renderAllAppData();
@@ -538,6 +544,47 @@ function hasFirebaseConfig() {
 
 function hasRealBackend() {
   return firebaseOnline || (apiOnline && Boolean(apiToken));
+}
+
+function isSignedIn() {
+  return Boolean(appData.account?.id && hasRealBackend());
+}
+
+function setAuthUiState(loading = false) {
+  document.body.classList.toggle("auth-loading", loading);
+  document.body.classList.toggle("auth-locked", !loading && !isSignedIn());
+  const gateStatus = $("#gate-auth-status");
+  if (gateStatus) {
+    if (loading) gateStatus.textContent = "Comprobando sesion con Firebase...";
+    else if (isSignedIn()) gateStatus.textContent = `Sesion iniciada: ${appData.account.email}`;
+    else if (firebaseOnline) gateStatus.textContent = "Firebase conectado. Crea cuenta gratis o inicia sesion.";
+    else if (apiOnline) gateStatus.textContent = "Backend local conectado. Crea cuenta o inicia sesion.";
+    else gateStatus.textContent = "No hay backend conectado. Revisa Firebase o arranca npm start.";
+  }
+  const shortcut = $(".account-shortcut");
+  if (shortcut) {
+    shortcut.innerHTML = isSignedIn()
+      ? '<svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0"/></svg>Mi cuenta'
+      : '<svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0"/></svg>Iniciar sesion';
+  }
+}
+
+function getAuthCredentials(source = "profile") {
+  const prefix = source === "gate" ? "gate-" : "";
+  return {
+    email: $(`#${prefix}auth-email`)?.value.trim() || "",
+    password: $(`#${prefix}auth-password`)?.value || "",
+  };
+}
+
+function syncAuthInputs(source = "profile") {
+  const fromGate = source === "gate";
+  const sourceEmail = fromGate ? $("#gate-auth-email") : $("#auth-email");
+  const sourcePassword = fromGate ? $("#gate-auth-password") : $("#auth-password");
+  const targetEmail = fromGate ? $("#auth-email") : $("#gate-auth-email");
+  const targetPassword = fromGate ? $("#auth-password") : $("#gate-auth-password");
+  if (targetEmail && sourceEmail) targetEmail.value = sourceEmail.value;
+  if (targetPassword && sourcePassword) targetPassword.value = sourcePassword.value;
 }
 
 async function uploadFoodPhotoToFirebase(file) {
@@ -611,6 +658,9 @@ function createWorkoutFromWeekDay(day) {
 
 function saveWorkout() {
   localStorage.setItem("liftlab-workout", JSON.stringify(state.activeWorkout));
+  if (firebaseOnline && firebaseBackend?.user) {
+    apiRequest("/api/active-workout", { method: "PUT", body: state.activeWorkout }).catch(() => {});
+  }
 }
 
 function showToast(message) {
@@ -622,6 +672,12 @@ function showToast(message) {
 }
 
 function setView(view) {
+  if (!isSignedIn()) {
+    setAuthUiState(false);
+    showToast("Primero inicia sesion o crea una cuenta gratis.");
+    $("#gate-auth-email")?.focus();
+    return;
+  }
   state.view = view;
   $$(".view").forEach((panel) => panel.classList.toggle("active", panel.id === `${view}-view`));
   $$(".nav-item, .mobile-tab").forEach((button) => button.classList.toggle("active", button.dataset.view === view));
@@ -642,6 +698,11 @@ function setView(view) {
 }
 
 function openAccountPanel() {
+  if (!isSignedIn()) {
+    setAuthUiState(false);
+    requestAnimationFrame(() => $("#gate-auth-email")?.focus());
+    return;
+  }
   setView("profile");
   requestAnimationFrame(() => {
     $(".account-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1879,6 +1940,7 @@ function renderHealthInputs() {
 
 function renderAuthStatus() {
   const status = $("#auth-status");
+  setAuthUiState(false);
   if (!status) return;
   const help = $("#auth-help");
   const isFirebaseAccount = appData.account?.mode === "firebase" && firebaseOnline;
@@ -1963,13 +2025,24 @@ function renderProfileInputs() {
   });
   const profileTitle = $(".profile-card h3");
   const profileText = $(".profile-card .subtle");
+  const profileAvatar = $(".profile-card .avatar");
   if (profileTitle) profileTitle.textContent = profile.name;
   if (profileText) profileText.textContent = `Objetivo: ${profile.goal.toLowerCase()} · ${profile.days} días/semana`;
+  if (profileAvatar) profileAvatar.textContent = initialsFromName(profile.name);
   if ($("#nutri-weight")) $("#nutri-weight").value = profile.weight;
   if ($("#nutri-height")) $("#nutri-height").value = profile.height;
   if ($("#nutri-age")) $("#nutri-age").value = profile.age;
   if ($("#nutri-sex")) $("#nutri-sex").value = profile.sex;
   if ($("#nutri-training-min")) $("#nutri-training-min").value = profile.sessionTime;
+}
+
+function initialsFromName(name) {
+  return String(name || "LiftLab")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || "")
+    .join("") || "LL";
 }
 
 async function saveProfileFromForm() {
@@ -2231,13 +2304,14 @@ function saveManualHealth() {
   showToast("Datos manuales de salud guardados.");
 }
 
-async function registerLocalAccount() {
-  const email = $("#auth-email")?.value.trim();
-  const password = $("#auth-password")?.value || "";
+async function registerLocalAccount(source = "profile") {
+  syncAuthInputs(source);
+  const { email, password } = getAuthCredentials(source);
   if (!email || password.length < 6) {
     showToast("Introduce email y contraseña de al menos 6 caracteres.");
     return;
   }
+  setAuthUiState(true);
   if (await detectApi()) {
     try {
       const session = await apiRequest("/api/auth/register", {
@@ -2257,23 +2331,27 @@ async function registerLocalAccount() {
       showToast(firebaseOnline ? "Cuenta real creada en Firebase." : "Cuenta real creada en backend local.");
     } catch (error) {
       showToast(authErrorMessage(error));
+      setAuthUiState(false);
       return;
     }
   } else {
     showBackendRequired();
+    setAuthUiState(false);
     return;
   }
   saveAppData();
   renderAuthStatus();
+  setView("dashboard");
 }
 
-async function loginLocalAccount() {
-  const email = $("#auth-email")?.value.trim();
-  const password = $("#auth-password")?.value || "";
+async function loginLocalAccount(source = "profile") {
+  syncAuthInputs(source);
+  const { email, password } = getAuthCredentials(source);
   if (!email) {
     showToast("Introduce el email.");
     return;
   }
+  setAuthUiState(true);
   if (await detectApi()) {
     try {
       const session = await apiRequest("/api/auth/login", { method: "POST", body: { email, password } });
@@ -2283,13 +2361,16 @@ async function loginLocalAccount() {
       saveAppData();
       await loadApiUserData();
       showToast(firebaseOnline ? "Sesion iniciada con Firebase." : "Sesion iniciada con backend.");
+      setView("dashboard");
       return;
     } catch (error) {
       showToast(authErrorMessage(error));
+      setAuthUiState(false);
       return;
     }
   }
   showBackendRequired();
+  setAuthUiState(false);
 }
 
 async function deleteLocalAccount() {
@@ -2301,10 +2382,9 @@ async function deleteLocalAccount() {
   apiToken = "";
   firebaseOnline = false;
   firebaseBackend = null;
-  appData = cloneData(defaultAppData);
-  mealLog = [];
-  state.activeWorkout = createWorkout("push");
+  resetLocalUserState(null);
   renderAllAppData();
+  renderAuthStatus();
   showToast("Cuenta y datos locales eliminados.");
 }
 
@@ -2577,8 +2657,29 @@ function bindEvents() {
     updatePhotoFoodItem(Number(input.dataset.photoIndex), input.dataset.photoField, input.value);
   });
   $("#save-onboarding-real")?.addEventListener("click", saveProfileFromForm);
-  $("#mock-register")?.addEventListener("click", registerLocalAccount);
-  $("#mock-login")?.addEventListener("click", loginLocalAccount);
+  $("#mock-register")?.addEventListener("click", () => registerLocalAccount("profile"));
+  $("#mock-login")?.addEventListener("click", () => loginLocalAccount("profile"));
+  $("#gate-register")?.addEventListener("click", () => registerLocalAccount("gate"));
+  $("#gate-login")?.addEventListener("click", () => loginLocalAccount("gate"));
+  ["#auth-email", "#auth-password", "#gate-auth-email", "#gate-auth-password"].forEach((selector) => {
+    $(selector)?.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      loginLocalAccount(selector.startsWith("#gate") ? "gate" : "profile");
+    });
+  });
+  $("#gate-reset")?.addEventListener("click", async () => {
+    syncAuthInputs("gate");
+    const email = $("#gate-auth-email")?.value.trim();
+    if (!email) return showToast("Introduce el email para recuperar contraseña.");
+    if (await detectApi()) {
+      await apiRequest("/api/auth/reset", { method: "POST", body: { email } })
+        .then(() => showToast(firebaseOnline ? "Email de recuperacion enviado por Firebase." : "Recuperacion preparada por backend."))
+        .catch((error) => showToast(authErrorMessage(error)));
+    } else {
+      showBackendRequired();
+    }
+  });
   $("#mock-reset")?.addEventListener("click", async () => {
     const email = $("#auth-email")?.value.trim();
     if (!email) return showToast("Introduce el email para recuperar contraseña.");
@@ -2615,12 +2716,7 @@ function bindEvents() {
     } else {
       const nextName = name.textContent.trim() || appData.profile.name || "Usuario";
       appData.profile.name = nextName;
-      const initials = nextName
-        .split(/\s+/)
-        .slice(0, 2)
-        .map((part) => part[0]?.toUpperCase() || "")
-        .join("");
-      $(".profile-card .avatar").textContent = initials || "LL";
+      $(".profile-card .avatar").textContent = initialsFromName(nextName);
       saveAppData();
       renderDashboardData();
       pushApi("/api/profile", appData.profile);
@@ -2752,7 +2848,22 @@ function renderOnboarding() {
   else $("#next-onboarding").onclick = () => moveOnboarding(1);
 }
 
+async function bootstrapAuth() {
+  setAuthUiState(true);
+  const online = await detectApi();
+  if (online && ((firebaseOnline && firebaseBackend?.user) || (!firebaseOnline && apiToken))) {
+    await loadApiUserData();
+    setView("dashboard");
+  } else {
+    appData.account = null;
+    saveAppData();
+    renderAuthStatus();
+    setAuthUiState(false);
+  }
+}
+
 function init() {
+  setAuthUiState(true);
   renderProfileInputs();
   renderDate();
   renderPhonePreview();
@@ -2769,7 +2880,6 @@ function init() {
   renderMilestones();
   renderCommunity();
   renderMeasures();
-  renderAuthStatus();
   renderHealthInputs();
   renderDashboardData();
   renderHabits();
@@ -2781,7 +2891,7 @@ function init() {
   updateDeviceToggleLabel();
   bindEvents();
   animateExercise();
-  detectApi().then(() => loadApiUserData());
+  bootstrapAuth();
 }
 
 function updateDeviceToggleLabel() {
