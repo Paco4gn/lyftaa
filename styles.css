@@ -178,6 +178,15 @@ body.device-mobile .topbar-actions .primary-button {
   display: none;
 }
 
+body.device-mobile .topbar-actions #open-onboarding {
+  display: inline-flex !important;
+  visibility: visible;
+  width: 42px;
+  min-height: 42px;
+  padding: 0;
+  font-size: 0;
+}
+
 body.device-mobile #device-toggle {
   width: 42px;
   min-height: 42px;
@@ -2561,6 +2570,19 @@ body.device-mobile .ghost-button {
   min-height: 46px;
   padding-inline: 14px;
   font-size: 0.94rem;
+}
+
+body.device-mobile .topbar-actions {
+  display: flex;
+}
+
+body.device-mobile .topbar-actions #open-onboarding {
+  display: inline-flex !important;
+  visibility: visible;
+  width: 42px;
+  min-height: 42px;
+  padding: 0;
+  font-size: 0;
 }
 
 body.device-mobile .text-button {

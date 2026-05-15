@@ -226,7 +226,7 @@ const weeklyRoutinePlan = [
     muscles: ["Core", "Movilidad"],
     blocks: [
       { name: "Movilidad", exercises: ["Cadera", "Columna toracica"] },
-      { name: "Habito", exercises: ["8.000 pasos", "Respiracion 5 min"] },
+      { name: "Hábito", exercises: ["8.000 pasos", "Respiración 5 min"] },
     ],
   },
   {
@@ -580,12 +580,11 @@ function setAuthUiState(loading = false) {
     else if (apiOnline) gateStatus.textContent = "Backend local conectado. Crea cuenta o inicia sesión.";
     else gateStatus.textContent = "No hay backend conectado. Revisa Firebase o arranca npm start.";
   }
-  const shortcut = $(".account-shortcut");
-  if (shortcut) {
+  $$(".account-shortcut").forEach((shortcut) => {
     shortcut.innerHTML = isSignedIn()
       ? '<svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0"/></svg>Mi cuenta'
       : '<svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0"/></svg>Iniciar sesión';
-  }
+  });
 }
 
 function getAuthCredentials(source = "profile") {
@@ -1899,7 +1898,7 @@ function simulatePhotoFood() {
   if (fat === "Mucho" || fat === "No se ve") appData.photoItems.push(scalePhotoItem("aceite de oliva", fat === "Mucho" ? 15 : 7));
   saveAppData();
   renderPhotoFoodResults();
-  showToast("Analisis aproximado generado. Revisa y corrige antes de guardar.");
+  showToast("Análisis aproximado generado. Revisa y corrige antes de guardar.");
 }
 
 function scalePhotoItem(name, grams) {
@@ -2058,7 +2057,7 @@ function renderAuthStatus() {
     if (help) help.textContent = "Registro, login, rutinas, comidas, entrenos y perfil se guardaran en SQLite.";
     return;
   }
-  status.textContent = "Sin backend conectado. No hay cuenta real ni sincronizacion.";
+  status.textContent = "Sin backend conectado. No hay cuenta real ni sincronización.";
   if (help) help.textContent = "Configura Firebase en config.js o abre la app con npm start para usar usuarios reales y base de datos.";
 }
 
@@ -2513,6 +2512,7 @@ async function deleteLocalAccount() {
   resetLocalUserState(null);
   renderAllAppData();
   renderAuthStatus();
+  setAuthUiState(false);
   showToast("Cuenta y datos locales eliminados.");
 }
 
@@ -2585,7 +2585,7 @@ function bindEvents() {
       saveAppData();
       pushApi("/api/habits", appData.habits);
       renderHabits();
-      showToast(habitToggle.checked ? "Habito completado." : "Habito pendiente.");
+      showToast(habitToggle.checked ? "Hábito completado." : "Hábito pendiente.");
     }
 
     const removePhotoFood = event.target.closest("[data-remove-photo-food]");
@@ -2736,7 +2736,7 @@ function bindEvents() {
     appData.communityPosts = [...(appData.communityPosts || []), post];
     saveAppData();
     if (hasRealBackend()) await apiRequest("/api/community/posts", { method: "POST", body: post }).catch(() => {});
-    showToast(privacy === "public" ? "Avance guardado como publico en tu cuenta." : "Avance guardado privado. Nadie mas lo ve.");
+    showToast(privacy === "public" ? "Avance guardado como público en tu cuenta." : "Avance guardado privado. Nadie más lo ve.");
     setView("community");
   });
   $("#public-profile-toggle")?.addEventListener("change", async (event) => {
@@ -2775,7 +2775,7 @@ function bindEvents() {
     appData.habits = appData.habits.map((habit) => ({ ...habit, done: false }));
     saveAppData();
     renderHabits();
-    showToast("Habitos reiniciados.");
+    showToast("Hábitos reiniciados.");
   });
   $("#generate-week-btn")?.addEventListener("click", () => {
     renderWeeklyRoutineBoard();
@@ -2786,20 +2786,20 @@ function bindEvents() {
     weeklyRoutinePlan.push({ ...cloneData(day), day: "Extra", status: "Pendiente" });
     renderWeeklyRoutineBoard();
     pushApi("/api/routines", weeklyRoutinePlan);
-    showToast("Dia duplicado en la semana.");
+    showToast("Día duplicado en la semana.");
   });
   $("#favorite-routine-day")?.addEventListener("click", async () => {
     appData.favoriteRoutine = cloneData(weeklyRoutinePlan[appData.selectedWeekDay]);
     saveAppData();
     if (hasRealBackend()) await pushApi("/api/preferences", { ...(appData.preferences || {}), favoriteRoutine: appData.favoriteRoutine });
-    showToast(hasRealBackend() ? "Rutina favorita guardada en tu cuenta." : "Rutina favorita pendiente de sincronizacion.");
+    showToast(hasRealBackend() ? "Rutina favorita guardada en tu cuenta." : "Rutina favorita pendiente de sincronización.");
   });
   $("#start-routine-day")?.addEventListener("click", () => {
     state.activeWorkout = createWorkoutFromWeekDay(weeklyRoutinePlan[appData.selectedWeekDay]);
     saveWorkout();
     renderWorkoutLog();
     setView("workout");
-    showToast("Dia cargado en modo entrenamiento.");
+    showToast("Día cargado en modo entrenamiento.");
   });
   $("#simulate-photo-food")?.addEventListener("click", simulatePhotoFood);
   $("#confirm-photo-food")?.addEventListener("click", confirmPhotoFood);
@@ -2813,11 +2813,11 @@ function bindEvents() {
     simulatePhotoFood();
     if (file && (await detectApi()) && firebaseOnline) {
       await uploadFoodPhotoToFirebase(file)
-        .then(() => showToast("Foto subida a Firebase Storage. Analisis aproximado listo para revisar."))
+        .then(() => showToast("Foto subida a Firebase Storage. Análisis aproximado listo para revisar."))
         .catch(() => showToast("No se pudo subir la foto. Puedes revisar y guardar la estimación manual."));
       return;
     }
-    showToast("Foto cargada. Analisis aproximado listo para revisar.");
+    showToast("Foto cargada. Análisis aproximado listo para revisar.");
   });
   $("#photo-food-results")?.addEventListener("change", (event) => {
     const input = event.target.closest("[data-photo-field]");
@@ -2850,6 +2850,7 @@ function bindEvents() {
     resetLocalUserState(null);
     renderAllAppData();
     renderAuthStatus();
+    setAuthUiState(false);
     showToast("Sesión cerrada.");
   });
   $("#account-delete")?.addEventListener("click", deleteLocalAccount);
