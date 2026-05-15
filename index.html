@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="LiftLab es una app gratuita de entrenamiento, nutrición, progreso y hábitos con cuenta privada por usuario." />
     <title>LiftLab - Entrenador de fuerza</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23090909'/%3E%3Cpath d='M15 26v12M49 26v12M8 29v6M56 29v6M15 32h34' stroke='%23f7f7f5' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M32 13l3 9 9 3-9 3-3 9-3-9-9-3 9-3 3-9z' fill='%23ff6b35'/%3E%3C/svg%3E" />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body class="dark lyfta-skin device-mobile auth-loading">
+  <body class="dark lyfta-skin auth-loading">
     <section class="auth-gate" id="auth-gate" aria-label="Acceso a LiftLab">
       <div class="auth-card">
         <div class="brand auth-brand">
@@ -59,7 +60,7 @@
           </button>
           <button class="nav-item" data-view="implementation">
             <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM7 9h10M7 13h6M16 13h1M7 17h4"/></svg>
-            Plan real
+            Mi plan
           </button>
           <button class="nav-item" data-view="workout">
             <svg viewBox="0 0 24 24"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg>
@@ -122,7 +123,7 @@
             </button>
             <button class="ghost-button account-shortcut">
               <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0"/></svg>
-              Iniciar sesion
+              Iniciar sesión
             </button>
             <button class="ghost-button" data-view-shortcut="library">
               <svg viewBox="0 0 24 24"><path d="M21 21l-4.3-4.3M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"/></svg>
@@ -145,7 +146,7 @@
                 <button class="primary-button" data-view-shortcut="workout">Entrenar ahora</button>
                 <button class="ghost-button" data-load-template="push">Cargar rutina</button>
                 <button class="ghost-button" data-view-shortcut="implementation">Ver app real</button>
-                <button class="ghost-button account-shortcut">Iniciar sesion / crear cuenta</button>
+                <button class="ghost-button account-shortcut">Iniciar sesión / crear cuenta</button>
               </div>
             </div>
             <div class="phone-stage" aria-label="Vista previa del entrenamiento">
@@ -163,18 +164,18 @@
           <div class="stats-grid">
             <article class="metric-card">
               <span>Volumen semanal</span>
-              <strong id="weekly-volume">34.820 kg</strong>
-              <small>+8% vs semana anterior</small>
+              <strong id="weekly-volume">0 kg</strong>
+              <small>Se actualizará con tus entrenos</small>
             </article>
             <article class="metric-card">
               <span>Mejor 1RM</span>
-              <strong id="best-orm">112 kg</strong>
-              <small>Press banca estimado</small>
+              <strong id="best-orm">Sin datos</strong>
+              <small>Aparecerá con tu historial</small>
             </article>
             <article class="metric-card">
               <span>Entrenos</span>
-              <strong id="weekly-workouts">5</strong>
-              <small>Objetivo: 5 por semana</small>
+              <strong id="weekly-workouts">0</strong>
+              <small>Objetivo semanal</small>
             </article>
             <article class="metric-card">
               <span>Recuperación</span>
@@ -229,9 +230,9 @@
             <div>
               <span class="pill">LiftLab 100% gratis</span>
               <h2>De maqueta visual a app real personalizada</h2>
-              <p>Esta es la hoja de trabajo visible dentro de la app: usuarios reales con Firebase, onboarding, rutinas por dias, HealthKit, comida por foto, privacidad y MVP por fases.</p>
+              <p>Esta es la hoja de trabajo visible dentro de la app: usuarios reales con Firebase, onboarding, rutinas por días, HealthKit, comida por foto, privacidad y MVP por fases.</p>
               <div class="hero-actions">
-                <button class="primary-button" data-view-shortcut="routines">Ver rutinas por dias</button>
+                <button class="primary-button" data-view-shortcut="routines">Ver rutinas por días</button>
                 <button class="ghost-button" data-view-shortcut="nutrition">Ver comida por foto</button>
               </div>
             </div>
@@ -256,8 +257,8 @@
             </article>
             <article class="implementation-card next">
               <span>Fase 2</span>
-              <h3>Rutinas por dias</h3>
-              <p>Semana organizada por dia, musculos, bloques, ejercicios, series, reps, RPE, descansos y progresion.</p>
+              <h3>Rutinas por días</h3>
+              <p>Semana organizada por día, músculos, bloques, ejercicios, series, reps, RPE, descansos y progresión.</p>
             </article>
             <article class="implementation-card next">
               <span>Fase 3</span>
@@ -285,8 +286,8 @@
                 <div><strong>1</strong><span>Auth real: registro, login, reset y eliminar cuenta.</span></div>
                 <div><strong>2</strong><span>Onboarding persistente con perfil, objetivos, lesiones, disponibilidad y preferencias.</span></div>
                 <div><strong>3</strong><span>Base de datos por usuario para rutinas, entrenos, comidas, peso, medidas y habitos.</span></div>
-                <div><strong>4</strong><span>Rutina semanal generada por objetivo, nivel, dias, tiempo y material.</span></div>
-                <div><strong>5</strong><span>Modo entreno con historial real y progresion automatica.</span></div>
+                <div><strong>4</strong><span>Rutina semanal generada por objetivo, nivel, días, tiempo y material.</span></div>
+                <div><strong>5</strong><span>Modo entreno con historial real y progresión automática.</span></div>
               </div>
             </section>
             <section class="panel">
@@ -322,7 +323,7 @@
               <label>Objetivo secundario<input id="profile-secondary-goal-input" value="Mejorar salud general"></label>
               <label>Nivel<select id="profile-level-input"><option selected>Principiante</option><option>Intermedio</option><option>Avanzado</option></select></label>
               <label>Dias disponibles<input id="profile-days-input" type="number" value="3" min="1" max="7"></label>
-              <label>Tiempo por sesion<input id="profile-session-time-input" type="number" value="60"></label>
+              <label>Tiempo por sesión<input id="profile-session-time-input" type="number" value="60"></label>
               <label>Lugar<select id="profile-place-input"><option>Gimnasio</option><option>Casa</option><option>Exterior</option></select></label>
               <label>Material<input id="profile-equipment-input" placeholder="Barra, mancuernas, polea, maquinas"></label>
               <label>Lesiones o molestias<input id="profile-injuries-input" placeholder="Hombro, rodilla, espalda..."></label>
@@ -335,7 +336,7 @@
               <label>Alergias<input id="profile-allergies-input" placeholder="Sin alergias"></label>
               <label>Intolerancias<input id="profile-intolerances-input" placeholder="Sin intolerancias"></label>
               <label>No me gusta<input id="profile-dislikes-input" placeholder="Alimentos a evitar"></label>
-              <label>Comidas al dia<input id="profile-meals-input" type="number" value="4"></label>
+              <label>Comidas al día<input id="profile-meals-input" type="number" value="4"></label>
               <label>Presupuesto comida<input id="profile-budget-input" value="Medio"></label>
               <label>Hora entreno<input id="profile-training-time-input" value="18:30"></label>
               <label>Horas comida<input id="profile-meal-times-input" value="08:00, 14:00, 18:00, 21:00"></label>
@@ -506,7 +507,7 @@
             <div class="panel-heading">
               <div>
                 <h3>Comida por foto con IA</h3>
-                <p class="subtle">La foto solo puede dar una estimacion. Siempre hay que revisar gramos, alimentos y macros antes de guardar.</p>
+                <p class="subtle">La foto solo puede dar una estimación. Siempre hay que revisar gramos, alimentos y macros antes de guardar.</p>
               </div>
               <button class="primary-button" id="simulate-photo-food">Simular analisis</button>
             </div>
@@ -522,7 +523,7 @@
                 <article><strong>Verduras</strong><span>100 g estimados</span><small>35 kcal</small></article>
               </div>
               <div class="photo-warning">
-                <strong>Revision obligatoria</strong>
+                <strong>Revisión obligatoria</strong>
                 <p>No se puede saber el peso exacto solo con una imagen. El usuario debe corregir y confirmar antes de guardar.</p>
                 <div class="photo-context-inputs">
                   <label>Plato<select id="photo-plate-size"><option>Normal</option><option>Pequeño</option><option>Grande</option></select></label>
@@ -530,7 +531,7 @@
                   <label>Aceite/salsas<select id="photo-extra-fat"><option>Poco</option><option>No se ve</option><option>Mucho</option></select></label>
                 </div>
                 <button class="ghost-button" id="add-photo-food-item">Añadir alimento</button>
-                <button class="ghost-button" id="confirm-photo-food">Guardar estimacion revisada</button>
+                <button class="ghost-button" id="confirm-photo-food">Guardar estimación revisada</button>
               </div>
             </div>
           </section>
@@ -559,7 +560,7 @@
                   <svg viewBox="0 0 24 24"><path d="M12 8v5l3 2M9 2h6M12 4a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z"/></svg>
                   Temporizador
                 </button>
-                <button class="primary-button" id="finish-workout-btn">Finalizar</button>
+                <button class="primary-button" id="finish-workout-btn">Finalizar entrenamiento</button>
               </div>
             </section>
             <aside class="panel coach-panel">
@@ -579,8 +580,8 @@
           <div class="routine-planner">
             <div class="panel-heading">
               <div>
-                <h3>Semana organizada por dias, musculos y ejercicios</h3>
-                <p class="subtle">Estructura estilo planificador real: cada dia tiene estado, bloques, musculos, ejercicios y acciones.</p>
+                <h3>Semana organizada por días, músculos y ejercicios</h3>
+                <p class="subtle">Estructura estilo planificador real: cada día tiene estado, bloques, músculos, ejercicios y acciones.</p>
               </div>
               <button class="primary-button" id="generate-week-btn">Generar semana</button>
             </div>
@@ -589,13 +590,13 @@
           <section class="panel routine-detail-panel">
             <div class="panel-heading">
               <div>
-                <h3 id="routine-detail-title">Detalle del dia</h3>
+                <h3 id="routine-detail-title">Detalle del día</h3>
                 <p class="subtle" id="routine-detail-subtitle">Calentamiento, ejercicios principales, accesorios, core y vuelta a la calma.</p>
               </div>
               <div class="detail-actions">
                 <button class="ghost-button" id="duplicate-routine-day">Duplicar</button>
                 <button class="ghost-button" id="favorite-routine-day">Favorita</button>
-                <button class="primary-button" id="start-routine-day">Empezar dia</button>
+                <button class="primary-button" id="start-routine-day">Empezar día</button>
               </div>
             </div>
             <div class="routine-day-detail" id="routine-day-detail"></div>
@@ -607,7 +608,7 @@
           <div class="filters-row">
             <label class="search-field">
               <svg viewBox="0 0 24 24"><path d="M21 21l-4.3-4.3M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"/></svg>
-              <input id="exercise-search" type="search" placeholder="Buscar ejercicio, musculo o equipo" />
+              <input id="exercise-search" type="search" placeholder="Buscar ejercicio, músculo o equipo" />
             </label>
             <div class="segmented" id="muscle-filter" role="tablist" aria-label="Filtro muscular"></div>
           </div>
@@ -629,7 +630,7 @@
             <section class="panel chart-panel">
               <div class="panel-heading">
                 <h3>Volumen e intensidad</h3>
-                <select id="chart-mode" aria-label="Modo de grafico">
+                <select id="chart-mode" aria-label="Modo de gráfico">
                   <option value="volume">Volumen</option>
                   <option value="orm">1RM estimado</option>
                   <option value="sets">Series duras</option>
@@ -707,7 +708,7 @@
                 <h3>Preferencias</h3>
               </div>
               <label class="switch-row">
-                Perfil publico
+                Perfil público
                 <input type="checkbox" id="public-profile-toggle" />
               </label>
               <label class="switch-row">
@@ -738,13 +739,13 @@
                 <input id="auth-email" type="text" inputmode="email" autocomplete="email" placeholder="email@liftlab.app" />
                 <input id="auth-password" type="password" placeholder="contraseña" />
                 <button class="ghost-button" id="account-register">Crear cuenta</button>
-                <button class="ghost-button" id="account-login">Iniciar sesion</button>
+                <button class="ghost-button" id="account-login">Iniciar sesión</button>
                 <button class="ghost-button" id="account-reset">Recuperar contraseña</button>
                 <button class="ghost-button" id="account-verify-email">Verificar email</button>
-                <button class="ghost-button" id="account-logout">Cerrar sesion</button>
+                <button class="ghost-button" id="account-logout">Cerrar sesión</button>
                 <button class="ghost-button danger" id="account-delete">Eliminar cuenta y datos</button>
               </div>
-              <div class="auth-status" id="auth-status">Sesion privada pendiente</div>
+              <div class="auth-status" id="auth-status">Sesión privada pendiente</div>
               <p class="subtle" id="auth-help">Para cuenta real configura Firebase en config.js. El backend local queda como respaldo con npm start.</p>
             </section>
             <section class="panel health-panel">
@@ -757,7 +758,7 @@
                 <span>Calorias activas</span>
                 <span>Sueño</span>
                 <span>Entrenamientos</span>
-                <span>Frecuencia cardiaca</span>
+                <span>Frecuencia cardíaca</span>
               </div>
               <div class="manual-health-grid">
                 <label>Pasos<input id="health-steps-input" type="number" value="8200"></label>

@@ -138,7 +138,7 @@ const routineTemplates = [
     id: "push",
     name: "Empuje A",
     focus: "Pecho, hombro y triceps",
-    days: "2 dias por semana",
+    days: "2 días por semana",
     difficulty: "Intermedio",
     bars: [86, 66, 42],
     exerciseIds: ["bench", "incline-db", "dip", "lateral-raise"],
@@ -147,7 +147,7 @@ const routineTemplates = [
     id: "pull",
     name: "Tiron A",
     focus: "Espalda y biceps",
-    days: "2 dias por semana",
+    days: "2 días por semana",
     difficulty: "Intermedio",
     bars: [72, 82, 55],
     exerciseIds: ["lat-pulldown", "row", "pull-up", "curl"],
@@ -156,7 +156,7 @@ const routineTemplates = [
     id: "legs",
     name: "Legs A",
     focus: "Cuádriceps, femoral y glúteo",
-    days: "1 dia por semana",
+    days: "1 día por semana",
     difficulty: "Avanzado",
     bars: [94, 74, 62],
     exerciseIds: ["squat", "rdl", "leg-ext", "hip-thrust"],
@@ -165,7 +165,7 @@ const routineTemplates = [
     id: "power",
     name: "Torso fuerza",
     focus: "Fuerza maxima y marcas",
-    days: "1 dia por semana",
+    days: "1 día por semana",
     difficulty: "Avanzado",
     bars: [96, 58, 48],
     exerciseIds: ["bench", "pull-up", "row", "lateral-raise"],
@@ -174,7 +174,7 @@ const routineTemplates = [
     id: "hypertrophy",
     name: "Hipertrofia mixta",
     focus: "Volumen controlado",
-    days: "3 dias por semana",
+    days: "3 días por semana",
     difficulty: "Principiante",
     bars: [64, 78, 70],
     exerciseIds: ["incline-db", "lat-pulldown", "leg-ext", "curl"],
@@ -183,7 +183,7 @@ const routineTemplates = [
     id: "fullbody",
     name: "Cuerpo completo",
     focus: "Consistencia total",
-    days: "3 dias por semana",
+    days: "3 días por semana",
     difficulty: "Principiante",
     bars: [74, 68, 76],
     exerciseIds: ["squat", "bench", "row", "rdl"],
@@ -220,7 +220,7 @@ const weeklyRoutinePlan = [
   {
     day: "Miercoles",
     title: "Movilidad y pasos",
-    status: "Recuperacion",
+    status: "Recuperación",
     duration: "25 min",
     difficulty: "Suave",
     muscles: ["Core", "Movilidad"],
@@ -363,6 +363,7 @@ const defaultAppData = {
     workouts: 0,
     activityMinutes: 0,
   },
+  workoutHistory: [],
   privacySettings: {
     publicProfile: false,
     autoRest: true,
@@ -420,6 +421,7 @@ function loadAppData() {
       privacySettings: { ...defaultAppData.privacySettings, ...(stored?.privacySettings || {}) },
       communityProfile: { ...defaultAppData.communityProfile, ...(stored?.communityProfile || {}) },
       communityPosts: Array.isArray(stored?.communityPosts) ? stored.communityPosts : [],
+      workoutHistory: Array.isArray(stored?.workoutHistory) ? stored.workoutHistory : [],
       habits: stored?.habits?.length ? stored.habits : cloneData(defaultAppData.habits),
       photoItems: stored?.photoItems?.length ? stored.photoItems : cloneData(defaultAppData.photoItems),
     };
@@ -492,6 +494,7 @@ async function loadApiUserData() {
       privacySettings: { ...cloneData(defaultAppData.privacySettings), ...(data.privacySettings || {}), publicProfile: Boolean(data.communityProfile?.public) },
       communityProfile: { ...cloneData(defaultAppData.communityProfile), ...(data.communityProfile || {}) },
       communityPosts: Array.isArray(data.communityPosts) ? data.communityPosts : [],
+      workoutHistory: Array.isArray(data.workouts) ? data.workouts : [],
       habits: Array.isArray(data.habits) ? data.habits : cloneData(defaultAppData.habits),
       photoItems: Array.isArray(data.foodPhotoResults?.[0]?.items) ? data.foodPhotoResults[0].items : cloneData(defaultAppData.photoItems),
     };
@@ -571,17 +574,17 @@ function setAuthUiState(loading = false) {
   document.body.classList.toggle("auth-locked", !loading && !isSignedIn());
   const gateStatus = $("#gate-auth-status");
   if (gateStatus) {
-    if (loading) gateStatus.textContent = "Comprobando sesion con Firebase...";
-    else if (isSignedIn()) gateStatus.textContent = `Sesion iniciada: ${appData.account.email}`;
-    else if (firebaseOnline) gateStatus.textContent = "Firebase conectado. Crea cuenta gratis o inicia sesion.";
-    else if (apiOnline) gateStatus.textContent = "Backend local conectado. Crea cuenta o inicia sesion.";
+    if (loading) gateStatus.textContent = "Comprobando sesión con Firebase...";
+    else if (isSignedIn()) gateStatus.textContent = `Sesión iniciada: ${appData.account.email}`;
+    else if (firebaseOnline) gateStatus.textContent = "Firebase conectado. Crea cuenta gratis o inicia sesión.";
+    else if (apiOnline) gateStatus.textContent = "Backend local conectado. Crea cuenta o inicia sesión.";
     else gateStatus.textContent = "No hay backend conectado. Revisa Firebase o arranca npm start.";
   }
   const shortcut = $(".account-shortcut");
   if (shortcut) {
     shortcut.innerHTML = isSignedIn()
       ? '<svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0"/></svg>Mi cuenta'
-      : '<svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0"/></svg>Iniciar sesion';
+      : '<svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0"/></svg>Iniciar sesión';
   }
 }
 
@@ -690,7 +693,7 @@ function showToast(message) {
 function setView(view) {
   if (!isSignedIn()) {
     setAuthUiState(false);
-    showToast("Primero inicia sesion o crea una cuenta gratis.");
+    showToast("Primero inicia sesión o crea una cuenta gratis.");
     $("#gate-auth-email")?.focus();
     return;
   }
@@ -702,7 +705,7 @@ function setView(view) {
     ai: "Entrenador IA",
     nutrition: "Nutrición",
     workout: "Entrenar",
-    implementation: "Plan real",
+    implementation: "Mi plan",
     routines: "Rutinas",
     library: "Ejercicios",
     progress: "Progreso",
@@ -752,11 +755,12 @@ function renderPhonePreview() {
 }
 
 function renderWeekPlan() {
+  const hasHistory = Array.isArray(appData.workoutHistory) && appData.workoutHistory.length > 0;
   const days = weeklyRoutinePlan.map((item, index) => [
     item.day.slice(0, 3),
     item.title.split(" - ")[0],
-    index < 2 ? "Completado" : index === 3 ? "Hoy" : item.status,
-    index < 2,
+    hasHistory && index < Math.min(appData.workoutHistory.length, 2) ? "Completado" : index === 3 ? "Hoy" : item.status,
+    hasHistory && index < Math.min(appData.workoutHistory.length, 2),
   ]);
   $("#week-plan").innerHTML = days
     .map(([day, title, status, done]) => `
@@ -1057,6 +1061,22 @@ function renderLibrary() {
 }
 
 function renderCues() {
+  if ($("#dialog-title")) $("#dialog-title").textContent = state.selectedExercise.name;
+  if ($("#dialog-muscle")) $("#dialog-muscle").textContent = state.selectedExercise.muscle;
+  if ($("#dialog-description")) $("#dialog-description").textContent = state.selectedExercise.description;
+  if ($("#dialog-video-frame")) {
+    $("#dialog-video-frame").src = posterSrc(state.selectedExercise, 0);
+    $("#dialog-video-frame").alt = `Video animado de ${state.selectedExercise.name}`;
+  }
+  if ($("#dialog-photos")) {
+    $("#dialog-photos").innerHTML = [0, 1, 2].map((frame) => `<img src="${posterSrc(state.selectedExercise, frame)}" alt="Foto ${frame + 1} de ${state.selectedExercise.name}">`).join("");
+  }
+  if ($("#dialog-muscles")) {
+    $("#dialog-muscles").innerHTML = `
+    <img src="${muscleDataUri(state.selectedExercise.muscle, "front")}" alt="Musculos frontales trabajados por ${state.selectedExercise.name}">
+    <img src="${muscleDataUri(state.selectedExercise.muscle, "back")}" alt="Musculos posteriores trabajados por ${state.selectedExercise.name}">
+  `;
+  }
   $("#cue-list").innerHTML = state.selectedExercise.cues.map((cue) => `<div class="cue">${cue}</div>`).join("");
 }
 
@@ -1254,11 +1274,14 @@ function renderCalculator() {
 }
 
 function renderMilestones() {
-  const items = [
-    ["Press banca", "100 x 5 registrado hace 2 dias"],
-    ["Sentadilla", "Volumen semanal +12%"],
-    ["Dominada", "Primera serie con lastre"],
-  ];
+  const history = Array.isArray(appData.workoutHistory) ? appData.workoutHistory : [];
+  const items = history.length
+    ? [
+        ["Último entreno", `${history.at(-1)?.name || "Entreno"} guardado en tu cuenta`],
+        ["Entrenos registrados", `${history.length} sesiones reales`],
+        ["Progreso", "Los récords aparecerán al repetir ejercicios"],
+      ]
+    : [["Sin registros todavía", "Completa tu primer entrenamiento para ver marcas reales"]];
   $("#milestones").innerHTML = items.map(([title, text]) => `<article class="milestone"><strong>${title}</strong><br><small>${text}</small></article>`).join("");
 }
 
@@ -1283,7 +1306,7 @@ function renderCommunity() {
     ["Volumen guardado", `${Math.round(volumeKg).toLocaleString("es-ES")} kg`, "Solo tu cuenta"],
     ["Series completadas", `${completedSets.length}`, "Entreno actual"],
     ["Pasos de hoy", `${Number(appData.health.steps || 0).toLocaleString("es-ES")}`, "Dato privado"],
-    ["Perfil publico", publicProfile ? "Activado" : "Desactivado", publicProfile ? "Solo si tu lo decides" : "Nadie ve tus datos"],
+    ["Perfil público", publicProfile ? "Activado" : "Desactivado", publicProfile ? "Solo si tú lo decides" : "Nadie ve tus datos"],
   ]
     .map(([metric, value, note]) => `
       <div class="leader-row">
@@ -1303,7 +1326,7 @@ function renderCommunity() {
               <strong>${escapeHtml(post.title || "Avance privado")}</strong>
               <small>${escapeHtml(post.text || "")}</small>
             </div>
-            <span class="pill">${escapeHtml(post.privacy === "public" ? "Publico" : "Privado")}</span>
+            <span class="pill">${escapeHtml(post.privacy === "public" ? "Público" : "Privado")}</span>
           </article>
         `)
         .join("")
@@ -1935,12 +1958,15 @@ async function confirmPhotoFood() {
 function renderDashboardData() {
   const profile = appData.profile;
   const health = appData.health;
+  const history = Array.isArray(appData.workoutHistory) ? appData.workoutHistory : [];
   const meals = todayMeals();
   const totals = sumNutrition(meals.map((meal) => meal.totals));
   const targets = getNutritionTargets();
-  $("#weekly-workouts").textContent = `${Math.min(profile.days, 5)}`;
+  $("#weekly-workouts").textContent = `${history.length}`;
   $("#recovery-score").textContent = `${estimateRecovery()}%`;
-  $("#side-streak").textContent = `${Math.max(1, Math.round(health.steps / 1000))} días`;
+  $("#weekly-volume").textContent = history.length ? `${estimateHistoryVolume(history).toLocaleString("es-ES")} kg` : "0 kg";
+  $("#best-orm").textContent = history.length ? `${estimateBestOrm(history)} kg` : "Sin datos";
+  $("#side-streak").textContent = `${history.length ? Math.min(history.length, 8) : 0} días`;
   const data = [
     ["Hola", profile.name, profile.goal],
     ["Pasos", health.steps.toLocaleString("es-ES"), `${Math.round((health.steps / profile.steps) * 100)}% objetivo`],
@@ -1954,6 +1980,18 @@ function renderDashboardData() {
   $("#dashboard-real-data").innerHTML = data
     .map(([label, value, help]) => `<div><span>${label}</span><strong>${value}</strong><small>${help}</small></div>`)
     .join("");
+}
+
+function estimateHistoryVolume(history) {
+  return Math.round(
+    history.reduce((sum, workout) => sum + (workout.exercises || []).flatMap((entry) => entry.sets || []).reduce((setSum, set) => setSum + Number(set.weight || 0) * Number(set.reps || 0), 0), 0)
+  );
+}
+
+function estimateBestOrm(history) {
+  const sets = history.flatMap((workout) => (workout.exercises || []).flatMap((entry) => entry.sets || []));
+  const best = sets.reduce((max, set) => Math.max(max, Number(set.weight || 0) * (1 + Number(set.reps || 0) / 30)), 0);
+  return best ? Math.round(best) : 0;
 }
 
 function estimateRecovery() {
@@ -2005,7 +2043,7 @@ function renderAuthStatus() {
     return;
   }
   if (firebaseOnline) {
-    status.textContent = "Firebase conectado. Puedes crear cuenta o iniciar sesion real.";
+    status.textContent = "Firebase conectado. Puedes crear cuenta o iniciar sesión real.";
     if (help) help.textContent = "Registro, login, rutinas, comidas, entrenos y perfil se guardaran en Firebase.";
     return;
   }
@@ -2016,7 +2054,7 @@ function renderAuthStatus() {
     return;
   }
   if (apiOnline) {
-    status.textContent = "Backend conectado. Puedes crear cuenta o iniciar sesion real.";
+    status.textContent = "Backend conectado. Puedes crear cuenta o iniciar sesión real.";
     if (help) help.textContent = "Registro, login, rutinas, comidas, entrenos y perfil se guardaran en SQLite.";
     return;
   }
@@ -2037,11 +2075,11 @@ function authErrorMessage(error) {
   if (message.includes("auth/operation-not-allowed")) {
     return "Activa el proveedor Email/Password en Firebase Authentication.";
   }
-  if (message.includes("auth/email-already-in-use")) return "Ese email ya tiene cuenta. Inicia sesion.";
-  if (message.includes("auth/invalid-credential") || message.includes("auth/wrong-password")) return "Email o contrasena incorrectos.";
-  if (message.includes("auth/weak-password")) return "La contrasena debe tener al menos 6 caracteres.";
-  if (message.includes("auth/invalid-email")) return "El email no es valido.";
-  if (message.includes("auth/network-request-failed")) return "Firebase no ha confirmado el envio. Comprueba conexion, espera un minuto y vuelve a probar con el email exacto.";
+  if (message.includes("auth/email-already-in-use")) return "Ese email ya tiene cuenta. Inicia sesión.";
+  if (message.includes("auth/invalid-credential") || message.includes("auth/wrong-password")) return "Email o contraseña incorrectos.";
+  if (message.includes("auth/weak-password")) return "La contraseña debe tener al menos 6 caracteres.";
+  if (message.includes("auth/invalid-email")) return "El email no es válido.";
+  if (message.includes("auth/network-request-failed")) return "Firebase no ha confirmado el envío. Comprueba conexión, espera un minuto y vuelve a probar con el email exacto.";
   if (message.includes("auth/too-many-requests")) return "Firebase ha bloqueado temporalmente demasiados intentos. Espera unos minutos y vuelve a probar.";
   if (message.includes("auth/user-not-found")) return "No existe cuenta con ese email. Revisa que este escrito exactamente igual.";
   return message || "No se pudo completar la accion de cuenta.";
@@ -2065,7 +2103,7 @@ async function sendPasswordReset(source = "profile") {
 }
 
 async function sendVerificationEmail() {
-  if (!isSignedIn()) return showToast("Inicia sesion para verificar tu email.");
+  if (!isSignedIn()) return showToast("Inicia sesión para verificar tu email.");
   if (await detectApi()) {
     await apiRequest("/api/auth/verify-email", { method: "POST" })
       .then((result) => showToast(`Correo de verificacion solicitado para ${result.email || appData.account.email}. Revisa Spam/Promociones.`))
@@ -2181,7 +2219,7 @@ function renderWeeklyRoutineBoard() {
   if (!board) return;
   board.innerHTML = weeklyRoutinePlan
     .map((day, index) => `
-      <article class="weekly-day-card ${day.status === "Recuperacion" ? "recovery" : ""} ${appData.selectedWeekDay === index ? "active" : ""}" data-select-week-day="${index}">
+      <article class="weekly-day-card ${day.status === "Recuperación" ? "recovery" : ""} ${appData.selectedWeekDay === index ? "active" : ""}" data-select-week-day="${index}">
         <div class="weekly-day-head">
           <div>
             <span>${day.day}</span>
@@ -2258,7 +2296,7 @@ function renderRoutineDayDetail() {
         `)
         .join("")}
     </div>
-    <div class="coach-note">Coach IA: si duermes mal o Salud marca baja recuperacion, baja 1 serie en accesorios. Si una maquina esta ocupada, usa la sustitucion del dia.</div>
+    <div class="coach-note">Coach IA: si duermes mal o Salud marca baja recuperación, baja 1 serie en accesorios. Si una máquina está ocupada, usa la sustitución del día.</div>
   `;
 }
 
@@ -2450,7 +2488,7 @@ async function loginLocalAccount(source = "profile") {
       appData.account = { email: session.user.email, id: session.user.id, mode: firebaseOnline ? "firebase" : "api" };
       saveAppData();
       await loadApiUserData();
-      showToast(firebaseOnline ? "Sesion iniciada con Firebase." : "Sesion iniciada con backend.");
+      showToast(firebaseOnline ? "Sesión iniciada con Firebase." : "Sesión iniciada con backend.");
       setView("dashboard");
       return;
     } catch (error) {
@@ -2483,6 +2521,7 @@ function renderAllAppData() {
   renderAuthStatus();
   renderHealthInputs();
   renderDashboardData();
+  renderWeekPlan();
   renderHabits();
   renderPhotoFoodResults();
   renderCommunity();
@@ -2527,7 +2566,7 @@ function bindEvents() {
     const editWeekDay = event.target.closest("[data-edit-week-day]");
     if (editWeekDay) {
       selectWeekDay(editWeekDay.dataset.editWeekDay);
-      showToast("Dia seleccionado. Cambia ejercicios desde Sustituir o empieza la sesion.");
+      showToast("Día seleccionado. Cambia ejercicios desde Sustituir o empieza la sesión.");
     }
 
     const swapWeekDay = event.target.closest("[data-swap-week-day]");
@@ -2536,7 +2575,7 @@ function bindEvents() {
       day.blocks[day.blocks.length - 1].exercises = day.blocks[day.blocks.length - 1].exercises.map((name) => (name.includes("Plancha") ? "Elevacion lateral" : name));
       selectWeekDay(swapWeekDay.dataset.swapWeekDay);
       pushApi("/api/routines", weeklyRoutinePlan);
-      showToast("Ejercicio sustituido segun disponibilidad y molestias.");
+      showToast("Ejercicio sustituido según disponibilidad y molestias.");
     }
 
     const habitToggle = event.target.closest("[data-habit-id]");
@@ -2627,7 +2666,12 @@ function bindEvents() {
       calories: Math.round((durationMin * appData.profile.weight * 5.5) / 60),
       source: "LiftLab modo entrenamiento",
     };
+    appData.workoutHistory = [...(appData.workoutHistory || []), finishedWorkout];
+    saveAppData();
     if (hasRealBackend()) apiRequest("/api/workouts", { method: "POST", body: finishedWorkout }).catch(() => {});
+    renderDashboardData();
+    renderMilestones();
+    renderWeekPlan();
     showToast(`Entreno guardado con ${completed} series completadas.`);
   });
   $("#add-exercise-btn").addEventListener("click", () => setView("library"));
@@ -2664,6 +2708,7 @@ function bindEvents() {
   });
   $("#device-toggle").addEventListener("click", () => {
     document.body.classList.toggle("device-mobile");
+    localStorage.setItem("liftlab-device-mode", document.body.classList.contains("device-mobile") ? "mobile" : "desktop");
     updateDeviceToggleLabel();
     drawProgressChart();
   });
@@ -2700,7 +2745,7 @@ function bindEvents() {
     saveAppData();
     renderCommunity();
     if (hasRealBackend()) await apiRequest("/api/community/profile", { method: "PUT", body: appData.communityProfile }).catch(() => {});
-    showToast(event.target.checked ? "Perfil publico activado por decision tuya." : "Perfil publico desactivado. Tus datos quedan privados.");
+    showToast(event.target.checked ? "Perfil público activado por decisión tuya." : "Perfil público desactivado. Tus datos quedan privados.");
   });
   $("#auto-rest-toggle")?.addEventListener("change", (event) => {
     appData.privacySettings.autoRest = event.target.checked;
@@ -2734,7 +2779,7 @@ function bindEvents() {
   });
   $("#generate-week-btn")?.addEventListener("click", () => {
     renderWeeklyRoutineBoard();
-    showToast("Semana generada segun objetivo, dias, tiempo y material.");
+    showToast("Semana generada según objetivo, días, tiempo y material.");
   });
   $("#duplicate-routine-day")?.addEventListener("click", () => {
     const day = weeklyRoutinePlan[appData.selectedWeekDay];
@@ -2769,7 +2814,7 @@ function bindEvents() {
     if (file && (await detectApi()) && firebaseOnline) {
       await uploadFoodPhotoToFirebase(file)
         .then(() => showToast("Foto subida a Firebase Storage. Analisis aproximado listo para revisar."))
-        .catch(() => showToast("No se pudo subir la foto. Puedes revisar y guardar la estimacion manual."));
+        .catch(() => showToast("No se pudo subir la foto. Puedes revisar y guardar la estimación manual."));
       return;
     }
     showToast("Foto cargada. Analisis aproximado listo para revisar.");
@@ -2805,7 +2850,7 @@ function bindEvents() {
     resetLocalUserState(null);
     renderAllAppData();
     renderAuthStatus();
-    showToast("Sesion cerrada.");
+    showToast("Sesión cerrada.");
   });
   $("#account-delete")?.addEventListener("click", deleteLocalAccount);
   ["#health-steps-input", "#health-active-input", "#health-resting-input", "#health-sleep-input", "#health-rhr-input", "#health-hrv-input"].forEach((selector) => {
@@ -2988,6 +3033,7 @@ async function bootstrapAuth() {
 }
 
 function init() {
+  applyPreferredDeviceMode();
   setAuthUiState(true);
   renderProfileInputs();
   renderDate();
@@ -3014,9 +3060,22 @@ function init() {
   renderFoodSearch();
   updateTimerText();
   updateDeviceToggleLabel();
+  window.addEventListener("resize", applyResponsiveDeviceMode);
   bindEvents();
   animateExercise();
   bootstrapAuth();
+}
+
+function applyPreferredDeviceMode() {
+  const saved = localStorage.getItem("liftlab-device-mode");
+  const useMobile = saved ? saved === "mobile" : window.innerWidth < 861;
+  document.body.classList.toggle("device-mobile", useMobile);
+}
+
+function applyResponsiveDeviceMode() {
+  if (localStorage.getItem("liftlab-device-mode")) return;
+  document.body.classList.toggle("device-mobile", window.innerWidth < 861);
+  updateDeviceToggleLabel();
 }
 
 function updateDeviceToggleLabel() {
@@ -3024,7 +3083,7 @@ function updateDeviceToggleLabel() {
   if (!toggle) return;
   toggle.innerHTML = document.body.classList.contains("device-mobile")
     ? '<svg viewBox="0 0 24 24"><path d="M3 5h18v12H3zM8 21h8M12 17v4"/></svg>Modo PC'
-    : '<svg viewBox="0 0 24 24"><path d="M7 3h10v18H7zM11 18h2"/></svg>Modo movil';
+    : '<svg viewBox="0 0 24 24"><path d="M7 3h10v18H7zM11 18h2"/></svg>Modo móvil';
 }
 
 init();

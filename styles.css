@@ -38,6 +38,11 @@ body.dark {
   box-sizing: border-box;
 }
 
+:where(button, input, select, textarea, a):focus-visible {
+  outline: 3px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -1190,11 +1195,11 @@ dialog canvas {
   gap: 14px;
   margin-bottom: 16px;
   padding: 18px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .weekly-routine-board {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 292px), 1fr));
   align-items: stretch;
 }
 
@@ -1299,7 +1304,7 @@ dialog canvas {
 
 .weekly-day-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
   gap: 8px;
   align-self: end;
 }
