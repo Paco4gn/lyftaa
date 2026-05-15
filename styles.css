@@ -1644,6 +1644,14 @@ dialog canvas {
   gap: 12px;
 }
 
+.ai-chat-priority {
+  margin-bottom: 16px;
+}
+
+.ai-chat-priority .ai-chat {
+  max-height: 180px;
+}
+
 .ai-control-panel {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-bottom: 16px;

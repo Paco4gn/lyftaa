@@ -346,6 +346,22 @@
         </section>
 
         <section class="view" id="ai-view" aria-label="Centro de inteligencia artificial">
+          <section class="panel ai-chat-priority">
+            <div class="panel-heading">
+              <h3>Chat del entrenador</h3>
+            </div>
+            <div class="ai-chat" id="ai-chat"></div>
+            <div class="ai-prompts">
+              <button type="button" data-ai-prompt="¿Subo peso hoy?">Subo peso</button>
+              <button type="button" data-ai-prompt="Me duele el hombro">Dolor hombro</button>
+              <button type="button" data-ai-prompt="¿Qué como antes de entrenar?">Nutrición</button>
+            </div>
+            <form class="ai-chat-form" id="ai-chat-form">
+              <input id="ai-chat-input" placeholder="Pregunta: ¿subo peso hoy?, ¿qué cambio si me duele el hombro?" />
+              <button class="primary-button" type="submit">Enviar</button>
+            </form>
+          </section>
+
           <div class="ai-hero">
             <div>
               <span class="pill">Entrenador IA gratuito</span>
@@ -389,8 +405,6 @@
             </label>
           </div>
 
-          <div class="ai-agent-grid" id="ai-agent-grid"></div>
-
           <div class="ai-workbench">
             <section class="panel nutrition-ai-panel">
               <div class="panel-heading">
@@ -406,22 +420,9 @@
               </div>
               <div id="ai-plan" class="ai-plan"></div>
             </section>
-            <section class="panel">
-              <div class="panel-heading">
-              <h3>Chat del entrenador</h3>
-              </div>
-              <div class="ai-chat" id="ai-chat"></div>
-              <div class="ai-prompts">
-                <button type="button" data-ai-prompt="¿Subo peso hoy?">Subo peso</button>
-                <button type="button" data-ai-prompt="Me duele el hombro">Dolor hombro</button>
-                <button type="button" data-ai-prompt="¿Qué como antes de entrenar?">Nutrición</button>
-              </div>
-              <form class="ai-chat-form" id="ai-chat-form">
-                <input id="ai-chat-input" placeholder="Pregunta: ¿subo peso hoy?, ¿qué cambio si me duele el hombro?" />
-                <button class="primary-button" type="submit">Enviar</button>
-              </form>
-            </section>
           </div>
+
+          <div class="ai-agent-grid" id="ai-agent-grid"></div>
         </section>
 
         <section class="view" id="nutrition-view" aria-label="Contador de calorías con IA">
