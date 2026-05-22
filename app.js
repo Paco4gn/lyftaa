@@ -1112,11 +1112,53 @@ function renderFeed(target = "#recent-feed") {
     .join("");
 }
 
+const premiumGifs = {
+  bench: "videos/0025-EIeI8Vf.gif",
+  "incline-db": "videos/0314-ns0SIbU.gif",
+  dip: "videos/0251-9WTm7dq.gif",
+  "lat-pulldown": "videos/2330-LEprlgG.gif",
+  row: "videos/0861-fUBheHs.gif",
+  curl: "videos/0031-25GPyDY.gif",
+  squat: "videos/0043-qXTaZnJ.gif",
+  rdl: "videos/0085-wQ2c4XD.gif",
+  "leg-ext": "videos/0585-my33uHU.gif",
+  "lateral-raise": "videos/0334-DsgkuIt.gif",
+  "pull-up": "videos/0652-lBDjFxJ.gif",
+  "hip-thrust": "videos/3562-qg2PGl6.gif",
+  "overhead-press": "videos/1456-wdRZISl.gif",
+  "pec-deck": "videos/0596-v3xmPAR.gif",
+  "triceps-pushdown": "videos/0241-gAwDzB3.gif",
+  "face-pull": "videos/0233-ZfyAGhK.gif",
+  deadlift: "videos/0032-ila4NZS.gif",
+  "tbar-row": "videos/1349-BgljGjd.gif",
+  "hammer-curl": "videos/0313-slDvUAU.gif",
+  "leg-press": "videos/0739-10Z2DXU.gif",
+  lunge: "videos/0336-RRWFUcw.gif",
+  "leg-curl": "videos/0586-17lJ1kr.gif",
+  "calf-raise": "videos/1372-8ozhUIZ.gif",
+  plank: "videos/2135-VBAWRPG.gif",
+  "push-up": "videos/0662-I4hDWkc.gif",
+  "cable-fly": "videos/0227-Pr9Rhf4.gif",
+  "seated-db-press": "videos/0405-znQUdHY.gif",
+  "wide-pulldown": "videos/0150-eYnzaCm.gif",
+  "single-row": "videos/0292-C0MA9bC.gif",
+  "glute-bridge": "videos/1409-qKBpF7I.gif"
+};
+
 function findExercise(id) {
   return exercises.find((item) => item.id === id) || exercises[0];
 }
 
 function posterSrc(exercise, frame = 0) {
+  const premiumPath = premiumGifs[exercise.id];
+  if (premiumPath) {
+    if (frame === "gif" || frame === "video") {
+      return `https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/${premiumPath}`;
+    } else {
+      const jpgPath = premiumPath.replace("videos/", "images/").replace(".gif", ".jpg");
+      return `https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/${jpgPath}`;
+    }
+  }
   return `assets/exercises/${exercise.id}-${frame}.svg`;
 }
 
@@ -1394,15 +1436,25 @@ function renderLibrary() {
 }
 
 function renderCues() {
+  if (!state.selectedExercise) return;
   if ($("#dialog-title")) $("#dialog-title").textContent = state.selectedExercise.name;
   if ($("#dialog-muscle")) $("#dialog-muscle").textContent = state.selectedExercise.muscle;
   if ($("#dialog-description")) $("#dialog-description").textContent = state.selectedExercise.description;
+  
+  const hasPremium = !!premiumGifs[state.selectedExercise.id];
   if ($("#dialog-video-frame")) {
-    $("#dialog-video-frame").src = posterSrc(state.selectedExercise, 0);
+    $("#dialog-video-frame").src = posterSrc(state.selectedExercise, hasPremium ? "gif" : 0);
     $("#dialog-video-frame").alt = `Video animado de ${state.selectedExercise.name}`;
   }
   if ($("#dialog-photos")) {
-    $("#dialog-photos").innerHTML = [0, 1, 2].map((frame) => `<img src="${posterSrc(state.selectedExercise, frame)}" alt="Foto ${frame + 1} de ${state.selectedExercise.name}">`).join("");
+    if (hasPremium) {
+      $("#dialog-photos").style.display = "none";
+    } else {
+      $("#dialog-photos").style.display = "";
+      $("#dialog-photos").innerHTML = [0, 1, 2]
+        .map((frame) => `<img src="${posterSrc(state.selectedExercise, frame)}" alt="Foto ${frame + 1} de ${state.selectedExercise.name}">`)
+        .join("");
+    }
   }
   if ($("#dialog-muscles")) {
     $("#dialog-muscles").innerHTML = `
@@ -1509,9 +1561,44 @@ function drawPlate(ctx, x, y, color) {
   ctx.fill();
 }
 
+let lastCoachExerciseId = null;
+
 function animateExercise() {
-  const phase = performance.now() / 650;
-  drawExercise($("#exercise-canvas"), state.selectedExercise, phase);
+  const canvas = $("#exercise-canvas");
+  const gifImg = $("#coach-exercise-gif");
+  
+  if (state.selectedExercise) {
+    const hasPremium = !!premiumGifs[state.selectedExercise.id];
+    if (hasPremium) {
+      if (canvas) canvas.style.display = "none";
+      if (gifImg) {
+        gifImg.style.display = "block";
+        if (lastCoachExerciseId !== state.selectedExercise.id) {
+          lastCoachExerciseId = state.selectedExercise.id;
+          gifImg.src = posterSrc(state.selectedExercise, "gif");
+        }
+      }
+    } else {
+      if (gifImg) {
+        gifImg.style.display = "none";
+        lastCoachExerciseId = null;
+      }
+      if (canvas) {
+        canvas.style.display = "block";
+        const phase = performance.now() / 650;
+        drawExercise(canvas, state.selectedExercise, phase);
+      }
+    }
+  } else {
+    if (gifImg) {
+      gifImg.style.display = "none";
+      lastCoachExerciseId = null;
+    }
+    if (canvas) {
+      canvas.style.display = "block";
+    }
+  }
+  
   requestAnimationFrame(animateExercise);
 }
 
@@ -1523,6 +1610,7 @@ function stopDialogAnimation() {
 
 function startDialogAnimation() {
   stopDialogAnimation();
+  if (state.selectedExercise && premiumGifs[state.selectedExercise.id]) return;
   let frame = 0;
   dialogFrameTimer = setInterval(() => {
     const dialog = $("#exercise-dialog");
@@ -2670,22 +2758,15 @@ function selectWeekDay(index) {
 function openExercise(id) {
   const exercise = findExercise(id);
   state.selectedExercise = exercise;
-  $("#dialog-title").textContent = exercise.name;
-  $("#dialog-muscle").textContent = exercise.muscle;
-  $("#dialog-description").textContent = exercise.description;
-  $("#dialog-video-frame").src = posterSrc(exercise, 0);
-  $("#dialog-video-frame").dataset.frame = "0";
-  $("#dialog-video-frame").alt = `Video animado de ${exercise.name}`;
-  $("#dialog-photos").innerHTML = [0, 1, 2]
-    .map((frame) => `<img src="${posterSrc(exercise, frame)}" alt="Foto ${frame + 1} de ${exercise.name}">`)
-    .join("");
-  $("#dialog-muscles").innerHTML = `
-    <img src="${muscleDataUri(exercise.muscle, "front")}" alt="Musculos frontales trabajados por ${exercise.name}">
-    <img src="${muscleDataUri(exercise.muscle, "back")}" alt="Musculos posteriores trabajados por ${exercise.name}">
-  `;
   renderCues();
+  
+  const hasPremium = !!premiumGifs[exercise.id];
+  if (!hasPremium) {
+    startDialogAnimation();
+  } else {
+    stopDialogAnimation();
+  }
   $("#exercise-dialog").showModal();
-  startDialogAnimation();
 }
 
 function renderMuscleAtlas() {
@@ -2752,6 +2833,42 @@ function loadTemplate(id) {
   renderWorkoutLog();
   showToast("Rutina cargada.");
   setView("workout");
+}
+
+function openHealthDialog(type) {
+  const dialog = $("#health-connection-dialog");
+  const title = $("#health-dialog-title");
+  const body = $("#health-dialog-body");
+  
+  if (!dialog || !title || !body) return;
+  
+  if (type === "apple") {
+    title.textContent = "Conectar Apple Health (Atajos de iOS)";
+    body.innerHTML = `
+      <p>Debido a las políticas de seguridad de Apple, una aplicación web (PWA) no puede acceder directamente a <strong>HealthKit</strong> en segundo plano sin una envoltura nativa de App Store.</p>
+      <p>Sin embargo, ¡tenemos una solución perfecta! Puedes conectar tus datos usando los <strong>Atajos de iOS (Shortcuts)</strong>:</p>
+      <ol style="margin-left: 20px; margin-top: 10px; display: grid; gap: 8px; font-size: 13px;">
+        <li>Crea un atajo en tu iPhone que lea tus pasos, sueño y frecuencia cardíaca del día de Apple Health.</li>
+        <li>Configura una acción de "Obtener contenido de URL" para enviar esos datos a LiftLab vía Webhook a nuestro backend local.</li>
+        <li>Configura una automatización diaria (ej: 23:00) para ejecutar el atajo de forma 100% silenciosa y automática.</li>
+      </ol>
+      <p style="margin-top: 15px; font-weight: bold; color: var(--accent);">¿Quieres simular la conexión para probar la aplicación hoy?</p>
+    `;
+  } else {
+    title.textContent = "Conectar Google Fit (OAuth 2.0)";
+    body.innerHTML = `
+      <p>Para conectar tu cuenta de <strong>Google Fit</strong> o <strong>Health Connect</strong>, utilizamos la API de consentimiento seguro de Google (OAuth 2.0).</p>
+      <p>Al hacer clic, se abrirá la pantalla oficial de Google para que nos concedas permisos de lectura para:</p>
+      <ul style="margin-left: 20px; margin-top: 10px; display: grid; gap: 6px; font-size: 13px;">
+        <li>Actividad física (pasos y minutos activos).</li>
+        <li>Sueño (horas y calidad).</li>
+        <li>Ritmo cardíaco y HRV.</li>
+      </ul>
+      <p style="margin-top: 15px; font-weight: bold; color: var(--accent);">¿Quieres iniciar el flujo de vinculación y sincronizar tus datos reales ahora?</p>
+    `;
+  }
+  
+  dialog.showModal();
 }
 
 function syncHealthData() {
@@ -3162,6 +3279,14 @@ function bindEvents() {
   });
   $("#sync-health-dashboard")?.addEventListener("click", syncHealthData);
   $("#sync-health-profile")?.addEventListener("click", syncHealthData);
+  $("#connect-apple-health")?.addEventListener("click", () => openHealthDialog("apple"));
+  $("#connect-google-fit")?.addEventListener("click", () => openHealthDialog("google"));
+  $("#close-health-dialog")?.addEventListener("click", () => $("#health-connection-dialog")?.close());
+  $("#confirm-health-dialog")?.addEventListener("click", () => {
+    $("#health-connection-dialog")?.close();
+    syncHealthData();
+    showToast("¡Dispositivo vinculado con éxito! Datos de salud sincronizados.");
+  });
   $("#reset-habits")?.addEventListener("click", () => {
     appData.habits = appData.habits.map((habit) => ({ ...habit, done: false }));
     saveAppData();

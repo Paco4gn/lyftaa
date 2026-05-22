@@ -1241,6 +1241,7 @@ select,
 }
 
 .coach-panel canvas,
+.coach-panel img,
 .chart-panel canvas,
 dialog canvas {
   display: block;

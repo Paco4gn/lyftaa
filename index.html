@@ -581,6 +581,7 @@
                 </button>
               </div>
               <canvas id="exercise-canvas" width="520" height="360" aria-label="Animacion tecnica"></canvas>
+              <img id="coach-exercise-gif" src="" alt="Demostración técnica" style="display: none;">
               <div class="cue-list" id="cue-list"></div>
             </aside>
           </div>
@@ -760,8 +761,18 @@
             </section>
             <section class="panel health-panel">
               <div class="panel-heading">
-                <h3>Salud del iPhone</h3>
-                <button class="text-button" id="sync-health-profile">Actualizar datos</button>
+                <h3>Conexión con Apps de Salud</h3>
+                <button class="text-button" id="sync-health-profile">Actualizar Sincronización</button>
+              </div>
+              <div class="health-sync-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <button class="ghost-button" id="connect-apple-health" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;">
+                  <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.22.67-2.94 1.5-.63.73-1.18 1.87-1.03 2.98.12.01.24.01.37.01.88 0 2.09-.59 2.61-1.43z"/></svg>
+                  Apple Health
+                </button>
+                <button class="ghost-button" id="connect-google-fit" style="display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px;">
+                  <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                  Google Fit
+                </button>
               </div>
               <div class="health-permission-list">
                 <span>Pasos</span>
@@ -778,7 +789,7 @@
                 <label>FC reposo<input id="health-rhr-input" type="number" value="58"></label>
                 <label>HRV<input id="health-hrv-input" type="number" value="62"></label>
               </div>
-              <p class="subtle">Disponible cuando LiftLab tenga app iOS real con HealthKit. La web puede funcionar manualmente sin Salud.</p>
+              <p class="subtle">Conectado a la app de salud de tu dispositivo para leer pasos, sueño y frecuencia cardíaca. También puedes editar los datos manualmente arriba.</p>
             </section>
           </div>
         </section>
@@ -826,6 +837,20 @@
       <div class="dialog-actions">
         <button class="ghost-button" id="add-to-workout">Añadir al entreno</button>
         <button class="primary-button" id="start-from-dialog">Iniciar ahora</button>
+      </div>
+    </dialog>
+
+    <dialog id="health-connection-dialog" style="border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); padding: 24px; max-width: 450px; box-shadow: var(--shadow-lg);">
+      <div class="dialog-head" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <h3 id="health-dialog-title" style="margin: 0; font-size: 1.25rem;">Conectar App de Salud</h3>
+        <button class="icon-button" id="close-health-dialog" aria-label="Cerrar" style="background: none; border: none; color: var(--muted); cursor: pointer;">
+          <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div id="health-dialog-body" style="font-size: 14px; line-height: 1.6; color: var(--ink); margin-bottom: 20px;">
+      </div>
+      <div class="dialog-actions" style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="primary-button" id="confirm-health-dialog">Entendido</button>
       </div>
     </dialog>
 
