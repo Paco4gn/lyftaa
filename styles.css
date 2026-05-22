@@ -56,13 +56,12 @@ body {
 .auth-gate {
   display: none;
   min-height: 100vh;
-  padding: 18px;
-  place-items: center;
+  width: 100%;
 }
 
 body.auth-loading .auth-gate,
 body.auth-locked .auth-gate {
-  display: grid;
+  display: flex;
 }
 
 body.auth-loading .app-shell,
@@ -72,80 +71,159 @@ body.auth-locked .mobile-tabs {
   display: none !important;
 }
 
-.auth-card {
-  width: min(100%, 520px);
-  display: grid;
-  gap: 20px;
-  padding: clamp(22px, 5vw, 36px);
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent 42%),
-    var(--surface);
-  box-shadow: var(--shadow);
-}
-
-.auth-brand {
-  padding-bottom: 6px;
-}
-
-.auth-copy h1 {
-  margin: 12px 0;
-  font-size: clamp(2rem, 8vw, 3.35rem);
-  line-height: 0.95;
-}
-
-.auth-copy p {
-  max-width: 42rem;
-  color: var(--muted);
-  font-size: 1.02rem;
-  line-height: 1.55;
-}
-
-.auth-form {
-  display: grid;
-  gap: 12px;
-}
-
-.auth-form label {
-  display: grid;
-  gap: 7px;
-  color: var(--muted);
-  font-weight: 700;
-}
-
-.auth-form input {
-  width: 100%;
-  min-height: 48px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--surface-strong);
-  color: var(--ink);
-  padding: 0 14px;
-  font: inherit;
-}
-
-.auth-form-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.auth-assurances {
+.SignIn-module__UbpVyq__signInContainer {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #15202B;
+  padding: 16px;
 }
 
-.auth-assurances span {
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 8px 10px;
-  color: var(--muted);
-  background: color-mix(in srgb, var(--surface-strong) 80%, transparent);
-  font-size: 0.86rem;
-  font-weight: 800;
+.SignIn-module__UbpVyq__signInModal {
+  background-color: #192734;
+  border-radius: 16px;
+  padding: clamp(24px, 6vw, 40px);
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  border: 1px solid #38444d;
 }
+
+.SignIn-module__UbpVyq__signInTitle {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 6px 0;
+  text-align: center;
+}
+
+.SignIn-module__UbpVyq__signInPrompt {
+  font-size: 1rem;
+  color: #8899a6;
+  margin: 0 0 24px 0;
+  text-align: center;
+}
+
+.SignIn-module__UbpVyq__socialButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.SignIn-module__UbpVyq__signInButtonGoogle,
+.SignIn-module__UbpVyq__signInButtonApple {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+  border-radius: 9999px;
+  height: 48px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.SignIn-module__UbpVyq__signInButtonApple {
+  background-color: #000000;
+  color: #ffffff;
+  border: 1px solid #38444d;
+}
+
+.SignIn-module__UbpVyq__signInButtonGoogle:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-1px);
+}
+
+.SignIn-module__UbpVyq__signInButtonApple:hover {
+  background-color: #111111;
+  transform: translateY(-1px);
+}
+
+.SignIn-module__UbpVyq__googleLogo,
+.SignIn-module__UbpVyq__appleLogo {
+  flex-shrink: 0;
+}
+
+.SignIn-module__UbpVyq__divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+  color: #8899a6;
+}
+
+.SignIn-module__UbpVyq__divider::before,
+.SignIn-module__UbpVyq__divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #38444d;
+}
+
+.SignIn-module__UbpVyq__divider:not(:empty)::before {
+  margin-right: .6em;
+}
+
+.SignIn-module__UbpVyq__divider:not(:empty)::after {
+  margin-left: .6em;
+}
+
+.SignIn-module__UbpVyq__dividerText {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.SignIn-module__UbpVyq__inputContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.SignIn-module__UbpVyq__emailInput,
+.SignIn-module__UbpVyq__passwordInput {
+  background-color: #22303c;
+  border: 1px solid #38444d;
+  border-radius: 9999px;
+  height: 48px;
+  padding: 0 20px;
+  color: #ffffff;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+
+.SignIn-module__UbpVyq__emailInput:focus,
+.SignIn-module__UbpVyq__passwordInput:focus {
+  outline: none;
+  border-color: #ccff00;
+  box-shadow: 0 0 10px rgba(204, 255, 0, 0.15);
+}
+
+.SignIn-module__UbpVyq__signInButtonEmail {
+  background-color: #ccff00;
+  color: #000000;
+  border: none;
+  border-radius: 9999px;
+  height: 48px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  margin-top: 12px;
+}
+
+.SignIn-module__UbpVyq__signInButtonEmail:hover {
+  background-color: #a6ff00;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(204, 255, 0, 0.3);
+}
+
 
 body.device-mobile .app-shell {
   grid-template-columns: 1fr;
@@ -2724,27 +2802,44 @@ body.device-mobile .mobile-tab span {
 }
 
 .lyfta-skin {
-  --bg: #000000;
-  --surface: #0b0b0d;
-  --surface-strong: #1c1c20;
-  --ink: #f7f7f8;
-  --muted: #9a9aa0;
-  --line: #27272c;
-  --accent: #ffffff;
-  --accent-strong: #ffffff;
+  --bg: #15202B;
+  --surface: #192734;
+  --surface-strong: #22303c;
+  --ink: #ffffff;
+  --muted: #8899a6;
+  --line: #38444d;
+  --accent: #ccff00;
+  --accent-strong: #d4ff00;
   --coral: #ff4b3e;
   --amber: #ffb84d;
   --blue: #2997ff;
   --violet: #bf5af2;
-  --shadow: 0 18px 50px rgba(0, 0, 0, 0.62);
-  background: #000;
+  --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  background: #15202B;
+  font-family: 'Inter', sans-serif;
+}
+
+.lyfta-skin h1,
+.lyfta-skin h2,
+.lyfta-skin h3,
+.lyfta-skin h4,
+.lyfta-skin .brand strong,
+.lyfta-skin .metric-card strong,
+.lyfta-skin .calc-result strong {
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: -0.02em;
 }
 
 .lyfta-skin .app-shell {
-  background: #000;
+  background: #15202B;
 }
 
-.lyfta-skin .sidebar,
+.lyfta-skin .sidebar {
+  background: rgba(25, 39, 52, 0.85);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid #38444d;
+}
+
 .lyfta-skin .panel,
 .lyfta-skin .metric-card,
 .lyfta-skin .routine-card,
@@ -2757,70 +2852,142 @@ body.device-mobile .mobile-tab span {
 .lyfta-skin .set-row,
 .lyfta-skin .log-exercise,
 .lyfta-skin .sidebar-footer {
-  background: #17171b;
-  border-color: #25252a;
+  background: #192734;
+  border: 1px solid #38444d;
   box-shadow: none;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.lyfta-skin .panel:hover,
+.lyfta-skin .metric-card:hover,
+.lyfta-skin .exercise-card:hover,
+.lyfta-skin .routine-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(204, 255, 0, 0.4);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.6), 0 0 15px rgba(204, 255, 0, 0.05);
 }
 
 .lyfta-skin .hero-panel {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 44%),
-    #050506;
-  border-color: #202025;
+    radial-gradient(circle at 10% 20%, rgba(204, 255, 0, 0.08), transparent 40%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 44%),
+    #192734;
+  border-color: #38444d;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
 }
 
 .lyfta-skin .hero-copy h2,
 .lyfta-skin h1 {
-  color: #fff;
+  color: #ffffff;
 }
 
 .lyfta-skin .primary-button,
 .lyfta-skin .apple-button {
-  background: #ffffff;
-  color: #000;
-  box-shadow: none;
+  background: var(--accent);
+  color: #000000;
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 4px 15px rgba(204, 255, 0, 0.25);
+  transition: background 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+}
+
+.lyfta-skin .primary-button:hover,
+.lyfta-skin .apple-button:hover {
+  background: var(--accent-strong);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(204, 255, 0, 0.4);
 }
 
 .lyfta-skin .ghost-button,
 .lyfta-skin .icon-button,
 .lyfta-skin .dark-button {
-  background: #202024;
-  color: #fff;
-  border-color: #2a2a30;
+  background: #22303c;
+  color: #ffffff;
+  border: 1px solid #38444d;
+  transition: all 0.25s ease;
+}
+
+.lyfta-skin .ghost-button:hover,
+.lyfta-skin .icon-button:hover,
+.lyfta-skin .dark-button:hover {
+  background: #2c3d4f;
+  border-color: var(--accent);
+  color: #ffffff;
 }
 
 .lyfta-skin .pill,
 .lyfta-skin .segmented button.active {
-  background: #fff;
-  color: #000;
-  border-color: #fff;
+  background: rgba(204, 255, 0, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(204, 255, 0, 0.35);
+  font-weight: 700;
 }
 
-.lyfta-skin .nav-item.active,
-.lyfta-skin .nav-item:hover,
+.lyfta-skin .nav-item {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.lyfta-skin .nav-item.active {
+  background: rgba(204, 255, 0, 0.08);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.lyfta-skin .nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 15%;
+  height: 70%;
+  width: 4px;
+  background: var(--accent);
+  border-radius: 0 4px 4px 0;
+}
+
+.lyfta-skin .nav-item:hover {
+  background: #22303c;
+  color: #ffffff;
+}
+
 .lyfta-skin .mobile-tab.active {
-  background: #242429;
-  color: #fff;
+  color: var(--accent);
+  background: rgba(204, 255, 0, 0.06);
 }
 
 .lyfta-skin .search-field,
 .lyfta-skin .segmented,
 .lyfta-skin .set-row input,
 .lyfta-skin .calculator input,
-.lyfta-skin select {
-  background: #1e1e22;
-  color: #fff;
-  border-color: #2b2b31;
+.lyfta-skin select,
+.lyfta-skin textarea {
+  background: #22303c;
+  color: #ffffff;
+  border: 1px solid #38444d;
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.lyfta-skin .search-field:focus-within,
+.lyfta-skin .set-row input:focus,
+.lyfta-skin .calculator input:focus,
+.lyfta-skin select:focus,
+.lyfta-skin textarea:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: 0 0 10px rgba(204, 255, 0, 0.15);
 }
 
 .lyfta-skin .phone-screen {
-  background: #070708;
-  border-color: #1a1a1d;
+  background: #15202B;
+  border-color: #38444d;
 }
 
 .lyfta-skin .mobile-tabs {
-  background: rgba(13, 13, 15, 0.94);
-  border-color: #2c2c32;
+  background: rgba(25, 39, 52, 0.85);
+  backdrop-filter: blur(20px);
+  border-color: #38444d;
 }
 
 .atlas-panel {

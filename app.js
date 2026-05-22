@@ -1,4 +1,4 @@
-﻿const $ = (selector) => document.querySelector(selector);
+const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 
 const exercises = [
@@ -413,6 +413,14 @@ function cloneData(value) {
 function loadAppData() {
   try {
     const stored = JSON.parse(localStorage.getItem("liftlab-app-data") || "null");
+    try {
+      const storedRoutines = JSON.parse(localStorage.getItem("liftlab-routines") || "null");
+      if (Array.isArray(storedRoutines) && storedRoutines.length > 0) {
+        weeklyRoutinePlan.splice(0, weeklyRoutinePlan.length, ...storedRoutines);
+      }
+    } catch (e) {
+      console.error("Error al cargar rutinas locales:", e);
+    }
     return {
       ...cloneData(defaultAppData),
       ...(stored || {}),
@@ -432,6 +440,7 @@ function loadAppData() {
 
 function saveAppData() {
   localStorage.setItem("liftlab-app-data", JSON.stringify(appData));
+  localStorage.setItem("liftlab-routines", JSON.stringify(weeklyRoutinePlan));
 }
 
 async function apiRequest(path, options = {}) {
@@ -638,18 +647,334 @@ function migrateWorkout(workout) {
   return workout;
 }
 
+function getLastSessionSets(exerciseId) {
+  const history = Array.isArray(appData.workoutHistory) ? appData.workoutHistory : [];
+  for (let i = history.length - 1; i >= 0; i--) {
+    const workout = history[i];
+    const exercise = workout.exercises?.find((ex) => ex.id === exerciseId);
+    if (exercise && exercise.sets?.length) {
+      return exercise.sets.map((set) => ({
+        weight: Number(set.weight) || 0,
+        reps: Number(set.reps) || 0,
+        rpe: Number(set.rpe) || 0,
+        type: set.type || "Trabajo",
+        done: false
+      }));
+    }
+  }
+  return null;
+}
+
+function generateWeeklyRoutinePlan() {
+  const profile = appData.profile;
+  const daysCount = clampNumber(profile.days, 1, 6, 3);
+  const place = profile.place || "Gimnasio";
+  const equipment = profile.equipment || "Gimnasio completo";
+  const injuries = (profile.injuries || "").toLowerCase();
+
+  function selectExercise(type, muscleGroup, fallbackId) {
+    let candidates = exercises.filter((ex) => ex.muscle.toLowerCase() === muscleGroup.toLowerCase() || ex.type === type);
+    if (muscleGroup) {
+      candidates = exercises.filter((ex) => ex.muscle.toLowerCase() === muscleGroup.toLowerCase());
+    }
+
+    if (injuries.includes("hombro") || injuries.includes("shoulder")) {
+      candidates = candidates.filter((ex) => !["bench", "overhead-press", "dip"].includes(ex.id));
+    }
+    if (injuries.includes("rodilla") || injuries.includes("knee")) {
+      candidates = candidates.filter((ex) => !["squat", "lunge", "leg-press"].includes(ex.id));
+    }
+    if (injuries.includes("espalda") || injuries.includes("back")) {
+      candidates = candidates.filter((ex) => !["deadlift", "rdl", "squat"].includes(ex.id));
+    }
+
+    let equipmentFilter = candidates;
+    if (place === "Casa" || equipment === "Mancuernas") {
+      equipmentFilter = candidates.filter((ex) => ex.equipment === "Mancuernas" || ex.equipment === "Mancuerna" || ex.equipment === "Peso corporal" || ex.equipment === "Barra fija");
+    } else if (equipment === "Pesas rusas") {
+      equipmentFilter = candidates.filter((ex) => ex.equipment === "Peso corporal" || ex.equipment === "Mancuernas" || ex.equipment === "Mancuerna");
+    } else if (equipment === "Máquinas") {
+      equipmentFilter = candidates.filter((ex) => ex.equipment === "Maquina" || ex.equipment === "Polea" || ex.equipment === "Peso corporal");
+    }
+
+    if (equipmentFilter.length > 0) {
+      return equipmentFilter[0];
+    }
+    if (candidates.length > 0) {
+      return candidates[0];
+    }
+    return exercises.find((ex) => ex.id === fallbackId) || exercises[0];
+  }
+
+  const plan = [];
+  if (daysCount === 1) {
+    const ex1 = selectExercise("push", "Pecho", "bench");
+    const ex2 = selectExercise("pull", "Espalda", "row");
+    const ex3 = selectExercise("legs", "Pierna", "squat");
+    const ex4 = selectExercise("legs", "Femoral", "rdl");
+    const ex5 = selectExercise("push", "Hombro", "lateral-raise");
+    plan.push({
+      day: "Lunes",
+      title: "Cuerpo Completo - Consistencia",
+      status: "Pendiente",
+      duration: "60 min",
+      difficulty: "Media",
+      muscles: ["Pecho", "Espalda", "Pierna", "Hombro"],
+      blocks: [
+        { name: "Calentamiento", exercises: ["Movilidad global", ex1.name + " aproximacion"] },
+        { name: "Principal", exercises: [ex1.name, ex2.name] },
+        { name: "Accesorios", exercises: [ex3.name, ex4.name, ex5.name] }
+      ]
+    });
+  } else if (daysCount === 2) {
+    const exPush = selectExercise("push", "Pecho", "bench");
+    const exPull = selectExercise("pull", "Espalda", "row");
+    const exShoulder = selectExercise("push", "Hombro", "lateral-raise");
+    const exBiceps = selectExercise("pull", "Bíceps", "curl");
+
+    const exLegs1 = selectExercise("legs", "Pierna", "squat");
+    const exLegs2 = selectExercise("legs", "Femoral", "rdl");
+    const exLegs3 = selectExercise("legs", "Glúteo", "hip-thrust");
+    const exCore = selectExercise("legs", "Core", "plank");
+
+    plan.push({
+      day: "Lunes",
+      title: "Torso - Pecho y Espalda",
+      status: "Pendiente",
+      duration: "55 min",
+      difficulty: "Media",
+      muscles: ["Pecho", "Espalda", "Hombro"],
+      blocks: [
+        { name: "Calentamiento", exercises: ["Movilidad de hombros", exPush.name + " suave"] },
+        { name: "Principal", exercises: [exPush.name, exPull.name] },
+        { name: "Accesorios", exercises: [exShoulder.name, exBiceps.name] }
+      ]
+    });
+    plan.push({
+      day: "Jueves",
+      title: "Pierna - Fuerza y Control",
+      status: "Pendiente",
+      duration: "60 min",
+      difficulty: "Alta",
+      muscles: ["Pierna", "Femoral", "Glúteo"],
+      blocks: [
+        { name: "Calentamiento", exercises: ["Movilidad cadera", exLegs1.name + " suave"] },
+        { name: "Principal", exercises: [exLegs1.name, exLegs2.name] },
+        { name: "Accesorios", exercises: [exLegs3.name, exCore.name] }
+      ]
+    });
+  } else if (daysCount === 3) {
+    const push1 = selectExercise("push", "Pecho", "bench");
+    const push2 = selectExercise("push", "Hombro", "overhead-press");
+    const push3 = selectExercise("push", "Tríceps", "dip");
+
+    const pull1 = selectExercise("pull", "Espalda", "lat-pulldown");
+    const pull2 = selectExercise("pull", "Espalda", "row");
+    const pull3 = selectExercise("pull", "Bíceps", "curl");
+
+    const legs1 = selectExercise("legs", "Pierna", "squat");
+    const legs2 = selectExercise("legs", "Femoral", "rdl");
+    const legs3 = selectExercise("legs", "Glúteo", "hip-thrust");
+
+    plan.push({
+      day: "Lunes",
+      title: "Push - Empuje Torso",
+      status: "Pendiente",
+      duration: "60 min",
+      difficulty: "Media",
+      muscles: ["Pecho", "Hombro", "Tríceps"],
+      blocks: [
+        { name: "Calentamiento", exercises: ["Movilidad hombro", push1.name + " suave"] },
+        { name: "Principal", exercises: [push1.name, push2.name] },
+        { name: "Accesorios", exercises: [push3.name, "Elevacion lateral"] }
+      ]
+    });
+    plan.push({
+      day: "Miércoles",
+      title: "Pull - Tirón Torso",
+      status: "Pendiente",
+      duration: "58 min",
+      difficulty: "Media",
+      muscles: ["Espalda", "Bíceps"],
+      blocks: [
+        { name: "Calentamiento", exercises: ["Activación escapular", pull1.name + " suave"] },
+        { name: "Principal", exercises: [pull1.name, pull2.name] },
+        { name: "Accesorios", exercises: [pull3.name, "Face pull"] }
+      ]
+    });
+    plan.push({
+      day: "Viernes",
+      title: "Pierna - Tren Inferior",
+      status: "Pendiente",
+      duration: "65 min",
+      difficulty: "Alta",
+      muscles: ["Pierna", "Femoral", "Glúteo"],
+      blocks: [
+        { name: "Calentamiento", exercises: ["Movilidad tobillo", legs1.name + " suave"] },
+        { name: "Principal", exercises: [legs1.name, legs2.name] },
+        { name: "Accesorios", exercises: [legs3.name, "Plancha"] }
+      ]
+    });
+  } else if (daysCount === 4) {
+    const pushA = selectExercise("push", "Pecho", "bench");
+    const pullA = selectExercise("pull", "Espalda", "lat-pulldown");
+    const pushB = selectExercise("push", "Pecho", "incline-db");
+    const pullB = selectExercise("pull", "Espalda", "row");
+
+    const legsA1 = selectExercise("legs", "Pierna", "squat");
+    const legsA2 = selectExercise("legs", "Femoral", "rdl");
+    const legsB1 = selectExercise("legs", "Pierna", "leg-press");
+    const legsB2 = selectExercise("legs", "Glúteo", "hip-thrust");
+
+    plan.push({
+      day: "Lunes",
+      title: "Torso A - Enfoque Pecho",
+      status: "Pendiente",
+      duration: "60 min",
+      difficulty: "Media",
+      muscles: ["Pecho", "Espalda", "Hombro"],
+      blocks: [
+        { name: "Principal", exercises: [pushA.name, pullA.name] },
+        { name: "Accesorios", exercises: ["Elevacion lateral", "Curl biceps"] }
+      ]
+    });
+    plan.push({
+      day: "Martes",
+      title: "Pierna A - Enfoque Rodilla",
+      status: "Pendiente",
+      duration: "65 min",
+      difficulty: "Alta",
+      muscles: ["Pierna", "Femoral"],
+      blocks: [
+        { name: "Principal", exercises: [legsA1.name, legsA2.name] },
+        { name: "Accesorios", exercises: ["Extension de cuadriceps", "Plancha"] }
+      ]
+    });
+    plan.push({
+      day: "Jueves",
+      title: "Torso B - Enfoque Espalda",
+      status: "Pendiente",
+      duration: "60 min",
+      difficulty: "Media",
+      muscles: ["Pecho", "Espalda", "Bíceps"],
+      blocks: [
+        { name: "Principal", exercises: [pullB.name, pushB.name] },
+        { name: "Accesorios", exercises: ["Face pull", "Extensión tríceps polea"] }
+      ]
+    });
+    plan.push({
+      day: "Viernes",
+      title: "Pierna B - Enfoque Cadera",
+      status: "Pendiente",
+      duration: "65 min",
+      difficulty: "Alta",
+      muscles: ["Pierna", "Glúteo", "Femoral"],
+      blocks: [
+        { name: "Principal", exercises: [legsB2.name, legsB1.name] },
+        { name: "Accesorios", exercises: ["Curl femoral", "Elevacion gemelo"] }
+      ]
+    });
+  } else {
+    const push1 = selectExercise("push", "Pecho", "bench");
+    const push2 = selectExercise("push", "Hombro", "overhead-press");
+    const pull1 = selectExercise("pull", "Espalda", "lat-pulldown");
+    const pull2 = selectExercise("pull", "Espalda", "row");
+    const legs1 = selectExercise("legs", "Pierna", "squat");
+    const legs2 = selectExercise("legs", "Femoral", "rdl");
+
+    plan.push({
+      day: "Lunes",
+      title: "Push - Empuje Torso",
+      status: "Pendiente",
+      duration: "60 min",
+      difficulty: "Media",
+      muscles: ["Pecho", "Hombro"],
+      blocks: [
+        { name: "Principal", exercises: [push1.name, push2.name] },
+        { name: "Accesorios", exercises: ["Fondos", "Elevacion lateral"] }
+      ]
+    });
+    plan.push({
+      day: "Martes",
+      title: "Pull - Tirón Espalda",
+      status: "Pendiente",
+      duration: "60 min",
+      difficulty: "Media",
+      muscles: ["Espalda", "Bíceps"],
+      blocks: [
+        { name: "Principal", exercises: [pull1.name, pull2.name] },
+        { name: "Accesorios", exercises: ["Curl barra", "Face pull"] }
+      ]
+    });
+    plan.push({
+      day: "Miércoles",
+      title: "Legs - Pierna Completa",
+      status: "Pendiente",
+      duration: "70 min",
+      difficulty: "Alta",
+      muscles: ["Pierna", "Femoral", "Glúteo"],
+      blocks: [
+        { name: "Principal", exercises: [legs1.name, legs2.name] },
+        { name: "Accesorios", exercises: ["Hip thrust", "Curl femoral"] }
+      ]
+    });
+    plan.push({
+      day: "Jueves",
+      title: "Torso - Fuerza e Hipertrofia",
+      status: "Pendiente",
+      duration: "55 min",
+      difficulty: "Media",
+      muscles: ["Pecho", "Espalda", "Hombro"],
+      blocks: [
+        { name: "Principal", exercises: ["Press inclinado mancuernas", "Dominada"] },
+        { name: "Accesorios", exercises: ["Remo sentado", "Press hombro mancuernas"] }
+      ]
+    });
+    plan.push({
+      day: "Viernes",
+      title: "Pierna - Detalle e Isometría",
+      status: "Pendiente",
+      duration: "60 min",
+      difficulty: "Alta",
+      muscles: ["Pierna", "Core"],
+      blocks: [
+        { name: "Principal", exercises: ["Prensa", "Zancada"] },
+        { name: "Accesorios", exercises: ["Extension de cuadriceps", "Plancha"] }
+      ]
+    });
+    if (daysCount === 6) {
+      plan.push({
+        day: "Sábado",
+        title: "Aislamiento y Brazos",
+        status: "Pendiente",
+        duration: "45 min",
+        difficulty: "Suave",
+        muscles: ["Bíceps", "Tríceps", "Core"],
+        blocks: [
+          { name: "Brazos", exercises: ["Curl barra", "Extensión tríceps polea", "Curl martillo"] },
+          { name: "Core", exercises: ["Plancha", "Puente glúteo"] }
+        ]
+      });
+    }
+  }
+  weeklyRoutinePlan.splice(0, weeklyRoutinePlan.length, ...plan);
+}
+
 function createWorkout(templateId) {
   const template = routineTemplates.find((item) => item.id === templateId) || routineTemplates[0];
   return {
     name: template.name,
-    exercises: template.exerciseIds.map((id, index) => ({
-      id,
-      sets: [
-        { weight: index === 0 ? 80 : 32, reps: index === 0 ? 6 : 10, rpe: 8, type: index === 0 ? "Top" : "Normal", done: false },
-        { weight: index === 0 ? 75 : 30, reps: index === 0 ? 8 : 12, rpe: 7, type: "Back", done: false },
-        { weight: index === 0 ? 72.5 : 28, reps: index === 0 ? 8 : 12, rpe: 7, type: "Back", done: false },
-      ],
-    })),
+    exercises: template.exerciseIds.map((id, index) => {
+      const historicalSets = getLastSessionSets(id);
+      return {
+        id,
+        sets: historicalSets || [
+          { weight: index === 0 ? 80 : 32, reps: index === 0 ? 6 : 10, rpe: 8, type: index === 0 ? "Top" : "Normal", done: false },
+          { weight: index === 0 ? 75 : 30, reps: index === 0 ? 8 : 12, rpe: 7, type: "Back", done: false },
+          { weight: index === 0 ? 72.5 : 28, reps: index === 0 ? 8 : 12, rpe: 7, type: "Back", done: false },
+        ]
+      };
+    }),
   };
 }
 
@@ -663,14 +988,17 @@ function createWorkoutFromWeekDay(day) {
   if (!ids.length) return workout;
   return {
     name: day.title,
-    exercises: ids.slice(0, 5).map((id, index) => ({
-      id,
-      sets: [
-        { weight: index === 0 ? 80 : 30, reps: index === 0 ? 6 : 10, rpe: 8, type: index === 0 ? "Principal" : "Trabajo", done: false },
-        { weight: index === 0 ? 75 : 28, reps: index === 0 ? 8 : 12, rpe: 7, type: "Progresion", done: false },
-        { weight: index === 0 ? 72.5 : 26, reps: index === 0 ? 8 : 12, rpe: 7, type: "Volumen", done: false },
-      ],
-    })),
+    exercises: ids.slice(0, 5).map((id, index) => {
+      const historicalSets = getLastSessionSets(id);
+      return {
+        id,
+        sets: historicalSets || [
+          { weight: index === 0 ? 80 : 30, reps: index === 0 ? 6 : 10, rpe: 8, type: index === 0 ? "Principal" : "Trabajo", done: false },
+          { weight: index === 0 ? 75 : 28, reps: index === 0 ? 8 : 12, rpe: 7, type: "Progresion", done: false },
+          { weight: index === 0 ? 72.5 : 26, reps: index === 0 ? 8 : 12, rpe: 7, type: "Volumen", done: false },
+        ]
+      };
+    }),
   };
 }
 
@@ -982,7 +1310,10 @@ function renderWorkoutLog() {
               <strong>${exercise.name}</strong>
               <small>${exercise.muscle} - ${exercise.equipment}</small>
             </div>
-            <button class="text-button" data-demo="${exercise.id}">Ver técnica</button>
+            <div style="display: flex; gap: 8px;">
+              <button class="text-button" data-demo="${exercise.id}">Ver técnica</button>
+              <button class="text-button" data-remove-exercise="${exerciseIndex}" style="color: var(--coral);">Eliminar</button>
+            </div>
           </div>
           <div class="set-grid">
             ${entry.sets
@@ -994,11 +1325,14 @@ function renderWorkoutLog() {
                   <label>RPE<input data-field="rpe" type="number" min="1" max="10" step="0.5" value="${set.rpe}"></label>
                   <label>Tipo<input data-field="type" value="${set.type}"></label>
                   <button class="check-set ${set.done ? "done" : ""}" data-check-set aria-label="Completar serie">${set.done ? "✓" : ""}</button>
+                  <button class="ghost-button" data-remove-set="${setIndex}" style="padding: 4px 8px; font-size: 1.1rem; color: var(--coral); min-width: auto; border: none; background: transparent;" aria-label="Eliminar serie">×</button>
                 </div>
               `)
               .join("")}
           </div>
-          <button class="text-button" data-add-set="${exerciseIndex}">Añadir serie</button>
+          <div style="display: flex; gap: 12px; margin-top: 8px;">
+            <button class="text-button" data-add-set="${exerciseIndex}">Añadir serie</button>
+          </div>
         </article>
       `;
     })
@@ -1240,7 +1574,10 @@ function drawProgressChart() {
   points.forEach(([x, y], index) => (index ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
   ctx.strokeStyle = accent;
   ctx.lineWidth = 5;
+  ctx.shadowBlur = 12;
+  ctx.shadowColor = accent;
   ctx.stroke();
+  ctx.shadowBlur = 0; // Reset shadow so it doesn't affect other elements
 
   points.forEach(([x, y, value], index) => {
     ctx.fillStyle = accent;
@@ -1382,6 +1719,13 @@ function runAIAgents() {
     back: "evitar bisagras pesadas y usar maquinas o apoyos",
     knee: "evitar flexion profunda cargada y priorizar control",
   };
+
+  const meals = todayMeals();
+  const totals = sumNutrition(meals.map((meal) => meal.totals));
+  const targets = getNutritionTargets(ctx.goal === "fatloss" ? "cut" : ctx.goal === "hypertrophy" ? "bulk" : "maintain", { trainingMinutes: ctx.time });
+  const remainingKcal = targets.kcal - totals.kcal;
+  const remainingProtein = Math.max(0, targets.protein - totals.protein);
+
   const agents = [
     {
       name: "Entrenador",
@@ -1411,10 +1755,8 @@ function runAIAgents() {
     },
     {
       name: "Nutrición",
-      score: ctx.goal === "fatloss" ? "Déficit" : "Proteína",
-      text: ctx.goal === "fatloss"
-        ? "Mantén proteína alta y deja carbohidratos alrededor del entreno para rendir."
-        : "Apunta a 1,8-2,2 g/kg de proteína y carbohidratos antes de la sesión.",
+      score: `${totals.kcal}/${targets.kcal} kcal`,
+      text: `Llevas ${totals.kcal} kcal consumidas de ${targets.kcal} kcal (${remainingKcal > 0 ? 'faltan ' + remainingKcal : 'exceso de ' + Math.abs(remainingKcal)} kcal). Proteína restante: ${remainingProtein}g de ${targets.protein}g.`,
     },
     {
       name: "Riesgo",
@@ -1513,18 +1855,36 @@ function addAIMessage(author, text) {
 function answerAIQuestion(question) {
   const ctx = collectTrainingContext();
   const q = question.toLowerCase();
-  if (q.includes("dolor") || q.includes("hombro") || q.includes("rodilla") || q.includes("espalda")) {
-    return "Reduce rango, baja carga un 10-20% y cambia a variante estable. Si el dolor es punzante o cambia tu técnica, corta esa serie.";
+  const meals = todayMeals();
+  const totals = sumNutrition(meals.map((meal) => meal.totals));
+  const targets = getNutritionTargets(ctx.goal === "fatloss" ? "cut" : ctx.goal === "hypertrophy" ? "bulk" : "maintain", { trainingMinutes: ctx.time });
+  const remainingKcal = targets.kcal - totals.kcal;
+  const remainingProtein = Math.max(0, targets.protein - totals.protein);
+  const workoutHistoryCount = Array.isArray(appData.workoutHistory) ? appData.workoutHistory.length : 0;
+
+  if (q.includes("dolor") || q.includes("hombro") || q.includes("rodilla") || q.includes("espalda") || q.includes("lesion") || q.includes("molestia")) {
+    let specificAdvice = "";
+    if (ctx.soreness === "shoulder" || q.includes("hombro")) {
+      specificAdvice = " Tienes molestia de hombro activa: evita Press banca o Press militar; realiza Cruce de poleas o elevaciones laterales en rangos cómodos.";
+    } else if (ctx.soreness === "knee" || q.includes("rodilla")) {
+      specificAdvice = " Tienes molestia de rodilla activa: sustituye Sentadillas y Prensa por Hip Thrust y extensiones ligeras controladas.";
+    } else if (ctx.soreness === "back" || q.includes("espalda")) {
+      specificAdvice = " Tienes molestia de espalda baja activa: evita Peso muerto y Remo con barra libre; usa remo apoyado en máquina y planchas para el core.";
+    }
+    return `Para tu dolor/molestia:${specificAdvice} Mi consejo general: reduce el rango de movimiento, baja el peso un 10-20% y prioriza ejercicios estables. Si el dolor es punzante o te hace compensar con otra postura, detén la serie de inmediato.`;
   }
-  if (q.includes("peso") || q.includes("subo") || q.includes("progres")) {
+  if (q.includes("peso") || q.includes("subo") || q.includes("progres") || q.includes("volumen") || q.includes("fuerza")) {
+    const volLogText = workoutHistoryCount > 0 
+      ? ` Llevas ${workoutHistoryCount} entrenos registrados y tu volumen en esta sesión es de ${ctx.volume} kg.` 
+      : " Aún no tienes entrenos históricos registrados.";
     return ctx.recovery >= 75
-      ? "Sí: sube poco, 2-2,5 kg en básicos o una repetición por serie en accesorios. Si pasas de RPE 9, vuelve al peso anterior."
-      : "Hoy no subiría peso. Mantén carga, mejora técnica y busca repetir rendimiento con menos fatiga.";
+      ? `Tu recuperación es buena (${ctx.recovery}%).${volLogText} Te aconsejo subir la carga un 2-2.5 kg en ejercicios básicos si en la última sesión completaste todas las series con RPE 8 o menos, o intentar una repetición extra por serie en accesorios.`
+      : `Tu recuperación está algo baja hoy (${ctx.recovery}%).${volLogText} Mantén los pesos actuales, concéntrate en mejorar la velocidad de levantamiento y la técnica, buscando repetir el rendimiento anterior sin acumular fatiga excesiva.`;
   }
-  if (q.includes("comer") || q.includes("prote") || q.includes("nutri")) {
-    return "Base simple: proteína alta, sal e hidratación antes de entrenar, carbohidrato fácil 60-120 min antes si la sesión es dura.";
+  if (q.includes("comer") || q.includes("prote") || q.includes("nutri") || q.includes("caloria") || q.includes("dieta")) {
+    return `Nutrición de hoy: Llevas consumidas ${totals.kcal} kcal de un objetivo diario de ${targets.kcal} kcal (te quedan ${remainingKcal > 0 ? remainingKcal + ' kcal libres' : Math.abs(remainingKcal) + ' kcal de exceso'}). Te restan ${remainingProtein}g de proteína (consumidos ${totals.protein}g de ${targets.protein}g). Mi consejo: prioriza fuentes magras como pechuga de pollo, claras de huevo, yogur griego o batido de whey para cubrir el objetivo restante.`;
   }
-  return "Para hoy prioriza adherencia: elige 4 ejercicios, deja 1-2 repeticiones en recámara y registra todo. Mañana ajusto progresión con lo que completes.";
+  return `Para la sesión de hoy (${ctx.workoutName}): Concéntrate en la adherencia y calidad técnica. Realiza tus series planificadas dejando 1-2 repeticiones en recámara (RPE 7-8) y regístralo todo. Tu recuperación estimada es del ${ctx.recovery}%. ¡A por ello!`;
 }
 
 function loadMealLog() {
@@ -2203,9 +2563,11 @@ async function saveProfileFromForm() {
     mealTimes: $("#profile-meal-times-input").value.trim(),
     health: $("#profile-health-input").value,
   };
+  generateWeeklyRoutinePlan();
   saveAppData();
   await pushApi("/api/profile", appData.profile);
   await pushApi("/api/onboarding", appData.profile);
+  await pushApi("/api/routines", weeklyRoutinePlan).catch(() => {});
   renderProfileInputs();
   renderDashboardData();
   renderNutrition();
@@ -2372,9 +2734,10 @@ function muscleDataUri(muscle, side = "front") {
 }
 
 function addExerciseToWorkout(id) {
+  const historicalSets = getLastSessionSets(id);
   state.activeWorkout.exercises.push({
     id,
-    sets: [{ weight: 20, reps: 10, rpe: 7, type: "Normal", done: false }],
+    sets: historicalSets || [{ weight: 20, reps: 10, rpe: 7, type: "Normal", done: false }],
   });
   saveWorkout();
   renderWorkoutLog();
@@ -2620,9 +2983,37 @@ function bindEvents() {
     const addSetButton = event.target.closest("[data-add-set]");
     if (addSetButton) {
       const index = Number(addSetButton.dataset.addSet);
-      state.activeWorkout.exercises[index].sets.push({ weight: 20, reps: 10, rpe: 7, type: "Normal", done: false });
+      const exercise = state.activeWorkout.exercises[index];
+      const lastSet = exercise.sets[exercise.sets.length - 1];
+      const newSet = lastSet
+        ? { weight: lastSet.weight, reps: lastSet.reps, rpe: lastSet.rpe, type: lastSet.type, done: false }
+        : { weight: 20, reps: 10, rpe: 7, type: "Normal", done: false };
+      exercise.sets.push(newSet);
       saveWorkout();
       renderWorkoutLog();
+    }
+
+    const removeSetButton = event.target.closest("[data-remove-set]");
+    if (removeSetButton) {
+      const row = removeSetButton.closest(".set-row");
+      const exerciseNode = removeSetButton.closest(".log-exercise");
+      if (row && exerciseNode) {
+        const exerciseIndex = Number(exerciseNode.dataset.exerciseIndex);
+        const setIndex = Number(row.dataset.setIndex);
+        state.activeWorkout.exercises[exerciseIndex].sets.splice(setIndex, 1);
+        saveWorkout();
+        renderWorkoutLog();
+        showToast("Serie eliminada.");
+      }
+    }
+
+    const removeExerciseButton = event.target.closest("[data-remove-exercise]");
+    if (removeExerciseButton) {
+      const exerciseIndex = Number(removeExerciseButton.dataset.removeExercise);
+      state.activeWorkout.exercises.splice(exerciseIndex, 1);
+      saveWorkout();
+      renderWorkoutLog();
+      showToast("Ejercicio eliminado del entreno.");
     }
   });
 
@@ -2804,7 +3195,32 @@ function bindEvents() {
   $("#simulate-photo-food")?.addEventListener("click", simulatePhotoFood);
   $("#confirm-photo-food")?.addEventListener("click", confirmPhotoFood);
   $("#add-photo-food-item")?.addEventListener("click", () => {
-    appData.photoItems.push(scalePhotoItem("huevo", 50));
+    const foodName = prompt("Escribe el nombre del alimento a buscar (ej. pollo, arroz, yogur, avena):");
+    if (!foodName) return;
+
+    const gramsInput = prompt(`¿Cuántos gramos de "${foodName}" quieres añadir?`, "100");
+    if (gramsInput === null) return;
+    const grams = Number(gramsInput) || 100;
+
+    const matched = findFood(foodName);
+    let scaled;
+    if (matched) {
+      scaled = scalePhotoItem(matched[0], grams);
+      showToast(`Añadido: ${scaled.name} (${scaled.grams}g) desde la base de datos.`);
+    } else {
+      // Si no existe, crear un alimento genérico con macros en 0, que el usuario puede ajustar
+      scaled = {
+        name: foodName,
+        grams: grams,
+        kcal: 0,
+        protein: 0,
+        carbs: 0,
+        fat: 0
+      };
+      showToast(`Añadido alimento personalizado: ${foodName} (${grams}g). Revisa macros.`);
+    }
+
+    appData.photoItems.push(scaled);
     saveAppData();
     renderPhotoFoodResults();
   });
@@ -2972,13 +3388,37 @@ function bindEvents() {
     const choice = event.target.closest(".onboarding-step button");
     if (!choice) return;
     const step = choice.closest(".onboarding-step");
+    const stepIndex = Number(step.dataset.step);
+
     step.querySelectorAll("button").forEach((button) => button.classList.remove("selected"));
     choice.classList.add("selected");
     const label = choice.textContent.trim();
+
+    // Guardar la elección dinámicamente
+    if (stepIndex === 1) { // Objetivos
+      if (label === "Ganar músculo") onboardingChoices.goal = "Ganar músculo";
+      else if (label === "Hacerme más fuerte") onboardingChoices.goal = "Ganar fuerza";
+      else if (label === "Perder peso") onboardingChoices.goal = "Perder peso";
+      else if (label === "Fundamentos" || label === "Acondicionamiento") onboardingChoices.goal = "Salud";
+      else if (label === "Deporte") onboardingChoices.goal = "Rendimiento";
+    } else if (stepIndex === 3) { // Experiencia
+      if (label.includes("nuevo") || label.includes("meses")) onboardingChoices.level = "Principiante";
+      else if (label.includes("año")) onboardingChoices.level = "Intermedio";
+      else onboardingChoices.level = "Avanzado";
+    } else if (stepIndex === 4) { // Equipo
+      if (label === "Gimnasio completo") { onboardingChoices.equipment = "Gimnasio completo"; onboardingChoices.place = "Gimnasio"; }
+      else if (label === "Barras") { onboardingChoices.equipment = "Barras"; onboardingChoices.place = "Casa"; }
+      else if (label === "Mancuernas") { onboardingChoices.equipment = "Mancuernas"; onboardingChoices.place = "Casa"; }
+      else if (label === "Pesas rusas") { onboardingChoices.equipment = "Pesas rusas"; onboardingChoices.place = "Casa"; }
+      else if (label === "Máquinas") { onboardingChoices.equipment = "Máquinas"; onboardingChoices.place = "Gimnasio"; }
+      else { onboardingChoices.equipment = "Peso corporal"; onboardingChoices.place = "Casa"; }
+    }
+
     if (label.includes("Continuar")) {
       showToast("Perfil inicial preparado gratis.");
       moveOnboarding(1);
     } else if (label.includes("Entrar gratis")) {
+      saveOnboardingChoices();
       showToast("Todo listo. Entrenamiento abierto.");
       closeOnboarding();
       setView("workout");
@@ -2986,9 +3426,46 @@ function bindEvents() {
       showToast("Preferencia guardada.");
     }
   });
+
+  $("#onboarding-weight-input")?.addEventListener("input", (e) => {
+    const val = Number(e.target.value) || 70;
+    if ($("#onboarding-weight-slider")) $("#onboarding-weight-slider").value = val;
+    onboardingChoices.weight = val;
+  });
+  $("#onboarding-weight-slider")?.addEventListener("input", (e) => {
+    const val = Number(e.target.value) || 70;
+    if ($("#onboarding-weight-input")) $("#onboarding-weight-input").value = val;
+    onboardingChoices.weight = val;
+  });
 }
 
 let onboardingIndex = 0;
+const onboardingChoices = {
+  goal: "Ganar músculo",
+  level: "Principiante",
+  equipment: "Gimnasio completo",
+  place: "Gimnasio",
+  weight: 70
+};
+
+function saveOnboardingChoices() {
+  appData.profile.goal = onboardingChoices.goal;
+  appData.profile.level = onboardingChoices.level;
+  appData.profile.equipment = onboardingChoices.equipment;
+  appData.profile.place = onboardingChoices.place;
+  appData.profile.weight = Number($("#onboarding-weight-input")?.value) || onboardingChoices.weight;
+
+  // Generar dinámicamente la rutina de forma adaptada
+  generateWeeklyRoutinePlan();
+
+  // Persistir los datos
+  saveAppData();
+  pushApi("/api/profile", appData.profile).catch(() => {});
+  pushApi("/api/onboarding", appData.profile).catch(() => {});
+  pushApi("/api/routines", weeklyRoutinePlan).catch(() => {});
+
+  renderAllAppData();
+}
 
 function openOnboarding(index = 0) {
   onboardingIndex = index;

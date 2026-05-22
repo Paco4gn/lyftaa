@@ -119,6 +119,7 @@ async function handleApi(req, res) {
   if (await jsonResource(req, res, path, user.id, "/api/privacy", "privacy_settings", {})) return;
   if (await jsonResource(req, res, path, user.id, "/api/health-permissions", "health_permissions", {})) return;
   if (await jsonResource(req, res, path, user.id, "/api/community/profile", "community_profiles", {})) return;
+  if (await jsonResource(req, res, path, user.id, "/api/active-workout", "active_workouts", null)) return;
 
   if (req.method === "GET" && path === "/api/workouts") return json(res, 200, listWorkoutSessions(user.id));
   if (req.method === "POST" && path === "/api/workouts") return json(res, 201, addWorkoutSession(user.id, await readJson(req)));

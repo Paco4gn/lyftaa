@@ -93,6 +93,13 @@ export function migrate() {
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
 
+    CREATE TABLE IF NOT EXISTS active_workouts (
+      user_id INTEGER PRIMARY KEY,
+      data TEXT NOT NULL,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
     CREATE TABLE IF NOT EXISTS meals (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
@@ -285,6 +292,7 @@ export function deleteUser(userId) {
   db.prepare("DELETE FROM habits WHERE user_id = ?").run(userId);
   db.prepare("DELETE FROM routines WHERE user_id = ?").run(userId);
   db.prepare("DELETE FROM onboarding_answers WHERE user_id = ?").run(userId);
+  db.prepare("DELETE FROM active_workouts WHERE user_id = ?").run(userId);
   db.prepare("DELETE FROM preferences WHERE user_id = ?").run(userId);
   db.prepare("DELETE FROM nutrition_plans WHERE user_id = ?").run(userId);
   db.prepare("DELETE FROM notification_settings WHERE user_id = ?").run(userId);
@@ -429,6 +437,7 @@ export function exportUserData(userId) {
     health: getJsonRow("health_metrics", userId, {}),
     habits: getJsonRow("habits", userId, []),
     routines: getJsonRow("routines", userId, []),
+    activeWorkout: getJsonRow("active_workouts", userId, null),
     onboarding: getJsonRow("onboarding_answers", userId, {}),
     preferences: getJsonRow("preferences", userId, {}),
     nutritionPlan: getJsonRow("nutrition_plans", userId, {}),
@@ -459,6 +468,7 @@ function createDefaultRows(userId) {
     days: 3,
     sessionTime: 60,
   });
+  setJsonRow("active_workouts", userId, null);
   setJsonRow("health_metrics", userId, {
     steps: 0,
     active: 0,
