@@ -147,6 +147,29 @@ body.auth-locked .mobile-tabs {
   transform: translateY(-1px);
 }
 
+.SignIn-module__UbpVyq__signInButtonGuest {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background-color: rgba(204, 255, 0, 0.04);
+  color: var(--accent, #ccff00);
+  border: 2px solid var(--accent, #ccff00);
+  border-radius: 9999px;
+  height: 48px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.SignIn-module__UbpVyq__signInButtonGuest:hover {
+  background-color: var(--accent, #ccff00);
+  color: #000000;
+  transform: translateY(-1px);
+  box-shadow: 0 0 15px rgba(204, 255, 0, 0.4);
+}
+
 .SignIn-module__UbpVyq__googleLogo,
 .SignIn-module__UbpVyq__appleLogo {
   flex-shrink: 0;

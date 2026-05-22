@@ -571,11 +571,11 @@ function hasFirebaseConfig() {
 }
 
 function hasRealBackend() {
-  return firebaseOnline || (apiOnline && Boolean(apiToken));
+  return firebaseOnline || (apiOnline && Boolean(apiToken)) || Boolean(appData.account?.isGuest);
 }
 
 function isSignedIn() {
-  return Boolean(appData.account?.id && hasRealBackend());
+  return Boolean(appData.account?.id && (hasRealBackend() || appData.account?.isGuest));
 }
 
 function setAuthUiState(loading = false) {
@@ -3098,6 +3098,24 @@ async function loginLocalAccount(source = "profile") {
   setAuthUiState(false);
 }
 
+function loginAsGuest(email = "invitado@lyfta.app", name = "Invitado Demo") {
+  appData.account = {
+    email: email,
+    id: "guest_" + Math.random().toString(36).substring(2, 11),
+    mode: "guest",
+    isGuest: true
+  };
+  appData.profile.name = name;
+  appData.profile.email = email;
+  saveAppData();
+  
+  renderAllAppData();
+  renderAuthStatus();
+  setAuthUiState(false);
+  setView("dashboard");
+  showToast(`Acceso concedido como ${name}. ¡Disfruta de la demo!`);
+}
+
 async function deleteLocalAccount() {
   if (firebaseOnline || (apiToken && apiOnline)) await apiRequest("/api/account", { method: "DELETE" }).catch(() => {});
   localStorage.removeItem("liftlab-app-data");
@@ -3488,6 +3506,9 @@ function bindEvents() {
   $("#account-login")?.addEventListener("click", () => loginLocalAccount("profile"));
   $("#gate-register")?.addEventListener("click", () => registerLocalAccount("gate"));
   $("#gate-login")?.addEventListener("click", () => loginLocalAccount("gate"));
+  $("#gate-guest")?.addEventListener("click", () => loginAsGuest("invitado@lyfta.app", "Invitado Demo"));
+  $("#gate-social-google")?.addEventListener("click", () => loginAsGuest("google-user@lyfta.app", "Usuario Google"));
+  $("#gate-social-apple")?.addEventListener("click", () => loginAsGuest("apple-user@lyfta.app", "Usuario Apple"));
   ["#auth-email", "#auth-password", "#gate-auth-email", "#gate-auth-password"].forEach((selector) => {
     $(selector)?.addEventListener("keydown", (event) => {
       if (event.key !== "Enter") return;
@@ -3744,6 +3765,10 @@ async function bootstrapAuth() {
   const online = await detectApi();
   if (online && ((firebaseOnline && firebaseBackend?.user) || (!firebaseOnline && apiToken))) {
     await loadApiUserData();
+    setView("dashboard");
+  } else if (appData.account?.isGuest) {
+    renderAllAppData();
+    setAuthUiState(false);
     setView("dashboard");
   } else {
     appData.account = null;
