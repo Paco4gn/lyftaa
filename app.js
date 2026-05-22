@@ -2785,32 +2785,150 @@ function renderMuscleAtlas() {
 }
 
 function muscleDataUri(muscle, side = "front") {
-  const active = "#ff3b30";
-  const base = "#f0f0f0";
-  const shadow = "#b8b8b8";
-  const mark = (name) => muscle === name ? active : base;
   const isBack = side === "back";
-  const svg = `
+  
+  function canonicalizeMuscle(name) {
+    if (!name) return "";
+    const n = name.toLowerCase().trim();
+    if (n === "pecho") return "pecho";
+    if (n === "biceps" || n === "bíceps") return "biceps";
+    if (n === "triceps" || n === "tríceps") return "triceps";
+    if (n === "espalda") return "espalda";
+    if (n === "hombros" || n === "hombro") return "hombros";
+    if (n === "abdominales" || n === "core") return "abdominales";
+    if (n === "cuádriceps" || n === "cuadriceps" || n === "pierna") return "cuadriceps";
+    if (n === "isquiotibiales" || n === "femoral") return "isquiotibiales";
+    if (n === "glúteos" || n === "gluteos" || n === "glúteo" || n === "gluteo") return "gluteos";
+    if (n === "gemelos" || n === "gemelo") return "gemelos";
+    return n;
+  }
+  
+  const muscleCanonical = canonicalizeMuscle(muscle);
+  
+  const styleFor = (muscleNames) => {
+    const isActive = muscleNames.some(m => canonicalizeMuscle(m) === muscleCanonical);
+    if (isActive) {
+      return 'fill="url(#active-grad)" filter="url(#neon-glow)" stroke="#ccff00" stroke-width="1.5"';
+    }
+    return 'fill="#1b1e25" stroke="#2c303b" stroke-width="1"';
+  };
+
+  const svg = !isBack ? `
     <svg xmlns="http://www.w3.org/2000/svg" width="360" height="420" viewBox="0 0 360 420">
-      <rect width="360" height="420" rx="24" fill="#050505"/>
-      <g transform="translate(75 28)">
-        <ellipse cx="105" cy="34" rx="26" ry="31" fill="${base}"/>
-        <path d="M78 68c14 16 40 16 54 0l16 42H62z" fill="${shadow}"/>
-        <path d="M60 102c-28 16-42 50-48 86l32 7c6-30 14-50 28-62z" fill="${mark(isBack ? "Espalda" : "Pecho")}"/>
-        <path d="M150 102c28 16 42 50 48 86l-32 7c-6-30-14-50-28-62z" fill="${mark(isBack ? "Espalda" : "Pecho")}"/>
-        <path d="M72 96h66c18 38 18 90 0 132H72c-18-42-18-94 0-132z" fill="${mark(isBack ? "Espalda" : "Pecho")}"/>
-        <path d="M88 112c10 40 10 78 0 112M122 112c-10 40-10 78 0 112" stroke="#050505" stroke-opacity=".35" stroke-width="4"/>
-        <path d="M48 186c-9 34-12 68-8 100l30 1c2-33 5-63 14-90z" fill="${mark("Bíceps")}"/>
-        <path d="M162 186c9 34 12 68 8 100l-30 1c-2-33-5-63-14-90z" fill="${mark("Tríceps")}"/>
-        <path d="M74 230h30v124H56c0-42 7-84 18-124z" fill="${mark("Cuádriceps")}"/>
-        <path d="M106 230h30c11 40 18 82 18 124h-48z" fill="${mark(isBack ? "Isquiotibiales" : "Cuádriceps")}"/>
-        <path d="M75 230c20 18 40 18 60 0l-8 54H83z" fill="${mark("Glúteos")}" opacity="${isBack ? "1" : ".28"}"/>
-        <path d="M82 106h46v118H82z" fill="${mark("Abdominales")}" opacity="${!isBack && muscle === "Abdominales" ? "1" : "0"}"/>
-        <path d="M48 96c16-18 34-26 54-26s38 8 60 26l-18 42c-16-18-28-26-42-26s-26 8-38 26z" fill="${mark("Hombros")}" opacity=".96"/>
-        <path d="M58 354h42l-4 42H60zM110 354h42l-2 42h-36z" fill="${muscle === "Gemelo" || muscle === "Gemelos" ? active : base}"/>
+      <defs>
+        <linearGradient id="bg-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0b0c10"/>
+          <stop offset="100%" stop-color="#151821"/>
+        </linearGradient>
+        <linearGradient id="active-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ccff00"/>
+          <stop offset="100%" stop-color="#10b981"/>
+        </linearGradient>
+        <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="5" result="blur" />
+          <feComponentTransfer in="blur" result="glow1">
+            <feFuncA type="linear" slope="0.8"/>
+          </feComponentTransfer>
+          <feMerge>
+            <feMergeNode in="glow1" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <rect width="360" height="420" rx="24" fill="url(#bg-grad)" stroke="#232731" stroke-width="1.5"/>
+      <circle cx="180" cy="180" r="140" fill="none" stroke="#232731" stroke-width="1" stroke-dasharray="3,6"/>
+      <circle cx="180" cy="180" r="90" fill="none" stroke="#232731" stroke-width="0.8" stroke-dasharray="3,6"/>
+      <line x1="180" y1="20" x2="180" y2="350" stroke="#232731" stroke-width="1" stroke-dasharray="2,4"/>
+      <line x1="30" y1="180" x2="330" y2="180" stroke="#232731" stroke-width="1" stroke-dasharray="2,4"/>
+      <g>
+        <path d="M168,52 C168,36 192,36 192,52 C192,67 186,75 180,82 C174,75 168,67 168,52 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+        <path d="M172,82 L172,92 H188 V82 Z" fill="#15181e" stroke="#2c303b" stroke-width="1"/>
+        <path d="M172,88 C160,94 146,100 135,108 C145,110 158,106 172,98 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+        <path d="M188,88 C200,94 214,100 225,108 C215,110 202,106 188,98 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+        <path d="M135,108 C122,114 116,130 116,146 C116,154 122,154 126,148 C132,138 136,124 135,108 Z" ${styleFor(["Hombros", "Hombro"])}/>
+        <path d="M225,108 C238,114 244,130 244,146 C244,154 238,154 234,148 C228,138 224,124 225,108 Z" ${styleFor(["Hombros", "Hombro"])}/>
+        <path d="M178,108 L138,110 C136,110 134,124 134,142 C134,152 144,156 178,156 Z" ${styleFor(["Pecho"])}/>
+        <path d="M182,108 L222,110 C224,110 226,124 226,142 C226,152 216,156 182,156 Z" ${styleFor(["Pecho"])}/>
+        <path d="M116,146 C108,158 104,180 108,198 C114,198 120,192 122,180 C124,168 126,154 126,148 Z" ${styleFor(["Bíceps", "Bicep"])}/>
+        <path d="M244,146 C252,158 256,180 252,198 C246,198 240,192 238,180 C236,168 234,154 234,148 Z" ${styleFor(["Bíceps", "Bicep"])}/>
+        <path d="M108,198 C102,216 96,248 102,274 L114,266 C118,246 120,220 122,200 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+        <path d="M252,198 C258,216 264,248 258,274 L246,266 C242,246 240,220 238,200 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+        <path d="M102,274 L98,290 L106,290 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+        <path d="M258,274 L262,290 L254,290 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+        <path d="M156,160 H178 V174 H156 Z M182,160 H204 V174 H182 Z M154,178 H178 V192 H154 Z M182,178 H206 V192 H182 Z M154,196 H178 V210 H154 Z M182,196 H206 V210 H182 Z M156,214 H178 V228 H156 Z M182,214 H204 V228 H182 Z" ${styleFor(["Abdominales", "Core"])}/>
+        <path d="M134,156 C136,180 140,204 150,228 C146,204 142,180 138,156 Z" ${styleFor(["Abdominales", "Core"])}/>
+        <path d="M226,156 C224,180 220,204 210,228 C214,204 218,180 222,156 Z" ${styleFor(["Abdominales", "Core"])}/>
+        <path d="M148,232 C138,260 135,300 148,332 C152,336 158,336 160,332 C164,308 170,268 178,232 Z" ${styleFor(["Cuádriceps", "Pierna"])}/>
+        <path d="M212,232 C222,260 225,300 212,332 C208,336 202,336 200,332 C196,308 190,268 182,232 Z" ${styleFor(["Cuádriceps", "Pierna"])}/>
+        <path d="M178,232 C170,268 164,308 160,332 L168,330 C172,308 176,268 180,232 Z" ${styleFor(["Cuádriceps", "Pierna"])}/>
+        <path d="M182,232 C190,268 196,308 200,332 L192,330 C188,308 184,268 180,232 Z" ${styleFor(["Cuádriceps", "Pierna"])}/>
+        <path d="M148,336 C144,352 142,372 150,392 L156,392 C158,372 158,352 160,336 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+        <path d="M212,336 C216,352 218,372 210,392 L204,392 C202,372 202,352 200,336 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+        <path d="M150,392 L144,406 H158 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+        <path d="M210,392 L216,406 H202 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
       </g>
-      <text x="180" y="400" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="800" fill="#fff">${escapeSvg(muscle)}</text>
+      <rect x="80" y="356" width="200" height="42" rx="10" fill="#000000" fill-opacity="0.6" stroke="#232731" stroke-width="1"/>
+      <text x="180" y="375" text-anchor="middle" font-family="'Outfit', 'Inter', sans-serif" font-size="14" font-weight="700" fill="#ffffff" letter-spacing="1.5">${escapeSvg(muscle).toUpperCase()}</text>
+      <text x="180" y="389" text-anchor="middle" font-family="'Inter', sans-serif" font-size="9" font-weight="600" fill="#8890a6" letter-spacing="1">VISTA FRONTAL</text>
+    </svg>` : `
+    <svg xmlns="http://www.w3.org/2000/svg" width="360" height="420" viewBox="0 0 360 420">
+      <defs>
+        <linearGradient id="bg-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0b0c10"/>
+          <stop offset="100%" stop-color="#151821"/>
+        </linearGradient>
+        <linearGradient id="active-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ccff00"/>
+          <stop offset="100%" stop-color="#10b981"/>
+        </linearGradient>
+        <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="5" result="blur" />
+          <feComponentTransfer in="blur" result="glow1">
+            <feFuncA type="linear" slope="0.8"/>
+          </feComponentTransfer>
+          <feMerge>
+            <feMergeNode in="glow1" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <rect width="360" height="420" rx="24" fill="url(#bg-grad)" stroke="#232731" stroke-width="1.5"/>
+      <circle cx="180" cy="180" r="140" fill="none" stroke="#232731" stroke-width="1" stroke-dasharray="3,6"/>
+      <circle cx="180" cy="180" r="90" fill="none" stroke="#232731" stroke-width="0.8" stroke-dasharray="3,6"/>
+      <line x1="180" y1="20" x2="180" y2="350" stroke="#232731" stroke-width="1" stroke-dasharray="2,4"/>
+      <line x1="30" y1="180" x2="330" y2="180" stroke="#232731" stroke-width="1" stroke-dasharray="2,4"/>
+      <g>
+        <path d="M168,52 C168,36 192,36 192,52 C192,67 186,75 180,82 C174,75 168,67 168,52 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+        <path d="M172,82 L172,92 H188 V82 Z" fill="#15181e" stroke="#2c303b" stroke-width="1"/>
+        <path d="M180,82 L172,92 C158,104 148,110 135,116 C155,123 170,128 180,136 C190,128 205,123 225,116 C212,110 202,104 188,92 Z" ${styleFor(["Espalda"])}/>
+        <path d="M135,116 C124,121 118,136 120,150 L130,146 C134,136 134,126 135,116 Z" ${styleFor(["Hombros", "Hombro"])}/>
+        <path d="M225,116 C236,121 242,136 240,150 L230,146 C226,136 226,126 225,116 Z" ${styleFor(["Hombros", "Hombro"])}/>
+        <path d="M120,150 C112,162 108,182 112,198 C118,198 124,192 126,180 C128,168 130,154 130,146 Z" ${styleFor(["Tríceps", "Tricep"])}/>
+        <path d="M240,150 C248,162 252,182 248,198 C242,198 236,192 234,180 C232,168 230,154 230,146 Z" ${styleFor(["Tríceps", "Tricep"])}/>
+        <path d="M112,198 C106,216 100,248 106,274 L118,266 C122,246 124,220 126,200 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+        <path d="M248,198 C254,216 260,248 254,274 L242,266 C238,246 236,220 234,200 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+        <path d="M106,274 L102,290 L110,290 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+        <path d="M254,274 L258,290 L250,290 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+        <path d="M180,136 C165,136 142,140 130,146 L136,172 C142,182 152,192 180,202 Z" ${styleFor(["Espalda"])}/>
+        <path d="M180,136 C195,136 218,140 230,146 L224,172 C218,182 208,192 180,202 Z" ${styleFor(["Espalda"])}/>
+        <path d="M180,202 L154,202 C158,214 162,222 180,228 Z" ${styleFor(["Espalda"])}/>
+        <path d="M180,202 L206,202 C202,214 198,222 180,228 Z" ${styleFor(["Espalda"])}/>
+        <path d="M180,228 C154,228 142,238 142,260 C142,278 158,288 180,282 Z" ${styleFor(["Glúteos", "Glúteo"])}/>
+        <path d="M180,228 C206,228 218,238 218,260 C218,278 202,288 180,282 Z" ${styleFor(["Glúteos", "Glúteo"])}/>
+        <path d="M142,284 C138,300 135,330 148,354 C150,358 158,358 160,354 C164,335 168,310 178,283 Z" ${styleFor(["Isquiotibiales", "Femoral"])}/>
+        <path d="M218,284 C222,300 225,330 212,354 C210,358 202,358 200,354 C196,335 190,310 182,283 Z" ${styleFor(["Isquiotibiales", "Femoral"])}/>
+        <path d="M178,283 C170,310 164,335 160,354 H166 C170,335 174,310 178,283 Z" ${styleFor(["Isquiotibiales", "Femoral"])}/>
+        <path d="M182,283 C190,310 196,335 200,354 H194 C190,335 186,310 182,283 Z" ${styleFor(["Isquiotibiales", "Femoral"])}/>
+        <path d="M148,358 C138,370 136,388 146,402 H152 C158,388 158,370 160,358 Z" ${styleFor(["Gemelos", "Gemelo"])}/>
+        <path d="M212,358 C222,370 224,388 214,402 H208 C202,388 202,370 200,358 Z" ${styleFor(["Gemelos", "Gemelo"])}/>
+        <path d="M152,402 L150,410 H156 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+        <path d="M208,402 L210,410 H204 Z" fill="#1b1e25" stroke="#2c303b" stroke-width="1"/>
+      </g>
+      <rect x="80" y="356" width="200" height="42" rx="10" fill="#000000" fill-opacity="0.6" stroke="#232731" stroke-width="1"/>
+      <text x="180" y="375" text-anchor="middle" font-family="'Outfit', 'Inter', sans-serif" font-size="14" font-weight="700" fill="#ffffff" letter-spacing="1.5">${escapeSvg(muscle).toUpperCase()}</text>
+      <text x="180" y="389" text-anchor="middle" font-family="'Inter', sans-serif" font-size="9" font-weight="600" fill="#8890a6" letter-spacing="1">VISTA POSTERIOR</text>
     </svg>`;
+    
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
