@@ -114,16 +114,18 @@ function hasFirebaseConfig(config) {
 function waitForAuth(auth) {
   return new Promise((resolve) => {
     let resolved = false;
+    let unsubscribe = null;
     const timer = setTimeout(() => {
       if (!resolved) {
         resolved = true;
         console.warn("Firebase Auth connection timed out.");
+        if (unsubscribe) unsubscribe();
         resolve();
       }
     }, 2500);
 
-    const unsubscribe = onAuthStateChanged(auth, () => {
-      unsubscribe();
+    unsubscribe = onAuthStateChanged(auth, () => {
+      if (unsubscribe) unsubscribe();
       if (!resolved) {
         resolved = true;
         clearTimeout(timer);

@@ -474,21 +474,27 @@ async function apiRequest(path, options = {}) {
 }
 
 async function detectApi() {
-  firebaseBackend = await loadFirebaseBackend();
-  firebaseOnline = Boolean(firebaseBackend?.configured);
-  if (firebaseOnline) {
-    apiOnline = false;
-    if (firebaseBackend.user) {
-      appData.account = { email: firebaseBackend.user.email, id: firebaseBackend.user.uid, mode: "firebase" };
-      saveAppData();
-    } else {
-      appData.account = null;
-      apiToken = "";
-      localStorage.removeItem("liftlab-api-token");
-      saveAppData();
+  try {
+    firebaseBackend = await loadFirebaseBackend();
+    firebaseOnline = Boolean(firebaseBackend?.configured);
+    if (firebaseOnline) {
+      apiOnline = false;
+      if (firebaseBackend.user) {
+        appData.account = { email: firebaseBackend.user.email, id: firebaseBackend.user.uid, mode: "firebase" };
+        saveAppData();
+      } else {
+        appData.account = null;
+        apiToken = "";
+        localStorage.removeItem("liftlab-api-token");
+        saveAppData();
+      }
+      renderAuthStatus();
+      return true;
     }
-    renderAuthStatus();
-    return true;
+  } catch (e) {
+    console.error("Firebase API detection failed:", e);
+    firebaseOnline = false;
+    firebaseBackend = null;
   }
   try {
     await apiRequest("/api/status");
@@ -535,10 +541,12 @@ async function loadApiUserData() {
     saveWorkout();
     saveAppData();
     renderAllAppData();
-  } catch {
+  } catch (error) {
+    console.error("loadApiUserData failed:", error);
     apiToken = "";
     localStorage.removeItem("liftlab-api-token");
     firebaseOnline = false;
+    throw error;
   }
 }
 
@@ -574,10 +582,10 @@ async function loadFirebaseBackend() {
   );
   try {
     const module = await Promise.race([
-      import("./firebase-client.js"),
+      import("./firebase-client.js?v=2.0.3"),
       importTimeout
     ]);
-    return module.createFirebaseBackend();
+    return await module.createFirebaseBackend();
   } catch (e) {
     console.error("Firebase backend load failed:", e);
     return { configured: false, mode: "firebase-unavailable" };
@@ -4133,15 +4141,24 @@ function renderOnboarding() {
 
 async function bootstrapAuth() {
   setAuthUiState(true);
-  const online = await detectApi();
-  if (online && ((firebaseOnline && firebaseBackend?.user) || (!firebaseOnline && apiToken))) {
-    await loadApiUserData();
-    setView("dashboard");
-  } else if (appData.account?.isGuest) {
-    renderAllAppData();
-    setAuthUiState(false);
-    setView("dashboard");
-  } else {
+  try {
+    const online = await detectApi();
+    if (online && ((firebaseOnline && firebaseBackend?.user) || (!firebaseOnline && apiToken))) {
+      await loadApiUserData();
+      setAuthUiState(false);
+      setView("dashboard");
+    } else if (appData.account?.isGuest) {
+      renderAllAppData();
+      setAuthUiState(false);
+      setView("dashboard");
+    } else {
+      appData.account = null;
+      saveAppData();
+      renderAuthStatus();
+      setAuthUiState(false);
+    }
+  } catch (e) {
+    console.error("Auth bootstrapping failed, resetting to guest/fallback mode:", e);
     appData.account = null;
     saveAppData();
     renderAuthStatus();
