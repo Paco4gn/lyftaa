@@ -81,7 +81,13 @@ export async function createFirebaseBackend() {
       return auth.currentUser;
     },
     async request(path, options = {}) {
-      return requestFirebase({ auth, db }, path, options);
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("Tiempo de espera agotado en la solicitud de Firebase")), 4000);
+      });
+      return Promise.race([
+        requestFirebase({ auth, db }, path, options),
+        timeoutPromise
+      ]);
     },
     async uploadFoodPhoto(file) {
       const user = requireFirebaseUser(auth);
