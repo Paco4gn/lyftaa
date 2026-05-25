@@ -1086,21 +1086,23 @@ function createWorkout(templateId) {
 function createWorkoutFromWeekDay(day) {
   const exerciseNames = day.blocks.flatMap((block) => block.exercises);
   const ids = exerciseNames
-    .map((name) => exercises.find((exercise) => normalizeText(exercise.name) === normalizeText(name) || normalizeText(name).includes(normalizeText(exercise.name)))?.id)
+    .map((name) => exercises.find((exercise) => normalizeText(exercise.name) === normalizeText(name) || normalizeText(name).includes(normalizeText(exercise.name)) || normalizeText(exercise.name).includes(normalizeText(name)))?.id)
     .filter(Boolean);
-  const fallback = ["push", "pull", "fullbody", "legs", "power"][appData.selectedWeekDay] || "push";
-  const workout = createWorkout(fallback);
-  if (!ids.length) return workout;
+  if (!ids.length) {
+    const fallback = ["push", "pull", "fullbody", "legs", "power"][appData.selectedWeekDay] || "push";
+    return createWorkout(fallback);
+  }
   return {
     name: day.title,
-    exercises: ids.slice(0, 5).map((id, index) => {
+    exercises: ids.map((id, index) => {
       const historicalSets = getLastSessionSets(id);
+      const isCompound = index < 2;
       return {
         id,
         sets: historicalSets || [
-          { weight: index === 0 ? 80 : 30, reps: index === 0 ? 6 : 10, rpe: 8, type: index === 0 ? "Principal" : "Trabajo", done: false },
-          { weight: index === 0 ? 75 : 28, reps: index === 0 ? 8 : 12, rpe: 7, type: "Progresion", done: false },
-          { weight: index === 0 ? 72.5 : 26, reps: index === 0 ? 8 : 12, rpe: 7, type: "Volumen", done: false },
+          { weight: isCompound ? 80 : 30, reps: isCompound ? 6 : 10, rpe: 8, type: isCompound ? "Top" : "Normal", done: false },
+          { weight: isCompound ? 75 : 28, reps: isCompound ? 8 : 12, rpe: 7, type: "Back", done: false },
+          { weight: isCompound ? 72.5 : 26, reps: isCompound ? 8 : 12, rpe: 7, type: "Back", done: false },
         ]
       };
     }),
@@ -3590,8 +3592,23 @@ function updateTimerText() {
 }
 
 function bindEvents() {
+  $(".nav-item, .mobile-tab").forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
   $$(".nav-item, .mobile-tab").forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
-  $$("[data-view-shortcut]").forEach((button) => button.addEventListener("click", () => setView(button.dataset.viewShortcut)));
+  $$("[data-view-shortcut]").forEach((button) => button.addEventListener("click", () => {
+    const target = button.dataset.viewShortcut;
+    if (target === "workout") {
+      // Load today's plan before switching to workout view
+      const today = ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"][new Date().getDay()];
+      const dayIndex = weeklyRoutinePlan.findIndex((d) => d.day === today);
+      const planDay = weeklyRoutinePlan[dayIndex >= 0 ? dayIndex : (appData.selectedWeekDay || 0)];
+      if (planDay && planDay.status !== "Recuperación") {
+        state.activeWorkout = createWorkoutFromWeekDay(planDay);
+        saveWorkout();
+        renderWorkoutLog();
+      }
+    }
+    setView(target);
+  }));
   document.addEventListener("click", (event) => {
     const templateButton = event.target.closest("[data-load-template]");
     if (templateButton) loadTemplate(templateButton.dataset.loadTemplate);
