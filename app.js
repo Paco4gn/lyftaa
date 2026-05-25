@@ -1282,7 +1282,40 @@ const premiumGifs = {
   "seated-db-press": "videos/0405-znQUdHY.gif",
   "wide-pulldown": "videos/0150-eYnzaCm.gif",
   "single-row": "videos/0292-C0MA9bC.gif",
-  "glute-bridge": "videos/1409-qKBpF7I.gif"
+  "glute-bridge": "videos/1409-qKBpF7I.gif",
+
+  // Custom CSV exercises — mapped to closest equivalent GIF
+  "press-inclinado-csv": "videos/0314-ns0SIbU.gif",          // Press inclinado → incline-db
+  "apertura-maquina-csv": "videos/0596-v3xmPAR.gif",          // Apertura en máquina → pec-deck
+  "elevaciones-laterales-mancuernas-csv": "videos/0334-DsgkuIt.gif", // Elev. laterales mancuernas → lateral-raise
+  "elevaciones-laterales-polea-csv": "videos/0334-DsgkuIt.gif",      // Elev. laterales polea → lateral-raise
+  "triceps-polea-alta-csv": "videos/0241-gAwDzB3.gif",        // Tríceps polea alta → triceps-pushdown
+  "fondos-maquina-csv": "videos/0251-9WTm7dq.gif",            // Fondos en máquina → dip
+  "dominadas-elasticos-csv": "videos/0652-lBDjFxJ.gif",       // Dominadas con elásticos → pull-up
+  "jalones-pecho-abierto-csv": "videos/0150-eYnzaCm.gif",     // Jalones al pecho abierto → wide-pulldown
+  "remo-gironda-unilateral-csv": "videos/0292-C0MA9bC.gif",   // Remo girándola unilateral → single-row
+  "jalones-cerrados-csv": "videos/2330-LEprlgG.gif",          // Jalones cerrados → lat-pulldown
+  "pull-over-csv": "videos/0227-Pr9Rhf4.gif",                 // Pull over → cable-fly (similar arc)
+  "deltoides-posterior-apertura-csv": "videos/0233-ZfyAGhK.gif", // Deltoides posterior → face-pull
+  "curl-scott-csv": "videos/0031-25GPyDY.gif",                // Curl scott → curl
+  "curl-biceps-mancuerna-csv": "videos/0313-slDvUAU.gif",     // Curl bíceps mancuerna → hammer-curl
+  "curl-braquial-antebrazo-csv": "videos/0313-slDvUAU.gif",   // Curl braquial antebrazo → hammer-curl
+  "extensiones-csv": "videos/0585-my33uHU.gif",               // Extensiones → leg-ext
+  "abductores-csv": "videos/3562-qg2PGl6.gif",                // Abductores → hip-thrust (glúteo)
+  "adductores-csv": "videos/3562-qg2PGl6.gif",                // Adductores → hip-thrust (glúteo)
+  "sentado-peso-arriba-csv": "videos/1372-8ozhUIZ.gif",       // Sentado peso arriba → calf-raise
+  "press-inclinado-barra-csv": "videos/0314-ns0SIbU.gif",     // Press inclinado barra → incline-db
+  "face-full-csv": "videos/0233-ZfyAGhK.gif",                 // Face full → face-pull
+  "jalon-abierto-csv": "videos/0150-eYnzaCm.gif",             // Jalón abierto → wide-pulldown
+  "remo-barra-polea-csv": "videos/0861-fUBheHs.gif",          // Remo con barra en polea → row
+  "curl-de-biceps-csv": "videos/0031-25GPyDY.gif",            // Curl de bíceps → curl
+  "triceps-con-cuerda-csv": "videos/0241-gAwDzB3.gif",        // Tríceps con cuerda → triceps-pushdown
+  "curl-con-barra-csv": "videos/0031-25GPyDY.gif",            // Curl con Barra → curl
+  "curl-con-mancuernas-csv": "videos/0313-slDvUAU.gif",       // Curl con Mancuernas → hammer-curl
+  "crunches-csv": "videos/2135-VBAWRPG.gif",                  // Crunches → plank (core)
+  "rompecraneos-csv": "videos/0241-gAwDzB3.gif",              // Rompecráneos → triceps-pushdown
+  "jalones-de-triceps-csv": "videos/0241-gAwDzB3.gif",        // Jalones de Tríceps → triceps-pushdown
+  "fondos-en-banco-csv": "videos/0251-9WTm7dq.gif"            // Fondos en Banco → dip
 };
 
 function findExercise(id) {
