@@ -113,9 +113,22 @@ function hasFirebaseConfig(config) {
 
 function waitForAuth(auth) {
   return new Promise((resolve) => {
+    let resolved = false;
+    const timer = setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        console.warn("Firebase Auth connection timed out.");
+        resolve();
+      }
+    }, 2500);
+
     const unsubscribe = onAuthStateChanged(auth, () => {
       unsubscribe();
-      resolve();
+      if (!resolved) {
+        resolved = true;
+        clearTimeout(timer);
+        resolve();
+      }
     });
   });
 }

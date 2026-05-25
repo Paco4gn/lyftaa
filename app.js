@@ -447,18 +447,27 @@ async function apiRequest(path, options = {}) {
   if (firebaseOnline && firebaseBackend?.configured) {
     return firebaseBackend.request(path, options);
   }
-  const response = await fetch(apiUrl(path), {
-    ...options,
-    headers: {
-      "content-type": "application/json",
-      ...(apiToken ? { authorization: `Bearer ${apiToken}` } : {}),
-      ...(options.headers || {}),
-    },
-    body: options.body && typeof options.body !== "string" ? JSON.stringify(options.body) : options.body,
-  });
-  const payload = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(payload.error || "API no disponible");
-  return payload;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3500);
+  try {
+    const response = await fetch(apiUrl(path), {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        "content-type": "application/json",
+        ...(apiToken ? { authorization: `Bearer ${apiToken}` } : {}),
+        ...(options.headers || {}),
+      },
+      body: options.body && typeof options.body !== "string" ? JSON.stringify(options.body) : options.body,
+    });
+    clearTimeout(timeoutId);
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || "API no disponible");
+    return payload;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
 }
 
 async function detectApi() {
