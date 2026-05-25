@@ -582,7 +582,7 @@ async function loadFirebaseBackend() {
   );
   try {
     const module = await Promise.race([
-      import("./firebase-client.js?v=2.0.4"),
+      import("./firebase-client.js?v=2.0.5"),
       importTimeout
     ]);
     return await module.createFirebaseBackend();
@@ -3428,19 +3428,26 @@ async function deleteLocalAccount() {
 }
 
 function renderAllAppData() {
-  renderProfileInputs();
-  renderAuthStatus();
-  renderHealthInputs();
-  renderDashboardData();
-  renderWeekPlan();
-  renderHabits();
-  renderPhotoFoodResults();
-  renderCommunity();
-  renderMeasures();
-  renderWeeklyRoutineBoard();
-  renderWorkoutLog();
-  renderNutrition();
-  renderMilestones();
+  const runSafe = (name, fn) => {
+    try {
+      fn();
+    } catch (e) {
+      console.error(`Error during render ${name}:`, e);
+    }
+  };
+  runSafe("renderProfileInputs", renderProfileInputs);
+  runSafe("renderAuthStatus", renderAuthStatus);
+  runSafe("renderHealthInputs", renderHealthInputs);
+  runSafe("renderDashboardData", renderDashboardData);
+  runSafe("renderWeekPlan", renderWeekPlan);
+  runSafe("renderHabits", renderHabits);
+  runSafe("renderPhotoFoodResults", renderPhotoFoodResults);
+  runSafe("renderCommunity", renderCommunity);
+  runSafe("renderMeasures", renderMeasures);
+  runSafe("renderWeeklyRoutineBoard", renderWeeklyRoutineBoard);
+  runSafe("renderWorkoutLog", renderWorkoutLog);
+  runSafe("renderNutrition", renderNutrition);
+  runSafe("renderMilestones", renderMilestones);
 }
 
 function startTimer(seconds = 90) {
@@ -4169,34 +4176,46 @@ async function bootstrapAuth() {
 function init() {
   applyPreferredDeviceMode();
   setAuthUiState(true);
-  renderProfileInputs();
-  renderDate();
-  renderPhonePreview();
-  renderWeekPlan();
-  renderFeed();
-  renderWorkoutLog();
-  renderRoutines();
-  renderFilters();
-  renderMuscleAtlas();
-  renderLibrary();
-  renderCues();
-  drawProgressChart();
-  renderCalculator();
-  renderMilestones();
-  renderCommunity();
-  renderMeasures();
-  renderHealthInputs();
-  renderDashboardData();
-  renderHabits();
-  renderPhotoFoodResults();
-  runAIAgents();
-  renderNutrition();
-  renderFoodSearch();
-  updateTimerText();
-  updateDeviceToggleLabel();
+  
+  const runSafe = (name, fn) => {
+    try {
+      fn();
+    } catch (e) {
+      console.error(`Error during init ${name}:`, e);
+    }
+  };
+
+  runSafe("renderProfileInputs", renderProfileInputs);
+  runSafe("renderDate", renderDate);
+  runSafe("renderPhonePreview", renderPhonePreview);
+  runSafe("renderWeekPlan", renderWeekPlan);
+  runSafe("renderFeed", renderFeed);
+  runSafe("renderWorkoutLog", renderWorkoutLog);
+  runSafe("renderRoutines", renderRoutines);
+  runSafe("renderFilters", renderFilters);
+  runSafe("renderMuscleAtlas", renderMuscleAtlas);
+  runSafe("renderLibrary", renderLibrary);
+  runSafe("renderCues", renderCues);
+  runSafe("drawProgressChart", drawProgressChart);
+  runSafe("renderCalculator", renderCalculator);
+  runSafe("renderMilestones", renderMilestones);
+  runSafe("renderCommunity", renderCommunity);
+  runSafe("renderMeasures", renderMeasures);
+  runSafe("renderHealthInputs", renderHealthInputs);
+  runSafe("renderDashboardData", renderDashboardData);
+  runSafe("renderHabits", renderHabits);
+  runSafe("renderPhotoFoodResults", renderPhotoFoodResults);
+  runSafe("runAIAgents", runAIAgents);
+  runSafe("renderNutrition", renderNutrition);
+  runSafe("renderFoodSearch", renderFoodSearch);
+  runSafe("updateTimerText", updateTimerText);
+  runSafe("updateDeviceToggleLabel", updateDeviceToggleLabel);
+  
   window.addEventListener("resize", applyResponsiveDeviceMode);
-  bindEvents();
-  animateExercise();
+  
+  runSafe("bindEvents", bindEvents);
+  runSafe("animateExercise", animateExercise);
+  
   bootstrapAuth();
 }
 
