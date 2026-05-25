@@ -193,66 +193,84 @@ const routineTemplates = [
 const weeklyRoutinePlan = [
   {
     day: "Lunes",
-    title: "Push - pecho, hombro y triceps",
+    title: "Torso Empuje (Pecho, Hombro, Tríceps)",
     status: "Pendiente",
-    duration: "62 min",
-    difficulty: "Media",
+    duration: "70 min",
+    difficulty: "Alta",
     muscles: ["Pecho", "Hombro", "Tríceps"],
     blocks: [
-      { name: "Calentamiento", exercises: ["Movilidad hombro", "Press banca aproximacion"] },
-      { name: "Principal", exercises: ["Press banca", "Press inclinado mancuernas"] },
-      { name: "Accesorios", exercises: ["Fondos", "Elevacion lateral"] },
+      { name: "Principal", exercises: ["Press banca", "Press inclinado mancuernas", "Contractora", "Press militar"] },
+      { name: "Accesorios", exercises: ["Elevacion lateral", "Extensión tríceps polea", "Fondos"] },
     ],
   },
   {
     day: "Martes",
-    title: "Pull - espalda y biceps",
+    title: "Torso Tirón (Espalda, Hombro, Bíceps)",
     status: "Pendiente",
-    duration: "58 min",
-    difficulty: "Media",
-    muscles: ["Espalda", "Bíceps"],
+    duration: "75 min",
+    difficulty: "Alta",
+    muscles: ["Espalda", "Hombro", "Bíceps"],
     blocks: [
-      { name: "Calentamiento", exercises: ["Activacion escapular", "Jalon suave"] },
-      { name: "Principal", exercises: ["Dominadas", "Remo con barra"] },
-      { name: "Accesorios", exercises: ["Jalon al pecho", "Curl biceps"] },
+      { name: "Principal", exercises: ["Dominada", "Jalon al pecho", "Remo una mano", "Jalon agarre amplio"] },
+      { name: "Accesorios", exercises: ["Face pull", "Curl barra", "Curl martillo"] },
     ],
   },
   {
     day: "Miercoles",
-    title: "Movilidad y pasos",
+    title: "Descanso activo y movilidad",
     status: "Recuperación",
-    duration: "25 min",
+    duration: "20 min",
     difficulty: "Suave",
     muscles: ["Core", "Movilidad"],
     blocks: [
-      { name: "Movilidad", exercises: ["Cadera", "Columna toracica"] },
-      { name: "Hábito", exercises: ["8.000 pasos", "Respiración 5 min"] },
+      { name: "Movilidad", exercises: ["Puente glúteo", "Plancha"] },
     ],
   },
   {
     day: "Jueves",
-    title: "Pierna y gluteo",
+    title: "Pierna Completa (Glúteos, Cuádriceps, Femoral, Gemelo)",
     status: "Pendiente",
-    duration: "70 min",
+    duration: "75 min",
     difficulty: "Alta",
-    muscles: ["Pierna", "Femoral", "Glúteo"],
+    muscles: ["Glúteo", "Pierna", "Femoral", "Gemelo"],
     blocks: [
-      { name: "Calentamiento", exercises: ["Movilidad tobillo", "Sentadilla goblet"] },
-      { name: "Principal", exercises: ["Sentadilla", "Peso muerto rumano"] },
-      { name: "Accesorios", exercises: ["Extension cuadriceps", "Hip thrust"] },
+      { name: "Principal", exercises: ["Peso muerto", "Prensa", "Extension de cuadriceps", "Curl femoral"] },
+      { name: "Accesorios", exercises: ["Puente glúteo", "Elevacion gemelo"] },
     ],
   },
   {
     day: "Viernes",
-    title: "Torso fuerza",
+    title: "Torso Mixto (Pecho, Hombro, Espalda, Brazos)",
     status: "Pendiente",
-    duration: "55 min",
-    difficulty: "Media",
-    muscles: ["Pecho", "Espalda", "Hombro"],
+    duration: "80 min",
+    difficulty: "Alta",
+    muscles: ["Pecho", "Hombro", "Espalda", "Bíceps", "Tríceps"],
     blocks: [
-      { name: "Principal", exercises: ["Press banca pesado", "Dominadas"] },
-      { name: "Accesorios", exercises: ["Remo", "Press hombro mancuernas"] },
-      { name: "Core", exercises: ["Plancha", "Pallof press"] },
+      { name: "Principal", exercises: ["Press inclinado mancuernas", "Press militar", "Jalon agarre amplio", "Remo sentado"] },
+      { name: "Accesorios", exercises: ["Elevacion lateral", "Face pull", "Curl barra", "Extensión tríceps polea"] },
+    ],
+  },
+  {
+    day: "Sabado",
+    title: "Bíceps y Abdominales",
+    status: "Pendiente",
+    duration: "45 min",
+    difficulty: "Media",
+    muscles: ["Bíceps", "Core"],
+    blocks: [
+      { name: "Principal", exercises: ["Curl barra", "Curl martillo"] },
+      { name: "Accesorios", exercises: ["Plancha"] },
+    ],
+  },
+  {
+    day: "Domingo",
+    title: "Tríceps y Fondos",
+    status: "Pendiente",
+    duration: "40 min",
+    difficulty: "Media",
+    muscles: ["Tríceps"],
+    blocks: [
+      { name: "Principal", exercises: ["Extensión tríceps polea", "Fondos"] },
     ],
   },
 ];
@@ -530,6 +548,14 @@ async function loadApiUserData() {
       weeklyRoutinePlan.length,
       ...(Array.isArray(data.routines) && data.routines.length ? data.routines : cloneData(defaultRoutinePlan))
     );
+    // Auto-update pacogn4@gmail.com to the new 7-day routine format
+    if (appData.account?.email === "pacogn4@gmail.com") {
+      const hasNewRoutine = weeklyRoutinePlan.some((day) => day.day === "Sabado" || day.day === "Sábado" || day.day === "Domingo");
+      if (!hasNewRoutine) {
+        weeklyRoutinePlan.splice(0, weeklyRoutinePlan.length, ...cloneData(defaultRoutinePlan));
+        pushApi("/api/routines", weeklyRoutinePlan).catch(console.error);
+      }
+    }
     if (Array.isArray(data.meals)) {
       mealLog = data.meals.map((meal) => ({ ...meal, date: meal.date || new Date().toISOString().slice(0, 10) }));
       saveMealLog();
@@ -582,7 +608,7 @@ async function loadFirebaseBackend() {
   );
   try {
     const module = await Promise.race([
-      import("./firebase-client.js?v=2.0.5"),
+      import("./firebase-client.js?v=2.0.6"),
       importTimeout
     ]);
     return await module.createFirebaseBackend();
