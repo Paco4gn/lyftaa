@@ -98,10 +98,6 @@
             <svg viewBox="0 0 24 24"><path d="M4 19V5M8 17v-5M13 17V8M18 17v-9M4 19h17"/></svg>
             Progreso
           </button>
-          <button class="nav-item" data-view="community">
-            <svg viewBox="0 0 24 24"><path d="M16 11a4 4 0 1 0-8 0M4 20a8 8 0 0 1 16 0M18 8a3 3 0 0 1 2 5"/></svg>
-            Comunidad
-          </button>
           <button class="nav-item" data-view="profile">
             <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0"/></svg>
             Perfil
@@ -149,6 +145,32 @@
         </header>
 
         <section class="view active" id="dashboard-view" aria-label="Panel de inicio">
+          <div class="welcome-banner" id="welcome-banner">
+            <div class="welcome-message">
+              <h2 id="welcome-title">¡Hola, Atleta!</h2>
+              <p id="welcome-coach-tip">Cargando consejos del Coach...</p>
+            </div>
+          </div>
+
+          <div class="quick-actions-bar">
+            <button class="quick-action-btn" data-view-shortcut="workout" title="Iniciar sesión de entrenamiento">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v8H2zM6 2v4M14 2v4M2 12h16"/></svg>
+              <span>Entrenar</span>
+            </button>
+            <button class="quick-action-btn" data-view-shortcut="nutrition" title="Registrar comidas">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <span>Comida</span>
+            </button>
+            <button class="quick-action-btn" data-view-shortcut="progress" title="Ver progreso físico">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/></svg>
+              <span>Progreso</span>
+            </button>
+            <button class="quick-action-btn" data-view-shortcut="ai" title="Charlar con Coach IA">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Coach IA</span>
+            </button>
+          </div>
+
           <div class="hero-panel">
             <div class="hero-copy">
               <span class="pill">Sesión de hoy</span>
@@ -177,21 +199,25 @@
             <article class="metric-card">
               <span>Volumen semanal</span>
               <strong id="weekly-volume">0 kg</strong>
+              <div class="metric-progress-bar"><div class="bar-fill" id="vol-bar-fill" style="width: 0%"></div></div>
               <small>Se actualizará con tus entrenos</small>
             </article>
             <article class="metric-card">
               <span>Mejor 1RM</span>
               <strong id="best-orm">Sin datos</strong>
+              <div class="metric-progress-bar"><div class="bar-fill" id="orm-bar-fill" style="width: 0%"></div></div>
               <small>Aparecerá con tu historial</small>
             </article>
             <article class="metric-card">
               <span>Entrenos</span>
               <strong id="weekly-workouts">0</strong>
+              <div class="metric-progress-bar"><div class="bar-fill" id="work-bar-fill" style="width: 0%"></div></div>
               <small>Objetivo semanal</small>
             </article>
             <article class="metric-card">
               <span>Recuperación</span>
               <strong id="recovery-score">82%</strong>
+              <div class="metric-progress-bar"><div class="bar-fill" id="rec-bar-fill" style="width: 82%"></div></div>
               <small>Listo para intensidad media</small>
             </article>
           </div>
@@ -207,7 +233,7 @@
             <section class="panel">
               <div class="panel-heading">
                 <h3>Actividad reciente</h3>
-                <button class="text-button" data-view-shortcut="community">Ver todo</button>
+                <button class="text-button" data-view-shortcut="progress">Ver todo</button>
               </div>
               <div class="feed-list" id="recent-feed"></div>
             </section>
@@ -502,6 +528,20 @@
                 <span id="nutrition-date"></span>
               </div>
               <div class="daily-summary" id="daily-summary"></div>
+              
+              <!-- Barra de Balance Calórico -->
+              <div class="calorie-balance-container" style="margin-top: 15px; margin-bottom: 15px; padding: 15px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--line); border-radius: var(--radius);">
+                <div class="balance-labels" style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px; color: var(--muted);">
+                  <span>Consumido: <strong id="balance-consumed" style="color: #fff; font-family: 'Outfit';">0 kcal</strong></span>
+                  <span>Restante: <strong id="balance-remaining" style="color: #ccff00; font-family: 'Outfit';">0 kcal</strong></span>
+                  <span>Objetivo: <strong id="balance-target" style="color: #fff; font-family: 'Outfit';">0 kcal</strong></span>
+                </div>
+                <div class="balance-bar-wrapper" style="height: 10px; background: #2b2b31; border-radius: 999px; overflow: hidden; position: relative;">
+                  <div class="balance-bar-fill" id="balance-bar-fill" style="height: 100%; width: 0%; background: #ccff00; border-radius: inherit; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s; box-shadow: 0 0 8px rgba(204, 255, 0, 0.5);"></div>
+                </div>
+                <small id="balance-warning-msg" class="balance-warning-msg" style="display: block; margin-top: 6px; font-size: 0.75rem; font-weight: 600; text-align: right;"></small>
+              </div>
+
               <div class="meal-log" id="meal-log"></div>
             </section>
             <section class="panel">
@@ -559,8 +599,14 @@
                   <p class="subtle">Registra series, peso, reps, RPE y notas.</p>
                 </div>
                 <div class="timer-box">
-                  <span>Descanso</span>
-                  <strong id="rest-timer">01:30</strong>
+                  <svg class="timer-svg" viewBox="0 0 36 36">
+                    <circle class="timer-bg-circle" cx="18" cy="18" r="15.9155" />
+                    <circle class="timer-fill-circle" id="timer-fill-circle" cx="18" cy="18" r="15.9155" stroke-dasharray="100 100" />
+                  </svg>
+                  <div class="timer-text-container">
+                    <span class="timer-label">Descanso</span>
+                    <strong id="rest-timer">01:30</strong>
+                  </div>
                 </div>
               </div>
               <div class="exercise-log" id="exercise-log"></div>
@@ -667,45 +713,15 @@
               <div class="milestones" id="milestones"></div>
             </section>
           </div>
-        </section>
-
-        <section class="view" id="community-view" aria-label="Comunidad">
-          <div class="community-grid">
-            <section class="panel">
-              <div class="panel-heading">
-                <h3>Reto privado mensual</h3>
-                <span class="pill" id="community-target-pill">45.000 kg</span>
-              </div>
-              <div class="challenge">
-                <div class="ring" id="community-ring" style="--progress: 0">
-                  <strong id="community-ring-value">0%</strong>
-                  <span>completado</span>
-                </div>
-                <div>
-                  <h4>Reto privado de fuerza de mayo</h4>
-                  <p class="subtle" id="community-challenge-copy">Suma volumen solo con tus sesiones registradas. Estos datos no se comparten con otros usuarios.</p>
-                  <button class="primary-button" id="share-progress-btn">Guardar avance privado</button>
-                </div>
-              </div>
-            </section>
-            <section class="panel">
-              <div class="panel-heading">
-                <h3>Mi progreso privado</h3>
-              </div>
-              <div class="leaderboard" id="leaderboard"></div>
-            </section>
-          </div>
-          <section class="panel">
+          <section class="panel" style="margin-top: 20px;">
             <div class="panel-heading">
-              <h3>Actividad privada</h3>
-              <button class="ghost-button" id="add-friend-btn">
-                <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-                Nota privada
-              </button>
+              <h3>Historial de Entrenamientos Privado</h3>
             </div>
-            <div class="feed-list wide" id="community-feed"></div>
+            <div class="timeline" id="workout-history-timeline"></div>
           </section>
         </section>
+
+
 
         <section class="view" id="profile-view" aria-label="Perfil y ajustes">
           <div class="profile-grid">
@@ -807,7 +823,6 @@
         <button class="mobile-tab" data-view="routines"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>Rutinas</span></button>
         <button class="mobile-tab" data-view="library"><svg viewBox="0 0 24 24"><path d="M21 21l-4.3-4.3M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"/></svg><span>Ejercicios</span></button>
         <button class="mobile-tab" data-view="progress"><svg viewBox="0 0 24 24"><path d="M4 19V5M8 17v-6M13 17V7M18 17v-9M22 19H4"/></svg><span>Progreso</span></button>
-        <button class="mobile-tab" data-view="community"><svg viewBox="0 0 24 24"><path d="M16 11a4 4 0 1 0-8 0M3 21a7 7 0 0 1 14 0M17 8a3 3 0 0 1 0 6M21 21a5 5 0 0 0-4-4.9"/></svg><span>Comunidad</span></button>
         <button class="mobile-tab" data-view="profile"><svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21a8 8 0 0 1 16 0"/></svg><span>Perfil</span></button>
       </nav>
     </div>

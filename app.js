@@ -285,38 +285,38 @@ const feed = [
 ];
 
 const foodDb = [
-  ["pechuga de pollo", ["pollo", "pechuga", "chicken"], 165, 31, 0, 3.6],
-  ["arroz cocido", ["arroz", "rice"], 130, 2.7, 28, 0.3],
-  ["pasta cocida", ["pasta", "macarrones", "espagueti"], 158, 5.8, 31, 0.9],
-  ["avena", ["oats", "copos de avena"], 389, 16.9, 66, 6.9],
-  ["claras de huevo", ["claras", "clara"], 52, 10.9, 0.7, 0.2],
-  ["huevo", ["huevos", "egg"], 143, 12.6, 0.7, 9.5, 50],
-  ["leche semidesnatada", ["leche", "milk"], 47, 3.4, 4.8, 1.6],
-  ["yogur griego", ["yogur", "yogurt griego"], 97, 9, 3.9, 5],
-  ["proteina whey", ["whey", "proteina", "proteina en polvo"], 400, 80, 8, 6, 30],
-  ["platano", ["platano", "banana"], 89, 1.1, 23, 0.3, 120],
-  ["manzana", ["apple"], 52, 0.3, 14, 0.2, 180],
-  ["aguacate", ["avocado"], 160, 2, 8.5, 14.7],
-  ["aceite de oliva", ["aceite", "aove"], 884, 0, 0, 100, 10],
-  ["pan integral", ["pan", "tostada integral"], 247, 13, 41, 4.2, 35],
-  ["patata cocida", ["patata", "papa"], 87, 1.9, 20, 0.1],
-  ["boniato", ["batata"], 86, 1.6, 20, 0.1],
-  ["pavo", ["pechuga de pavo"], 104, 22, 1, 1.5],
-  ["ternera magra", ["ternera", "carne"], 170, 26, 0, 7],
-  ["salmon", ["salmon"], 208, 20, 0, 13],
-  ["atun natural", ["atun", "atun al natural"], 116, 26, 0, 1, 80],
-  ["merluza", ["pescado blanco"], 89, 17, 0, 2],
-  ["brocoli", ["brocoli"], 35, 2.4, 7.2, 0.4],
-  ["tomate", ["tomates"], 18, 0.9, 3.9, 0.2, 120],
-  ["ensalada", ["lechuga", "verdura"], 20, 1.2, 3.5, 0.2],
-  ["garbanzos cocidos", ["garbanzos"], 164, 8.9, 27, 2.6],
-  ["lentejas cocidas", ["lentejas"], 116, 9, 20, 0.4],
-  ["almendras", ["almendra"], 579, 21, 22, 50],
-  ["mantequilla cacahuete", ["crema cacahuete", "cacahuete"], 588, 25, 20, 50],
-  ["queso fresco batido", ["queso fresco", "quark"], 62, 8.5, 4, 0.2],
-  ["cafe con leche", ["cafe leche", "cortado"], 35, 1.8, 3, 1.2, 200],
-  ["pizza", ["porcion pizza", "porcion pizza"], 266, 11, 33, 10],
-  ["hamburguesa", ["burger"], 254, 17, 24, 10],
+  ["🍗 pechuga de pollo", ["pollo", "pechuga", "chicken"], 165, 31, 0, 3.6],
+  ["🍚 arroz cocido", ["arroz", "rice"], 130, 2.7, 28, 0.3],
+  ["🍝 pasta cocida", ["pasta", "macarrones", "espagueti"], 158, 5.8, 31, 0.9],
+  ["🥣 avena", ["oats", "copos de avena"], 389, 16.9, 66, 6.9],
+  ["🥚 claras de huevo", ["claras", "clara"], 52, 10.9, 0.7, 0.2],
+  ["🥚 huevo", ["huevos", "egg"], 143, 12.6, 0.7, 9.5, 50],
+  ["🥛 leche semidesnatada", ["leche", "milk"], 47, 3.4, 4.8, 1.6],
+  ["🍧 yogur griego", ["yogur", "yogurt griego"], 97, 9, 3.9, 5],
+  ["🥛 proteina whey", ["whey", "proteina", "proteina en polvo"], 400, 80, 8, 6, 30],
+  ["🍌 platano", ["platano", "banana"], 89, 1.1, 23, 0.3, 120],
+  ["🍎 manzana", ["apple"], 52, 0.3, 14, 0.2, 180],
+  ["🥑 aguacate", ["avocado"], 160, 2, 8.5, 14.7],
+  ["🫒 aceite de oliva", ["aceite", "aove"], 884, 0, 0, 100, 10],
+  ["🍞 pan integral", ["pan", "tostada integral"], 247, 13, 41, 4.2, 35],
+  ["🥔 patata cocida", ["patata", "papa"], 87, 1.9, 20, 0.1],
+  ["🍠 boniato", ["batata"], 86, 1.6, 20, 0.1],
+  ["🦃 pechuga de pavo", ["pavo", "pechuga de pavo"], 104, 22, 1, 1.5],
+  ["🥩 ternera magra", ["ternera", "carne"], 170, 26, 0, 7],
+  ["🍣 salmon", ["salmon"], 208, 20, 0, 13],
+  ["🐟 atun natural", ["atun", "atun al natural"], 116, 26, 0, 1, 80],
+  ["🐟 merluza", ["pescado blanco"], 89, 17, 0, 2],
+  ["🥦 brocoli", ["brocoli"], 35, 2.4, 7.2, 0.4],
+  ["🍅 tomate", ["tomates"], 18, 0.9, 3.9, 0.2, 120],
+  ["🥗 ensalada", ["lechuga", "verdura"], 20, 1.2, 3.5, 0.2],
+  ["🫘 garbanzos cocidos", ["garbanzos"], 164, 8.9, 27, 2.6],
+  ["🫘 lentejas cocidas", ["lentejas"], 116, 9, 20, 0.4],
+  ["🫘 almendras", ["almendra"], 579, 21, 22, 50],
+  ["🥜 mantequilla cacahuete", ["crema cacahuete", "cacahuete"], 588, 25, 20, 50],
+  ["🧀 queso fresco batido", ["queso fresco", "quark"], 62, 8.5, 4, 0.2],
+  ["☕ cafe con leche", ["cafe leche", "cortado"], 35, 1.8, 3, 1.2, 200],
+  ["🍕 pizza", ["porcion pizza", "porcion pizza"], 266, 11, 33, 10],
+  ["🍔 hamburguesa", ["burger"], 254, 17, 24, 10],
 ];
 
 let mealLog = loadMealLog();
@@ -1101,15 +1101,48 @@ function renderWeekPlan() {
 }
 
 function renderFeed(target = "#recent-feed") {
-  $(target).innerHTML = feed
-    .map(([avatar, title, subtitle, tag]) => `
-      <article class="feed-item">
-        <span class="thumb">${avatar}</span>
-        <div><strong>${title}</strong><small>${subtitle}</small></div>
-        <span class="pill">${tag}</span>
-      </article>
-    `)
-    .join("");
+  const history = Array.isArray(appData.workoutHistory) ? appData.workoutHistory : [];
+  if (history.length > 0) {
+    const sorted = [...history].sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt)).slice(0, 3);
+    $(target).innerHTML = sorted.map((workout) => {
+      let dateFormatted = "Reciente";
+      if (workout.completedAt) {
+        try {
+          dateFormatted = new Date(workout.completedAt).toLocaleDateString("es-ES", {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+          });
+        } catch (e) {}
+      }
+      let muscleTag = "Entreno";
+      if (workout.exercises && workout.exercises.length > 0) {
+        const firstEx = findExercise(workout.exercises[0].id);
+        if (firstEx) muscleTag = firstEx.muscle;
+      }
+      return `
+        <article class="feed-item">
+          <span class="thumb">🏆</span>
+          <div>
+            <strong>${workout.name}</strong>
+            <small>${dateFormatted} • ${workout.durationMin || 60} min • ${workout.calories || 0} kcal</small>
+          </div>
+          <span class="pill" style="background: rgba(204, 255, 0, 0.15); color: #ccff00; border: 1px solid rgba(204, 255, 0, 0.3); font-weight: 700;">${muscleTag}</span>
+        </article>
+      `;
+    }).join("");
+  } else {
+    $(target).innerHTML = feed
+      .map(([avatar, title, subtitle, tag]) => `
+        <article class="feed-item">
+          <span class="thumb">${avatar}</span>
+          <div><strong>${title}</strong><small>${subtitle}</small></div>
+          <span class="pill">${tag}</span>
+        </article>
+      `)
+      .join("");
+  }
 }
 
 const premiumGifs = {
@@ -1361,9 +1394,21 @@ function renderWorkoutLog() {
             ${entry.sets
               .map((set, setIndex) => `
                 <div class="set-row" data-set-index="${setIndex}">
-                  <strong>${setIndex + 1}</strong>
-                  <label>Peso<input data-field="weight" type="number" min="0" step="0.5" value="${set.weight}"></label>
-                  <label>Reps<input data-field="reps" type="number" min="1" step="1" value="${set.reps}"></label>
+                  <strong class="set-label" style="font-size: 0.76rem; white-space: nowrap;">Serie ${setIndex + 1} de ${entry.sets.length}</strong>
+                  <label>Peso
+                    <div class="qty-btn-group">
+                      <button type="button" class="qty-btn" data-adjust-set-val="-2.5" data-field="weight" data-exercise-index="${exerciseIndex}" data-set-index="${setIndex}">-</button>
+                      <input data-field="weight" type="number" min="0" step="0.5" value="${set.weight}">
+                      <button type="button" class="qty-btn" data-adjust-set-val="2.5" data-field="weight" data-exercise-index="${exerciseIndex}" data-set-index="${setIndex}">+</button>
+                    </div>
+                  </label>
+                  <label>Reps
+                    <div class="qty-btn-group">
+                      <button type="button" class="qty-btn" data-adjust-set-val="-1" data-field="reps" data-exercise-index="${exerciseIndex}" data-set-index="${setIndex}">-</button>
+                      <input data-field="reps" type="number" min="1" step="1" value="${set.reps}">
+                      <button type="button" class="qty-btn" data-adjust-set-val="1" data-field="reps" data-exercise-index="${exerciseIndex}" data-set-index="${setIndex}">+</button>
+                    </div>
+                  </label>
                   <label>RPE<input data-field="rpe" type="number" min="1" max="10" step="0.5" value="${set.rpe}"></label>
                   <label>Tipo<input data-field="type" value="${set.type}"></label>
                   <button class="check-set ${set.done ? "done" : ""}" data-check-set aria-label="Completar serie">${set.done ? "✓" : ""}</button>
@@ -1658,14 +1703,51 @@ function drawProgressChart() {
     return [x, y, value];
   });
 
-  ctx.beginPath();
-  points.forEach(([x, y], index) => (index ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
-  ctx.strokeStyle = accent;
-  ctx.lineWidth = 5;
-  ctx.shadowBlur = 12;
-  ctx.shadowColor = accent;
-  ctx.stroke();
-  ctx.shadowBlur = 0; // Reset shadow so it doesn't affect other elements
+  if (points.length > 0) {
+    // 1. Draw and fill the gradient area under the Bezier curve
+    const fillGrad = ctx.createLinearGradient(0, padding, 0, height - padding);
+    fillGrad.addColorStop(0, accent);
+    fillGrad.addColorStop(1, "rgba(0,0,0,0)");
+    
+    ctx.save();
+    ctx.fillStyle = fillGrad;
+    ctx.globalAlpha = 0.25; // beautiful glowing opacity
+    ctx.beginPath();
+    ctx.moveTo(points[0][0], height - padding);
+    ctx.lineTo(points[0][0], points[0][1]);
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      const cpX1 = p0[0] + (p1[0] - p0[0]) / 2;
+      const cpY1 = p0[1];
+      const cpX2 = p0[0] + (p1[0] - p0[0]) / 2;
+      const cpY2 = p1[1];
+      ctx.bezierCurveTo(cpX1, cpY1, cpX2, cpY2, p1[0], p1[1]);
+    }
+    ctx.lineTo(points[points.length - 1][0], height - padding);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    // 2. Draw the smooth stroke on top
+    ctx.beginPath();
+    ctx.moveTo(points[0][0], points[0][1]);
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      const cpX1 = p0[0] + (p1[0] - p0[0]) / 2;
+      const cpY1 = p0[1];
+      const cpX2 = p0[0] + (p1[0] - p0[0]) / 2;
+      const cpY2 = p1[1];
+      ctx.bezierCurveTo(cpX1, cpY1, cpX2, cpY2, p1[0], p1[1]);
+    }
+    ctx.strokeStyle = accent;
+    ctx.lineWidth = 5;
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = accent;
+    ctx.stroke();
+    ctx.shadowBlur = 0; // Reset shadow
+  }
 
   points.forEach(([x, y, value], index) => {
     ctx.fillStyle = accent;
@@ -1707,54 +1789,101 @@ function renderMilestones() {
       ]
     : [["Sin registros todavía", "Completa tu primer entrenamiento para ver marcas reales"]];
   $("#milestones").innerHTML = items.map(([title, text]) => `<article class="milestone"><strong>${title}</strong><br><small>${text}</small></article>`).join("");
+  
+  // Update timeline
+  renderWorkoutHistoryTimeline();
+}
+
+function renderWorkoutHistoryTimeline() {
+  const container = $("#workout-history-timeline");
+  if (!container) return;
+  
+  const history = Array.isArray(appData.workoutHistory) ? appData.workoutHistory : [];
+  if (history.length === 0) {
+    container.innerHTML = `<div class="timeline-empty">Aún no has registrado ningún entrenamiento. ¡Completa tu primera sesión para comenzar tu historial!</div>`;
+    return;
+  }
+  
+  const sortedHistory = [...history].sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt));
+  
+  container.innerHTML = sortedHistory.map((workout) => {
+    const muscles = new Set();
+    let totalVolume = 0;
+    let completedSets = 0;
+    
+    if (Array.isArray(workout.exercises)) {
+      workout.exercises.forEach((exEntry) => {
+        const exercise = findExercise(exEntry.id);
+        if (exercise) muscles.add(exercise.muscle);
+        
+        if (Array.isArray(exEntry.sets)) {
+          exEntry.sets.forEach((set) => {
+            if (set.done) {
+              completedSets++;
+              totalVolume += (Number(set.weight) || 0) * (Number(set.reps) || 0);
+            }
+          });
+        }
+      });
+    }
+    
+    let dateFormatted = "Fecha no disponible";
+    if (workout.completedAt) {
+      try {
+        dateFormatted = new Date(workout.completedAt).toLocaleDateString("es-ES", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+      } catch (e) {}
+    }
+    
+    const badgesHtml = Array.from(muscles).map((muscle) => {
+      let typeClass = "";
+      let emoji = "💪";
+      const muscleLower = String(muscle).toLowerCase();
+      if (["pecho", "hombro", "tríceps", "hombros"].some(m => muscleLower.includes(m))) {
+        typeClass = "push";
+        emoji = "💪";
+      } else if (["espalda", "bíceps"].some(m => muscleLower.includes(m))) {
+        typeClass = "pull";
+        emoji = "🏋️";
+      } else if (["pierna", "femoral", "glúteo", "gemelo", "cuádriceps", "isquiotibiales", "glúteos", "gemelos"].some(m => muscleLower.includes(m))) {
+        typeClass = "legs";
+        emoji = "🦵";
+      } else {
+        emoji = "🛡️";
+      }
+      return `<span class="muscle-badge ${typeClass}">${emoji} ${muscle}</span>`;
+    }).join(" ");
+    
+    return `
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-header">
+          <strong class="timeline-title">${workout.name}</strong>
+          <span class="timeline-date">${dateFormatted}</span>
+        </div>
+        <div class="timeline-meta">
+          <span>⏱️ ${workout.durationMin || 60} min</span>
+          <span>🔥 ${workout.calories || 0} kcal</span>
+          <span>🏋️ ${totalVolume.toLocaleString("es-ES")} kg (Volumen)</span>
+          <span>✅ ${completedSets} series</span>
+        </div>
+        <div class="timeline-badges">
+          ${badgesHtml}
+        </div>
+      </div>
+    `;
+  }).join("");
 }
 
 function renderCommunity() {
-  const sets = state.activeWorkout.exercises.flatMap((entry) => entry.sets || []);
-  const completedSets = sets.filter((set) => set.done);
-  const volumeKg = completedSets.reduce((total, set) => total + Number(set.weight || 0) * Number(set.reps || 0), 0);
-  const targetKg = 45000;
-  const progress = Math.min(100, Math.round((volumeKg / targetKg) * 100));
-  const publicProfile = Boolean(appData.privacySettings?.publicProfile || appData.communityProfile?.public);
-  const ring = $("#community-ring");
-  const ringValue = $("#community-ring-value");
-  const challengeCopy = $("#community-challenge-copy") || $(".challenge .subtle");
-  if (ring) ring.style.setProperty("--progress", progress);
-  if (ringValue) ringValue.textContent = `${progress}%`;
-  if ($("#community-target-pill")) $("#community-target-pill").textContent = `${targetKg.toLocaleString("es-ES")} kg`;
-  if (challengeCopy) {
-    challengeCopy.textContent = "Suma volumen solo con tus sesiones registradas. Estos datos son privados por defecto y no se mezclan con otros usuarios.";
-  }
-
-  $("#leaderboard").innerHTML = [
-    ["Volumen guardado", `${Math.round(volumeKg).toLocaleString("es-ES")} kg`, "Solo tu cuenta"],
-    ["Series completadas", `${completedSets.length}`, "Entreno actual"],
-    ["Pasos de hoy", `${Number(appData.health.steps || 0).toLocaleString("es-ES")}`, "Dato privado"],
-    ["Perfil público", publicProfile ? "Activado" : "Desactivado", publicProfile ? "Solo si tú lo decides" : "Nadie ve tus datos"],
-  ]
-    .map(([metric, value, note]) => `
-      <div class="leader-row">
-        <strong>LL</strong>
-        <span>${escapeHtml(metric)}</span>
-        <small>${escapeHtml(value)} · ${escapeHtml(note)}</small>
-      </div>
-    `)
-    .join("");
-  const posts = Array.isArray(appData.communityPosts) ? appData.communityPosts.slice().reverse() : [];
-  $("#community-feed").innerHTML = posts.length
-    ? posts
-        .map((post) => `
-          <article class="feed-item">
-            <span class="thumb">${escapeHtml(initialsFromName(appData.profile.name))}</span>
-            <div>
-              <strong>${escapeHtml(post.title || "Avance privado")}</strong>
-              <small>${escapeHtml(post.text || "")}</small>
-            </div>
-            <span class="pill">${escapeHtml(post.privacy === "public" ? "Público" : "Privado")}</span>
-          </article>
-        `)
-        .join("")
-    : `<div class="empty-state">No hay actividad compartida. Esta pantalla solo muestra tus propios datos y no enseña personas de ejemplo.</div>`;
+  // Vista de comunidad eliminada por solicitud del usuario
+  return;
 }
 
 function renderMeasures() {
@@ -1938,6 +2067,32 @@ function addAIMessage(author, text) {
   if (!chat) return;
   chat.insertAdjacentHTML("beforeend", `<div class="ai-message ${author === "Tu" ? "user" : ""}"><strong>${author}</strong><p>${text}</p></div>`);
   chat.scrollTop = chat.scrollHeight;
+}
+
+function showAITypingIndicator() {
+  const chat = $("#ai-chat");
+  if (!chat) return;
+  const existing = chat.querySelector(".ai-typing-indicator");
+  if (existing) existing.remove();
+  chat.insertAdjacentHTML(
+    "beforeend",
+    `<div class="ai-message ai-typing-indicator">
+      <strong>Coach IA</strong>
+      <div class="typing-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>`
+  );
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function removeAITypingIndicator() {
+  const chat = $("#ai-chat");
+  if (!chat) return;
+  const indicator = chat.querySelector(".ai-typing-indicator");
+  if (indicator) indicator.remove();
 }
 
 function answerAIQuestion(question) {
@@ -2175,19 +2330,37 @@ function renderNutrition() {
   const meals = todayMeals();
   const totals = sumNutrition(meals.map((meal) => meal.totals));
   $("#nutrition-date").textContent = new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "short" }).format(new Date());
+  
   $("#macro-rings").innerHTML = [
-    ["Kcal", totals.kcal, targets.kcal],
-    ["Proteína", totals.protein, targets.protein, "g"],
-    ["Carbos", totals.carbs, targets.carbs, "g"],
-    ["Grasas", totals.fat, targets.fat, "g"],
-    ["Agua", 0, targets.water.liters, " L"],
+    ["Kcal", totals.kcal, targets.kcal, "kcal", "kcal", "#ccff00"],
+    ["Proteína", totals.protein, targets.protein, "g", "proteina", "#ff3366"],
+    ["Carbos", totals.carbs, targets.carbs, "g", "carbos", "#00f0ff"],
+    ["Grasas", totals.fat, targets.fat, "g", "grasas", "#ffb703"],
+    ["Agua", 0, targets.water.liters, " L", "agua", "#00a8ff"],
   ]
-    .map(([label, value, target, unit = ""]) => {
+    .map(([label, value, target, unit = "", classLabel = "", color = ""]) => {
       const displayValue = label === "Agua" ? targets.water.liters : value;
       const pct = label === "Agua" ? 100 : Math.min(100, Math.round((Number(value) / Number(target)) * 100) || 0);
-      return `<div class="macro-card"><span>${label}</span><strong>${displayValue}${unit}</strong><small>${target}${unit} objetivo</small><div class="macro-bar"><i style="width:${pct}%"></i></div></div>`;
+      return `
+        <div class="macro-ring-card ${classLabel}">
+          <div class="ring-container">
+            <svg class="macro-svg-ring" viewBox="0 0 36 36">
+              <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path class="ring-fill" stroke-dasharray="${pct}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <div class="ring-text">
+              <strong>${pct}%</strong>
+            </div>
+          </div>
+          <div class="macro-details">
+            <span class="macro-label">${label}</span>
+            <span class="macro-values"><strong>${displayValue}${unit}</strong> / ${target}${unit}</span>
+          </div>
+        </div>
+      `;
     })
     .join("");
+
   $("#daily-summary").innerHTML = `
     <div><span>Consumido</span><strong>${totals.kcal} kcal</strong></div>
     <div><span>Restante</span><strong>${Math.max(0, targets.kcal - totals.kcal)} kcal</strong></div>
@@ -2195,6 +2368,40 @@ function renderNutrition() {
     <div><span>Agua IA</span><strong>${targets.water.liters} L/día</strong></div>
     <div><span>Gasto total</span><strong>${targets.tdee} kcal</strong></div>
   `;
+
+  // Update Calorie Balance Bar
+  const remaining = targets.kcal - totals.kcal;
+  const balancePct = Math.min(100, Math.round((totals.kcal / targets.kcal) * 100) || 0);
+  
+  const balanceBarFill = $("#balance-bar-fill");
+  const balanceConsumed = $("#balance-consumed");
+  const balanceRemaining = $("#balance-remaining");
+  const balanceTarget = $("#balance-target");
+  const warningMsg = $("#balance-warning-msg");
+  
+  if (balanceBarFill) balanceBarFill.style.width = `${balancePct}%`;
+  if (balanceConsumed) balanceConsumed.textContent = `${totals.kcal} kcal`;
+  if (balanceTarget) balanceTarget.textContent = `${targets.kcal} kcal`;
+  
+  if (remaining < 0) {
+    if (balanceRemaining) balanceRemaining.innerHTML = `<span style="color:#ff3366">${Math.abs(remaining)} kcal extra</span>`;
+    if (warningMsg) {
+      warningMsg.textContent = "⚠️ ¡Has superado tu objetivo calórico de hoy!";
+      warningMsg.style.color = "#ff3366";
+    }
+    if (balanceBarFill) {
+      balanceBarFill.style.backgroundColor = "#ff3366";
+      balanceBarFill.style.boxShadow = "0 0 10px #ff3366";
+    }
+  } else {
+    if (balanceRemaining) balanceRemaining.textContent = `${remaining} kcal`;
+    if (warningMsg) warningMsg.textContent = "";
+    if (balanceBarFill) {
+      balanceBarFill.style.backgroundColor = "#ccff00";
+      balanceBarFill.style.boxShadow = "0 0 10px #ccff00";
+    }
+  }
+
   $("#meal-log").innerHTML = meals.length
     ? meals
         .map((meal, index) => `
@@ -2205,7 +2412,7 @@ function renderNutrition() {
           </article>
         `)
         .join("")
-    : `<p class="subtle">Aun no hay comidas registradas hoy.</p>`;
+    : `<p class="subtle">Aún no hay comidas registradas hoy.</p>`;
   renderNutritionAI(totals, targets);
   renderNutritionCoach(totals, targets);
   renderDashboardData();
@@ -2409,11 +2616,52 @@ function renderDashboardData() {
   const meals = todayMeals();
   const totals = sumNutrition(meals.map((meal) => meal.totals));
   const targets = getNutritionTargets();
+  
+  // Saludo dinámico y consejos en welcome banner
+  const welcomeTitle = $("#welcome-title");
+  const welcomeCoachTip = $("#welcome-coach-tip");
+  if (welcomeTitle && welcomeCoachTip) {
+    const hours = new Date().getHours();
+    let greeting = "¡Buenos días";
+    if (hours >= 12 && hours < 20) greeting = "¡Buenas tardes";
+    else if (hours >= 20 || hours < 6) greeting = "¡Buenas noches";
+    
+    const userName = profile.name || "Atleta";
+    welcomeTitle.textContent = `${greeting}, ${userName}! 👋`;
+    
+    const tips = [
+      "La constancia vence al talento. ¡Mantén tu racha activa hoy!",
+      "Prioriza la técnica antes de subir el peso. La calidad construye fuerza real.",
+      "El descanso y la nutrición son el 50% de tus ganancias. No los descuides.",
+      "Tu único rival es la persona que fuiste ayer. ¡A entrenar con foco y determinación!",
+      "Sincroniza tus datos de Salud periódicamente para afinar las recomendaciones de la IA.",
+      "El agua lubrica tus articulaciones y mejora el rendimiento. Bebe al menos 2.5 litros.",
+      "Un entrenamiento de 20 minutos es 100% mejor que uno que no se hace."
+    ];
+    const tipIndex = new Date().getDate() % tips.length;
+    welcomeCoachTip.textContent = tips[tipIndex];
+  }
+
+  const recoveryVal = estimateRecovery();
+  const volumeKg = history.length ? estimateHistoryVolume(history) : 0;
+  const bestOrmVal = history.length ? estimateBestOrm(history) : 0;
+
   $("#weekly-workouts").textContent = `${history.length}`;
-  $("#recovery-score").textContent = `${estimateRecovery()}%`;
-  $("#weekly-volume").textContent = history.length ? `${estimateHistoryVolume(history).toLocaleString("es-ES")} kg` : "0 kg";
-  $("#best-orm").textContent = history.length ? `${estimateBestOrm(history)} kg` : "Sin datos";
+  $("#recovery-score").textContent = `${recoveryVal}%`;
+  $("#weekly-volume").textContent = volumeKg ? `${volumeKg.toLocaleString("es-ES")} kg` : "0 kg";
+  $("#best-orm").textContent = bestOrmVal ? `${bestOrmVal} kg` : "Sin datos";
   $("#side-streak").textContent = `${history.length ? Math.min(history.length, 8) : 0} días`;
+
+  // Actualizar micro-barras de progreso
+  const volBar = $("#vol-bar-fill");
+  const ormBar = $("#orm-bar-fill");
+  const workBar = $("#work-bar-fill");
+  const recBar = $("#rec-bar-fill");
+  
+  if (volBar) volBar.style.width = `${Math.min(100, Math.round((volumeKg / 15000) * 100))}%`;
+  if (ormBar) ormBar.style.width = `${Math.min(100, Math.round((bestOrmVal / (Number(profile.weight || 75) * 1.5)) * 100))}%`;
+  if (workBar) workBar.style.width = `${Math.min(100, Math.round((history.length / 4) * 100))}%`;
+  if (recBar) recBar.style.width = `${recoveryVal}%`;
   const data = [
     ["Hola", profile.name, profile.goal],
     ["Pasos", health.steps.toLocaleString("es-ES"), `${Math.round((health.steps / profile.steps) * 100)}% objetivo`],
@@ -2427,6 +2675,7 @@ function renderDashboardData() {
   $("#dashboard-real-data").innerHTML = data
     .map(([label, value, help]) => `<div><span>${label}</span><strong>${value}</strong><small>${help}</small></div>`)
     .join("");
+  renderFeed();
 }
 
 function estimateHistoryVolume(history) {
@@ -3145,10 +3394,12 @@ function renderAllAppData() {
   renderWeeklyRoutineBoard();
   renderWorkoutLog();
   renderNutrition();
+  renderMilestones();
 }
 
 function startTimer(seconds = 90) {
   clearInterval(state.timer.handle);
+  state.timer.total = seconds;
   state.timer.remaining = seconds;
   state.timer.running = true;
   updateTimerText();
@@ -3164,9 +3415,17 @@ function startTimer(seconds = 90) {
 }
 
 function updateTimerText() {
-  const minutes = String(Math.floor(state.timer.remaining / 60)).padStart(2, "0");
-  const seconds = String(state.timer.remaining % 60).padStart(2, "0");
-  $("#rest-timer").textContent = `${minutes}:${seconds}`;
+  const minutes = String(Math.max(0, Math.floor(state.timer.remaining / 60))).padStart(2, "0");
+  const seconds = String(Math.max(0, state.timer.remaining % 60)).padStart(2, "0");
+  const restTimer = $("#rest-timer");
+  if (restTimer) restTimer.textContent = `${minutes}:${seconds}`;
+  
+  const total = state.timer.total || 90;
+  const pct = Math.max(0, Math.min(100, (state.timer.remaining / total) * 100));
+  const fillCircle = $("#timer-fill-circle");
+  if (fillCircle) {
+    fillCircle.style.strokeDasharray = `${pct} 100`;
+  }
 }
 
 function bindEvents() {
@@ -3285,17 +3544,42 @@ function bindEvents() {
 
   $("#exercise-log").addEventListener("click", (event) => {
     const button = event.target.closest("[data-check-set]");
-    if (!button) return;
-    const row = button.closest(".set-row");
-    const exerciseNode = button.closest(".log-exercise");
-    const exerciseIndex = Number(exerciseNode.dataset.exerciseIndex);
-    const setIndex = Number(row.dataset.setIndex);
-    const set = state.activeWorkout.exercises[exerciseIndex].sets[setIndex];
-    set.done = !set.done;
-    saveWorkout();
-    button.classList.toggle("done", set.done);
-    button.textContent = set.done ? "✓" : "";
-    if (set.done) startTimer(90);
+    if (button) {
+      const row = button.closest(".set-row");
+      const exerciseNode = button.closest(".log-exercise");
+      const exerciseIndex = Number(exerciseNode.dataset.exerciseIndex);
+      const setIndex = Number(row.dataset.setIndex);
+      const set = state.activeWorkout.exercises[exerciseIndex].sets[setIndex];
+      set.done = !set.done;
+      saveWorkout();
+      button.classList.toggle("done", set.done);
+      button.textContent = set.done ? "✓" : "";
+      if (set.done) startTimer(90);
+      return;
+    }
+
+    const adjustBtn = event.target.closest("[data-adjust-set-val]");
+    if (adjustBtn) {
+      const row = adjustBtn.closest(".set-row");
+      const exerciseNode = adjustBtn.closest(".log-exercise");
+      if (!row || !exerciseNode) return;
+      const exerciseIndex = Number(exerciseNode.dataset.exerciseIndex);
+      const setIndex = Number(row.dataset.setIndex);
+      const delta = Number(adjustBtn.dataset.adjustSetVal);
+      const field = adjustBtn.dataset.field;
+      const set = state.activeWorkout.exercises[exerciseIndex].sets[setIndex];
+      let val = Number(set[field]) || 0;
+      val += delta;
+      if (field === "reps" && val < 1) val = 1;
+      if (field === "weight" && val < 0) val = 0;
+      set[field] = val;
+      saveWorkout();
+      const input = row.querySelector(`input[data-field="${field}"]`);
+      if (input) {
+        input.value = val;
+      }
+      return;
+    }
   });
 
   $("#timer-btn").addEventListener("click", () => startTimer(90));
@@ -3587,14 +3871,22 @@ function bindEvents() {
     const value = input.value.trim();
     if (!value) return;
     addAIMessage("Tu", value);
-    addAIMessage("Entrenador", answerAIQuestion(value));
     input.value = "";
+    showAITypingIndicator();
+    setTimeout(() => {
+      removeAITypingIndicator();
+      addAIMessage("Entrenador", answerAIQuestion(value));
+    }, 1000);
   });
   $$(".ai-prompts [data-ai-prompt]").forEach((button) => {
     button.addEventListener("click", () => {
       const value = button.dataset.aiPrompt;
       addAIMessage("Tu", value);
-      addAIMessage("Entrenador", answerAIQuestion(value));
+      showAITypingIndicator();
+      setTimeout(() => {
+        removeAITypingIndicator();
+        addAIMessage("Entrenador", answerAIQuestion(value));
+      }, 1000);
     });
   });
   $("#meal-input").addEventListener("input", previewMeal);
@@ -3630,12 +3922,53 @@ function bindEvents() {
     });
   });
   $("#food-search").addEventListener("input", renderFoodSearch);
-  $("#food-results").addEventListener("click", (event) => {
+  $("#food-results").addEventListener("click", async (event) => {
     const button = event.target.closest("[data-food-name]");
     if (!button) return;
-    const current = $("#meal-input").value.trim();
-    $("#meal-input").value = current ? `${current}, 100g ${button.dataset.foodName}` : `100g ${button.dataset.foodName}`;
-    previewMeal();
+    const foodName = button.dataset.foodName;
+    const slot = $("#meal-slot").value || "Comida";
+    
+    const foodItem = foodDb.find(([name]) => name === foodName);
+    if (!foodItem) return;
+    
+    const [name, , kcal, protein, carbs, fat, defaultGrams = 100] = foodItem;
+    const grams = defaultGrams || 100;
+    const factor = grams / 100;
+    
+    const meal = {
+      date: new Date().toISOString().slice(0, 10),
+      slot: slot,
+      text: `${grams}g de ${name}`,
+      items: [{
+        name: name,
+        grams: grams,
+        kcal: Math.round(kcal * factor),
+        protein: round1(protein * factor),
+        carbs: round1(carbs * factor),
+        fat: round1(fat * factor),
+        matched: true
+      }],
+      totals: {
+        kcal: Math.round(kcal * factor),
+        protein: round1(protein * factor),
+        carbs: round1(carbs * factor),
+        fat: round1(fat * factor)
+      }
+    };
+    
+    mealLog.push(meal);
+    saveMealLog();
+    if (hasRealBackend()) {
+      const saved = await apiRequest("/api/meals", {
+        method: "POST",
+        body: meal
+      }).catch(() => null);
+      if (saved && saved.id) {
+        meal.id = saved.id;
+      }
+    }
+    renderNutrition();
+    showToast(`Añadido: ${grams}g de ${name} a ${slot}`);
   });
   $$("#nutrition-view [data-meal-example]").forEach((button) => {
     button.addEventListener("click", () => {
