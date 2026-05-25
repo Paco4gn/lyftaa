@@ -569,10 +569,17 @@ function apiUrl(path) {
 async function loadFirebaseBackend() {
   if (firebaseBackend) return firebaseBackend;
   if (!hasFirebaseConfig()) return { configured: false, mode: "firebase-missing-config" };
+  const importTimeout = new Promise((_, reject) => 
+    setTimeout(() => reject(new Error("Import timeout")), 2500)
+  );
   try {
-    const module = await import("./firebase-client.js");
+    const module = await Promise.race([
+      import("./firebase-client.js"),
+      importTimeout
+    ]);
     return module.createFirebaseBackend();
-  } catch {
+  } catch (e) {
+    console.error("Firebase backend load failed:", e);
     return { configured: false, mode: "firebase-unavailable" };
   }
 }
