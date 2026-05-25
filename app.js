@@ -413,6 +413,8 @@ function cloneData(value) {
 function loadAppData() {
   try {
     const stored = JSON.parse(localStorage.getItem("liftlab-app-data") || "null");
+    const valid = stored && typeof stored === "object" && !Array.isArray(stored);
+    const safeStored = valid ? stored : {};
     try {
       const storedRoutines = JSON.parse(localStorage.getItem("liftlab-routines") || "null");
       if (Array.isArray(storedRoutines) && storedRoutines.length > 0) {
@@ -423,17 +425,18 @@ function loadAppData() {
     }
     return {
       ...cloneData(defaultAppData),
-      ...(stored || {}),
-      profile: { ...defaultAppData.profile, ...(stored?.profile || {}) },
-      health: { ...defaultAppData.health, ...(stored?.health || {}) },
-      privacySettings: { ...defaultAppData.privacySettings, ...(stored?.privacySettings || {}) },
-      communityProfile: { ...defaultAppData.communityProfile, ...(stored?.communityProfile || {}) },
-      communityPosts: Array.isArray(stored?.communityPosts) ? stored.communityPosts : [],
-      workoutHistory: Array.isArray(stored?.workoutHistory) ? stored.workoutHistory : [],
-      habits: stored?.habits?.length ? stored.habits : cloneData(defaultAppData.habits),
-      photoItems: stored?.photoItems?.length ? stored.photoItems : cloneData(defaultAppData.photoItems),
+      ...safeStored,
+      profile: { ...defaultAppData.profile, ...(safeStored.profile || {}) },
+      health: { ...defaultAppData.health, ...(safeStored.health || {}) },
+      privacySettings: { ...defaultAppData.privacySettings, ...(safeStored.privacySettings || {}) },
+      communityProfile: { ...defaultAppData.communityProfile, ...(safeStored.communityProfile || {}) },
+      communityPosts: Array.isArray(safeStored.communityPosts) ? safeStored.communityPosts : [],
+      workoutHistory: Array.isArray(safeStored.workoutHistory) ? safeStored.workoutHistory : [],
+      habits: safeStored.habits?.length ? safeStored.habits : cloneData(defaultAppData.habits),
+      photoItems: safeStored.photoItems?.length ? safeStored.photoItems : cloneData(defaultAppData.photoItems),
     };
-  } catch {
+  } catch (err) {
+    console.error("Error loading app data:", err);
     return cloneData(defaultAppData);
   }
 }
@@ -635,7 +638,10 @@ function loadWorkout() {
   const stored = localStorage.getItem("liftlab-workout");
   if (stored) {
     try {
-      return migrateWorkout(JSON.parse(stored));
+      const parsed = JSON.parse(stored);
+      if (parsed && typeof parsed === "object" && Array.isArray(parsed.exercises)) {
+        return migrateWorkout(parsed);
+      }
     } catch {
       localStorage.removeItem("liftlab-workout");
     }
@@ -1110,10 +1116,12 @@ function renderWeekPlan() {
 }
 
 function renderFeed(target = "#recent-feed") {
+  const container = $(target);
+  if (!container) return;
   const history = Array.isArray(appData.workoutHistory) ? appData.workoutHistory : [];
   if (history.length > 0) {
     const sorted = [...history].sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt)).slice(0, 3);
-    $(target).innerHTML = sorted.map((workout) => {
+    container.innerHTML = sorted.map((workout) => {
       let dateFormatted = "Reciente";
       if (workout.completedAt) {
         try {
@@ -1142,7 +1150,7 @@ function renderFeed(target = "#recent-feed") {
       `;
     }).join("");
   } else {
-    $(target).innerHTML = feed
+    container.innerHTML = feed
       .map(([avatar, title, subtitle, tag]) => `
         <article class="feed-item">
           <span class="thumb">${avatar}</span>
@@ -1383,8 +1391,11 @@ function escapeSvg(value) {
 }
 
 function renderWorkoutLog() {
-  $("#active-workout-name").textContent = state.activeWorkout.name;
-  $("#exercise-log").innerHTML = state.activeWorkout.exercises
+  const nameEl = $("#active-workout-name");
+  const logEl = $("#exercise-log");
+  if (!nameEl || !logEl) return;
+  nameEl.textContent = state.activeWorkout.name;
+  logEl.innerHTML = state.activeWorkout.exercises
     .map((entry, exerciseIndex) => {
       const exercise = findExercise(entry.id);
       return `
@@ -1437,7 +1448,9 @@ function renderWorkoutLog() {
 
 function renderRoutines() {
   renderWeeklyRoutineBoard();
-  $("#routines-grid").innerHTML = routineTemplates
+  const grid = $("#routines-grid");
+  if (!grid) return;
+  grid.innerHTML = routineTemplates
     .map((routine) => `
       <article class="routine-card">
         <div>
@@ -1458,21 +1471,26 @@ function renderRoutines() {
 }
 
 function renderFilters() {
+  const container = $("#muscle-filter");
+  if (!container) return;
   const muscles = ["Todos", ...new Set(exercises.map((item) => item.muscle))];
-  $("#muscle-filter").innerHTML = muscles
+  container.innerHTML = muscles
     .map((muscle) => `<button class="${state.libraryFilter === muscle ? "active" : ""}" data-muscle="${muscle}">${muscle}</button>`)
     .join("");
 }
 
 function renderLibrary() {
+  const countLabel = $("#exercise-count-label");
+  const libraryContainer = $("#exercise-library");
+  if (!countLabel || !libraryContainer) return;
   const query = $("#exercise-search")?.value?.trim().toLowerCase() || "";
   const filtered = exercises.filter((exercise) => {
     const matchesFilter = state.libraryFilter === "Todos" || exercise.muscle === state.libraryFilter;
     const haystack = `${exercise.name} ${exercise.muscle} ${exercise.equipment}`.toLowerCase();
     return matchesFilter && haystack.includes(query);
   });
-  $("#exercise-count-label").textContent = `${filtered.length} ejercicios`;
-  $("#exercise-library").innerHTML = filtered
+  countLabel.textContent = `${filtered.length} ejercicios`;
+  libraryContainer.innerHTML = filtered
     .map((exercise) => `
       <article class="exercise-card">
         <button class="exercise-visual media-card" data-open-exercise="${exercise.id}" aria-label="Abrir guía de ${exercise.name}">
@@ -1789,6 +1807,8 @@ function renderCalculator() {
 }
 
 function renderMilestones() {
+  const container = $("#milestones");
+  if (!container) return;
   const history = Array.isArray(appData.workoutHistory) ? appData.workoutHistory : [];
   const items = history.length
     ? [
@@ -1797,7 +1817,7 @@ function renderMilestones() {
         ["Progreso", "Los récords aparecerán al repetir ejercicios"],
       ]
     : [["Sin registros todavía", "Completa tu primer entrenamiento para ver marcas reales"]];
-  $("#milestones").innerHTML = items.map(([title, text]) => `<article class="milestone"><strong>${title}</strong><br><small>${text}</small></article>`).join("");
+  container.innerHTML = items.map(([title, text]) => `<article class="milestone"><strong>${title}</strong><br><small>${text}</small></article>`).join("");
   
   // Update timeline
   renderWorkoutHistoryTimeline();
@@ -1896,6 +1916,8 @@ function renderCommunity() {
 }
 
 function renderMeasures() {
+  const container = $("#measure-grid");
+  if (!container) return;
   const profile = appData.profile;
   const health = appData.health;
   const measures = [
@@ -1906,7 +1928,7 @@ function renderMeasures() {
     ["Sueño", health.sleep ? `${round1(health.sleep)} h` : "Sin registrar"],
     ["Pasos", Number(health.steps || 0).toLocaleString("es-ES")],
   ];
-  $("#measure-grid").innerHTML = measures.map(([name, value]) => `<div class="measure-item"><span>${name}</span><strong>${value}</strong></div>`).join("");
+  container.innerHTML = measures.map(([name, value]) => `<div class="measure-item"><span>${name}</span><strong>${value}</strong></div>`).join("");
 }
 
 function collectTrainingContext() {
