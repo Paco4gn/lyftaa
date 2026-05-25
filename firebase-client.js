@@ -107,7 +107,7 @@ export async function createFirebaseBackend() {
 function hasFirebaseConfig(config) {
   return ["apiKey", "authDomain", "projectId", "appId"].every((key) => {
     const value = String(config[key] || "").trim();
-    return value && !value.includes("TU_") && !value.includes("YOUR_");
+    return value && value.length > 5;
   });
 }
 
