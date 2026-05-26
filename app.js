@@ -1205,6 +1205,13 @@ function setView(view) {
     state.animationRunning = true;
     animateExercise();
   }
+
+  // Hide the onboarding button when not on dashboard or if signed in
+  const onboardingBtn = $("#open-onboarding");
+  if (onboardingBtn) {
+    const shouldHide = view !== "dashboard" || isSignedIn();
+    onboardingBtn.classList.toggle("hidden", shouldHide);
+  }
 }
 
 function openAccountPanel() {
