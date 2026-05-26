@@ -3592,7 +3592,6 @@ function updateTimerText() {
 }
 
 function bindEvents() {
-  $(".nav-item, .mobile-tab").forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
   $$(".nav-item, .mobile-tab").forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
   $$("[data-view-shortcut]").forEach((button) => button.addEventListener("click", () => {
     const target = button.dataset.viewShortcut;
