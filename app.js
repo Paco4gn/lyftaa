@@ -657,7 +657,7 @@ async function loadFirebaseBackend() {
   );
   try {
     const module = await Promise.race([
-      import("./firebase-client.js?v=2.0.7"),
+      import("./firebase-client.js?v=2.3.0"),
       importTimeout
     ]);
     return await module.createFirebaseBackend();
