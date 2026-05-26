@@ -3758,7 +3758,7 @@ function bindEvents() {
     }
   });
 
-  $("#exercise-log").addEventListener("input", (event) => {
+  $("#exercise-log")?.addEventListener("input", (event) => {
     const input = event.target;
     const row = input.closest(".set-row");
     const exerciseNode = input.closest(".log-exercise");
@@ -3771,7 +3771,7 @@ function bindEvents() {
     saveWorkout();
   });
 
-  $("#exercise-log").addEventListener("click", (event) => {
+  $("#exercise-log")?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-check-set]");
     if (button) {
       const row = button.closest(".set-row");
@@ -3811,9 +3811,9 @@ function bindEvents() {
     }
   });
 
-  $("#timer-btn").addEventListener("click", () => startTimer(90));
+  $("#timer-btn")?.addEventListener("click", () => startTimer(90));
   $$(".account-shortcut").forEach((button) => button.addEventListener("click", openAccountPanel));
-  $("#finish-workout-btn").addEventListener("click", () => {
+  $("#finish-workout-btn")?.addEventListener("click", () => {
     const completed = state.activeWorkout.exercises.flatMap((item) => item.sets).filter((set) => set.done).length;
     const durationMin = Number($("#ai-time")?.value || appData.profile.sessionTime || 60);
     const finishedWorkout = {
@@ -3831,45 +3831,45 @@ function bindEvents() {
     renderWeekPlan();
     showToast(`Entreno guardado con ${completed} series completadas.`);
   });
-  $("#add-exercise-btn").addEventListener("click", () => setView("library"));
-  $("#swap-exercise").addEventListener("click", () => {
+  $("#add-exercise-btn")?.addEventListener("click", () => setView("library"));
+  $("#swap-exercise")?.addEventListener("click", () => {
     const index = exercises.findIndex((item) => item.id === state.selectedExercise.id);
     state.selectedExercise = exercises[(index + 1) % exercises.length];
     renderCues();
   });
-  $("#close-dialog").addEventListener("click", () => $("#exercise-dialog").close());
-  $("#exercise-dialog").addEventListener("close", stopDialogAnimation);
-  $("#add-to-workout").addEventListener("click", () => {
+  $("#close-dialog")?.addEventListener("click", () => $("#exercise-dialog").close());
+  $("#exercise-dialog")?.addEventListener("close", stopDialogAnimation);
+  $("#add-to-workout")?.addEventListener("click", () => {
     addExerciseToWorkout(state.selectedExercise.id);
     $("#exercise-dialog").close();
   });
-  $("#start-from-dialog").addEventListener("click", () => {
+  $("#start-from-dialog")?.addEventListener("click", () => {
     addExerciseToWorkout(state.selectedExercise.id);
     $("#exercise-dialog").close();
     setView("workout");
   });
-  $("#exercise-search").addEventListener("input", renderLibrary);
-  $("#muscle-filter").addEventListener("click", (event) => {
+  $("#exercise-search")?.addEventListener("input", renderLibrary);
+  $("#muscle-filter")?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-muscle]");
     if (!button) return;
     state.libraryFilter = button.dataset.muscle;
     renderFilters();
     renderLibrary();
   });
-  $("#chart-mode").addEventListener("change", drawProgressChart);
-  $("#calc-weight").addEventListener("input", renderCalculator);
-  $("#calc-reps").addEventListener("input", renderCalculator);
-  $("#theme-toggle").addEventListener("click", () => {
+  $("#chart-mode")?.addEventListener("change", drawProgressChart);
+  $("#calc-weight")?.addEventListener("input", renderCalculator);
+  $("#calc-reps")?.addEventListener("input", renderCalculator);
+  $("#theme-toggle")?.addEventListener("click", () => {
     document.body.classList.toggle("dark");
     drawProgressChart();
   });
-  $("#device-toggle").addEventListener("click", () => {
+  $("#device-toggle")?.addEventListener("click", () => {
     document.body.classList.toggle("device-mobile");
     localStorage.setItem("liftlab-device-mode", document.body.classList.contains("device-mobile") ? "mobile" : "desktop");
     updateDeviceToggleLabel();
     drawProgressChart();
   });
-  $("#add-friend-btn").addEventListener("click", async () => {
+  $("#add-friend-btn")?.addEventListener("click", async () => {
     const post = {
       title: "Nota privada",
       text: "Espacio reservado para tus avances. No se muestra a otros usuarios.",
@@ -3882,7 +3882,7 @@ function bindEvents() {
     if (hasRealBackend()) await apiRequest("/api/community/posts", { method: "POST", body: post }).catch(() => {});
     showToast(hasRealBackend() ? "Nota privada guardada en tu cuenta." : "Nota privada guardada en este dispositivo.");
   });
-  $("#share-progress-btn").addEventListener("click", async () => {
+  $("#share-progress-btn")?.addEventListener("click", async () => {
     const privacy = appData.privacySettings?.publicProfile ? "public" : "private";
     const post = {
       title: privacy === "public" ? "Avance listo para publicar" : "Avance privado",
@@ -4050,7 +4050,7 @@ function bindEvents() {
   ["#health-steps-input", "#health-active-input", "#health-resting-input", "#health-sleep-input", "#health-rhr-input", "#health-hrv-input"].forEach((selector) => {
     $(selector)?.addEventListener("change", saveManualHealth);
   });
-  $("#edit-profile-btn").addEventListener("click", () => {
+  $("#edit-profile-btn")?.addEventListener("click", () => {
     const card = $(".profile-card");
     const name = $(".profile-card h3");
     const editing = !card.classList.contains("editing");
@@ -4069,7 +4069,7 @@ function bindEvents() {
     }
     showToast(editing ? "Edita tu nombre y pulsa Guardar perfil." : "Perfil guardado.");
   });
-  $("#random-measure").addEventListener("click", async () => {
+  $("#random-measure")?.addEventListener("click", async () => {
     renderMeasures();
     if (hasRealBackend()) {
       await apiRequest("/api/body-metrics", {
@@ -4086,15 +4086,15 @@ function bindEvents() {
     }
     showToast(hasRealBackend() ? "Medidas guardadas en tu cuenta." : "Medidas actualizadas.");
   });
-  $("#run-ai-agents").addEventListener("click", runAIAgents);
-  $("#apply-ai-plan").addEventListener("click", applyAIPlan);
-  $("#ai-recovery").addEventListener("input", () => {
+  $("#run-ai-agents")?.addEventListener("click", runAIAgents);
+  $("#apply-ai-plan")?.addEventListener("click", applyAIPlan);
+  $("#ai-recovery")?.addEventListener("input", () => {
     $("#ai-recovery-label").textContent = `${$("#ai-recovery").value}%`;
   });
   ["#ai-goal", "#ai-time", "#ai-soreness"].forEach((selector) => {
-    $(selector).addEventListener("change", runAIAgents);
+    $(selector)?.addEventListener("change", runAIAgents);
   });
-  $("#ai-chat-form").addEventListener("submit", (event) => {
+  $("#ai-chat-form")?.addEventListener("submit", (event) => {
     event.preventDefault();
     const input = $("#ai-chat-input");
     const value = input.value.trim();
@@ -4118,11 +4118,11 @@ function bindEvents() {
       }, 1000);
     });
   });
-  $("#meal-input").addEventListener("input", previewMeal);
-  $("#analyze-meal").addEventListener("click", previewMeal);
-  $("#add-meal").addEventListener("click", () => addMeal());
-  $("#recalc-nutrition").addEventListener("click", renderNutrition);
-  $("#clear-meals").addEventListener("click", async () => {
+  $("#meal-input")?.addEventListener("input", previewMeal);
+  $("#analyze-meal")?.addEventListener("click", previewMeal);
+  $("#add-meal")?.addEventListener("click", () => addMeal());
+  $("#recalc-nutrition")?.addEventListener("click", renderNutrition);
+  $("#clear-meals")?.addEventListener("click", async () => {
     const today = new Date().toISOString().slice(0, 10);
     const todayMealsToDelete = mealLog.filter((meal) => meal.date === today);
     mealLog = mealLog.filter((meal) => meal.date !== today);
@@ -4134,7 +4134,7 @@ function bindEvents() {
     showToast("Día nutricional limpiado.");
   });
   ["#nutri-weight", "#nutri-height", "#nutri-age", "#nutri-sex", "#nutri-activity", "#nutri-goal", "#nutri-rate", "#nutri-training-min"].forEach((selector) => {
-    $(selector).addEventListener("change", renderNutrition);
+    $(selector)?.addEventListener("change", renderNutrition);
   });
   $$("#meal-log").forEach((log) => {
     log.addEventListener("click", (event) => {
@@ -4150,8 +4150,8 @@ function bindEvents() {
       renderNutrition();
     });
   });
-  $("#food-search").addEventListener("input", renderFoodSearch);
-  $("#food-results").addEventListener("click", async (event) => {
+  $("#food-search")?.addEventListener("input", renderFoodSearch);
+  $("#food-results")?.addEventListener("click", async (event) => {
     const button = event.target.closest("[data-food-name]");
     if (!button) return;
     const foodName = button.dataset.foodName;
@@ -4205,11 +4205,11 @@ function bindEvents() {
       previewMeal();
     });
   });
-  $("#open-onboarding").addEventListener("click", () => openOnboarding(0));
-  $("#close-onboarding").addEventListener("click", closeOnboarding);
+  $("#open-onboarding")?.addEventListener("click", () => openOnboarding(0));
+  $("#close-onboarding")?.addEventListener("click", closeOnboarding);
   $("#next-onboarding").onclick = () => moveOnboarding(1);
   $("#prev-onboarding").onclick = () => moveOnboarding(-1);
-  $("#onboarding-flow").addEventListener("click", (event) => {
+  $("#onboarding-flow")?.addEventListener("click", (event) => {
     if (event.target.id === "onboarding-flow") closeOnboarding();
     const choice = event.target.closest(".onboarding-step button");
     if (!choice) return;
