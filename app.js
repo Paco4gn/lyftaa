@@ -1066,11 +1066,58 @@ function generateWeeklyRoutinePlan() {
   weeklyRoutinePlan.splice(0, weeklyRoutinePlan.length, ...plan);
 }
 
+function getActiveSoreness() {
+  const selectVal = $("#ai-soreness")?.value || "none";
+  if (selectVal !== "none") return selectVal;
+  
+  const profileInjuries = normalizeText(appData.profile?.injuries || "");
+  if (profileInjuries.includes("hombro") || profileInjuries.includes("shoulder") || profileInjuries.includes("manguito")) return "shoulder";
+  if (profileInjuries.includes("rodilla") || profileInjuries.includes("knee") || profileInjuries.includes("patela") || profileInjuries.includes("cuad")) return "knee";
+  if (profileInjuries.includes("espalda") || profileInjuries.includes("back") || profileInjuries.includes("lumbar")) return "back";
+  
+  return "none";
+}
+
+function translateSoreness(soreness) {
+  const map = {
+    shoulder: "hombro",
+    back: "espalda baja",
+    knee: "rodilla"
+  };
+  return map[soreness] || soreness;
+}
+
+function adaptExercisesForSoreness(exerciseIds, soreness) {
+  if (!soreness || soreness === "none") return { ids: exerciseIds, adapted: false };
+  let adapted = false;
+  const newIds = exerciseIds.map(id => {
+    if (soreness === "shoulder" && ["bench", "incline-db", "dip"].includes(id)) {
+      adapted = true;
+      return "row";
+    }
+    if (soreness === "back" && ["rdl", "deadlift"].includes(id)) {
+      adapted = true;
+      return "leg-ext";
+    }
+    if (soreness === "knee" && ["squat", "leg-press", "lunge"].includes(id)) {
+      adapted = true;
+      return "hip-thrust";
+    }
+    return id;
+  });
+  return { ids: newIds, adapted };
+}
+
 function createWorkout(templateId) {
   const template = routineTemplates.find((item) => item.id === templateId) || routineTemplates[0];
+  const soreness = getActiveSoreness();
+  const adaptation = adaptExercisesForSoreness(template.exerciseIds, soreness);
+  if (adaptation.adapted) {
+    setTimeout(() => showToast(`IA: Ajustados ejercicios para proteger tu lesión de ${translateSoreness(soreness)}.`), 500);
+  }
   return {
-    name: template.name,
-    exercises: template.exerciseIds.map((id, index) => {
+    name: template.name + (adaptation.adapted ? " (Adaptado)" : ""),
+    exercises: adaptation.ids.map((id, index) => {
       const historicalSets = getLastSessionSets(id);
       return {
         id,
@@ -1093,9 +1140,14 @@ function createWorkoutFromWeekDay(day) {
     const fallback = ["push", "pull", "fullbody", "legs", "power"][appData.selectedWeekDay] || "push";
     return createWorkout(fallback);
   }
+  const soreness = getActiveSoreness();
+  const adaptation = adaptExercisesForSoreness(ids, soreness);
+  if (adaptation.adapted) {
+    setTimeout(() => showToast(`IA: Ajustados ejercicios para proteger tu lesión de ${translateSoreness(soreness)}.`), 500);
+  }
   return {
-    name: day.title,
-    exercises: ids.map((id, index) => {
+    name: day.title + (adaptation.adapted ? " (Adaptado)" : ""),
+    exercises: adaptation.ids.map((id, index) => {
       const historicalSets = getLastSessionSets(id);
       const isCompound = index < 2;
       return {
@@ -1520,6 +1572,48 @@ function escapeSvg(value) {
     .replaceAll('"', "&quot;");
 }
 
+function openSwapWorkoutExerciseDialog(exerciseIndex) {
+  let dialog = $("#swap-workout-exercise-dialog");
+  if (!dialog) {
+    document.body.insertAdjacentHTML("beforeend", `
+      <dialog id="swap-workout-exercise-dialog" style="border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); padding: 24px; max-width: 400px; box-shadow: var(--shadow-lg); width: 90%;">
+        <h3 style="margin-top: 0; margin-bottom: 16px; font-family: 'Outfit', sans-serif;">Sustituir ejercicio</h3>
+        <label style="display: block; margin-bottom: 20px;">
+          Selecciona el nuevo ejercicio:
+          <select id="workout-swap-select" style="width: 100%; padding: 10px; margin-top: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-strong); color: var(--ink);">
+            ${exercises.map(e => `<option value="${e.id}">${escapeHtml(e.name)} (${e.muscle})</option>`).join("")}
+          </select>
+        </label>
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button class="ghost-button" id="workout-swap-cancel">Cancelar</button>
+          <button class="primary-button" id="workout-swap-confirm">Sustituir</button>
+        </div>
+      </dialog>
+    `);
+    dialog = $("#swap-workout-exercise-dialog");
+    $("#workout-swap-cancel").addEventListener("click", () => dialog.close());
+  }
+  
+  const confirmBtn = $("#workout-swap-confirm");
+  const newConfirmBtn = confirmBtn.cloneNode(true);
+  confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+  
+  newConfirmBtn.addEventListener("click", () => {
+    const select = $("#workout-swap-select");
+    const newExerciseId = select.value;
+    if (newExerciseId) {
+      state.activeWorkout.exercises[exerciseIndex].id = newExerciseId;
+      saveWorkout();
+      renderWorkoutLog();
+      const newEx = findExercise(newExerciseId);
+      showToast(`Ejercicio sustituido por "${newEx.name}".`);
+    }
+    dialog.close();
+  });
+  
+  dialog.showModal();
+}
+
 function renderWorkoutLog() {
   const nameEl = $("#active-workout-name");
   const logEl = $("#exercise-log");
@@ -1537,6 +1631,7 @@ function renderWorkoutLog() {
             </div>
             <div style="display: flex; gap: 8px;">
               <button class="text-button" data-demo="${exercise.id}">Ver técnica</button>
+              <button class="text-button" data-swap-workout-exercise="${exerciseIndex}">Sustituir</button>
               <button class="text-button" data-remove-exercise="${exerciseIndex}" style="color: var(--coral);">Eliminar</button>
             </div>
           </div>
@@ -2493,12 +2588,34 @@ function round1(value) {
 }
 
 function getNutritionTargets(goalOverride = null, options = {}) {
-  const weight = clampNumber($("#nutri-weight")?.value, 30, 250, 82);
-  const height = clampNumber($("#nutri-height")?.value, 120, 230, 178);
-  const age = clampNumber($("#nutri-age")?.value, 12, 90, 35);
-  const sex = $("#nutri-sex")?.value || "male";
-  const activity = clampNumber($("#nutri-activity")?.value, 1.2, 1.9, 1.55);
-  const goal = goalOverride || $("#nutri-goal")?.value || "maintain";
+  const profile = appData.profile || {};
+  
+  const weight = clampNumber($("#nutri-weight")?.value || profile.weight, 30, 250, 82);
+  const height = clampNumber($("#nutri-height")?.value || profile.height, 120, 230, 178);
+  const age = clampNumber($("#nutri-age")?.value || profile.age, 12, 90, 35);
+  const sex = $("#nutri-sex")?.value || profile.sex || "male";
+  
+  let activityVal = 1.55;
+  if ($("#nutri-activity")?.value) {
+    activityVal = Number($("#nutri-activity").value);
+  } else if (profile.activityLevel) {
+    const act = String(profile.activityLevel).toLowerCase();
+    if (act.includes("sedentario") || act.includes("poco")) activityVal = 1.2;
+    else if (act.includes("ligero") || act.includes("1-3")) activityVal = 1.375;
+    else if (act.includes("moderado") || act.includes("3-5")) activityVal = 1.55;
+    else if (act.includes("intenso") || act.includes("6-7")) activityVal = 1.725;
+    else if (act.includes("muy") || act.includes("atletas")) activityVal = 1.9;
+  }
+  const activity = clampNumber(activityVal, 1.2, 1.9, 1.55);
+
+  let goal = goalOverride || $("#nutri-goal")?.value;
+  if (!goal) {
+    const g = String(profile.goal || "").toLowerCase();
+    if (g.includes("fat") || g.includes("perder") || g.includes("defin")) goal = "cut";
+    else if (g.includes("hyper") || g.includes("ganar") || g.includes("volumen")) goal = "bulk";
+    else goal = "maintain";
+  }
+  
   const rate = $("#nutri-rate")?.value || "standard";
   const bmr = sex === "male" ? 10 * weight + 6.25 * height - 5 * age + 5 : 10 * weight + 6.25 * height - 5 * age - 161;
   const tdee = bmr * activity;
@@ -4002,6 +4119,11 @@ function bindEvents() {
       }
     }
 
+    const swapWorkoutExerciseButton = event.target.closest("[data-swap-workout-exercise]");
+    if (swapWorkoutExerciseButton) {
+      openSwapWorkoutExerciseDialog(Number(swapWorkoutExerciseButton.dataset.swapWorkoutExercise));
+    }
+
     const removeExerciseButton = event.target.closest("[data-remove-exercise]");
     if (removeExerciseButton) {
       const exerciseIndex = Number(removeExerciseButton.dataset.removeExercise);
@@ -4402,7 +4524,24 @@ function bindEvents() {
     showToast("Día nutricional limpiado.");
   });
   ["#nutri-weight", "#nutri-height", "#nutri-age", "#nutri-sex", "#nutri-activity", "#nutri-goal", "#nutri-rate", "#nutri-training-min"].forEach((selector) => {
-    $(selector)?.addEventListener("change", renderNutrition);
+    $(selector)?.addEventListener("change", (e) => {
+      const val = e.target.value;
+      if (selector === "#nutri-weight") appData.profile.weight = Number(val) || 82;
+      else if (selector === "#nutri-height") appData.profile.height = Number(val) || 178;
+      else if (selector === "#nutri-age") appData.profile.age = Number(val) || 35;
+      else if (selector === "#nutri-sex") appData.profile.sex = val;
+      else if (selector === "#nutri-training-min") appData.profile.sessionTime = Number(val) || 60;
+      else if (selector === "#nutri-goal") {
+        appData.profile.goal = val === "cut" ? "Fatloss" : val === "bulk" ? "Hypertrophy" : "Recomp";
+      }
+      
+      saveAppData();
+      pushApi("/api/profile", appData.profile).catch(() => {});
+      
+      renderNutrition();
+      renderProfileInputs();
+      renderDashboardData();
+    });
   });
   $$("#meal-log").forEach((log) => {
     log.addEventListener("click", (event) => {
