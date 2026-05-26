@@ -4831,3 +4831,24 @@ function updateDeviceToggleLabel() {
 
 init();
 
+// Sincronización en segundo plano: asegurar que los datos estén frescos al volver a la app
+document.addEventListener("visibilitychange", async () => {
+  if (document.visibilityState === "visible") {
+    console.log("App visible. Sincronizando con el servidor...");
+    try {
+      await loadApiUserData();
+    } catch (e) {
+      console.warn("Error en sincronización en segundo plano", e);
+    }
+  }
+});
+
+window.addEventListener("focus", async () => {
+  console.log("Ventana enfocada. Sincronizando con el servidor...");
+  try {
+    await loadApiUserData();
+  } catch (e) {
+    console.warn("Error en sincronización en segundo plano", e);
+  }
+});
+
