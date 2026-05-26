@@ -3434,6 +3434,58 @@ function saveManualHealth() {
   showToast("Datos manuales de salud guardados.");
 }
 
+async function loginWithGoogle() {
+  setAuthUiState(true);
+  try {
+    await detectApi();
+    if (!firebaseOnline || !firebaseBackend?.signinWithGoogle) {
+      showToast("Google Sign-In solo disponible con Firebase activo.");
+      setAuthUiState(false);
+      return;
+    }
+    const session = await firebaseBackend.signinWithGoogle();
+    apiToken = session.token;
+    localStorage.setItem("liftlab-api-token", apiToken);
+    appData.account = { email: session.user.email, id: session.user.id, mode: "firebase" };
+    saveAppData();
+    await loadApiUserData();
+    showToast(`¡Bienvenido, ${appData.profile.name || session.user.email}!`);
+    renderAuthStatus();
+    setAuthUiState(false);
+    setView("dashboard");
+  } catch (error) {
+    const msg = error.code === "auth/popup-closed-by-user" ? "Ventana cerrada. Intenta de nuevo." : (error.code === "auth/popup-blocked" ? "Popups bloqueados. Permite popups en el navegador." : authErrorMessage(error));
+    showToast(msg);
+    setAuthUiState(false);
+  }
+}
+
+async function loginWithApple() {
+  setAuthUiState(true);
+  try {
+    await detectApi();
+    if (!firebaseOnline || !firebaseBackend?.signinWithApple) {
+      showToast("Apple Sign-In solo disponible con Firebase activo.");
+      setAuthUiState(false);
+      return;
+    }
+    const session = await firebaseBackend.signinWithApple();
+    apiToken = session.token;
+    localStorage.setItem("liftlab-api-token", apiToken);
+    appData.account = { email: session.user.email, id: session.user.id, mode: "firebase" };
+    saveAppData();
+    await loadApiUserData();
+    showToast(`¡Bienvenido con Apple ID!`);
+    renderAuthStatus();
+    setAuthUiState(false);
+    setView("dashboard");
+  } catch (error) {
+    const msg = error.code === "auth/popup-closed-by-user" ? "Ventana cerrada. Intenta de nuevo." : (error.code === "auth/popup-blocked" ? "Popups bloqueados. Permite popups en el navegador." : authErrorMessage(error));
+    showToast(msg);
+    setAuthUiState(false);
+  }
+}
+
 async function registerLocalAccount(source = "profile") {
   syncAuthInputs(source);
   const { email, password } = getAuthCredentials(source);
@@ -3968,8 +4020,8 @@ function bindEvents() {
   $("#gate-register")?.addEventListener("click", () => registerLocalAccount("gate"));
   $("#gate-login")?.addEventListener("click", () => loginLocalAccount("gate"));
   $("#gate-guest")?.addEventListener("click", () => loginAsGuest("invitado@lyfta.app", "Invitado Demo"));
-  $("#gate-social-google")?.addEventListener("click", () => loginAsGuest("google-user@lyfta.app", "Usuario Google"));
-  $("#gate-social-apple")?.addEventListener("click", () => loginAsGuest("apple-user@lyfta.app", "Usuario Apple"));
+  $("#gate-social-google")?.addEventListener("click", loginWithGoogle);
+  $("#gate-social-apple")?.addEventListener("click", loginWithApple);
   ["#auth-email", "#auth-password", "#gate-auth-email", "#gate-auth-password"].forEach((selector) => {
     $(selector)?.addEventListener("keydown", (event) => {
       if (event.key !== "Enter") return;
