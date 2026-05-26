@@ -460,6 +460,7 @@ const state = {
   selectedExercise: exercises[0],
   activeWorkout: loadWorkout(),
   timer: { remaining: 90, running: false, handle: null },
+  animationRunning: false,
 };
 
 let dialogFrameTimer = null;
@@ -1148,6 +1149,10 @@ function setView(view) {
   };
   $("#view-title").textContent = titles[view];
   if (view === "progress") drawProgressChart();
+  if (view === "workout" && !state.animationRunning) {
+    state.animationRunning = true;
+    animateExercise();
+  }
 }
 
 function openAccountPanel() {
@@ -1761,6 +1766,10 @@ function drawPlate(ctx, x, y, color) {
 let lastCoachExerciseId = null;
 
 function animateExercise() {
+  if (state.view !== "workout") {
+    state.animationRunning = false;
+    return;
+  }
   const canvas = $("#exercise-canvas");
   const gifImg = $("#coach-exercise-gif");
   
@@ -1822,12 +1831,56 @@ function startDialogAnimation() {
   }, 650);
 }
 
+function getChartData(mode) {
+  const history = Array.isArray(appData.workoutHistory) ? appData.workoutHistory : [];
+  if (history.length === 0) {
+    return {
+      isDemo: true,
+      labels: ["S1", "S2", "S3", "S4", "S5", "S6", "S7"],
+      values: progressData[mode]
+    };
+  }
+
+  // Sort history chronologically by completion date
+  const sorted = [...history].sort((a, b) => new Date(a.completedAt) - new Date(b.completedAt));
+  const recent = sorted.slice(-7);
+
+  const labels = recent.map(w => {
+    try {
+      const d = new Date(w.completedAt);
+      if (isNaN(d.getTime())) return "Entreno";
+      return d.toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" });
+    } catch {
+      return "Entreno";
+    }
+  });
+
+  let values = [];
+  if (mode === "volume") {
+    values = recent.map(w => estimateHistoryVolume([w]));
+  } else if (mode === "orm") {
+    values = recent.map(w => estimateBestOrm([w]));
+  } else if (mode === "sets") {
+    values = recent.map(w => (w.exercises || []).flatMap(e => e.sets || []).filter(s => s.done).length);
+  }
+
+  return {
+    isDemo: false,
+    labels,
+    values
+  };
+}
+
 function drawProgressChart() {
   const canvas = $("#progress-chart");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
   const mode = $("#chart-mode").value;
-  const data = progressData[mode];
+  
+  const chartInfo = getChartData(mode);
+  const data = chartInfo.values;
+  const labels = chartInfo.labels;
+
   const styles = getComputedStyle(document.body);
   const ink = styles.getPropertyValue("--ink").trim();
   const muted = styles.getPropertyValue("--muted").trim();
@@ -1840,8 +1893,12 @@ function drawProgressChart() {
   ctx.fillRect(0, 0, width, height);
 
   const padding = 54;
-  const max = Math.max(...data) * 1.12;
-  const min = Math.min(...data) * 0.88;
+  const maxVal = Math.max(...data);
+  const minVal = Math.min(...data);
+  // Ensure we don't divide by zero if max and min are equal
+  const max = maxVal === 0 ? 100 : maxVal * 1.12;
+  const min = minVal === 0 ? 0 : minVal * 0.88;
+
   ctx.strokeStyle = line;
   ctx.lineWidth = 1;
   for (let i = 0; i < 5; i++) {
@@ -1850,55 +1907,73 @@ function drawProgressChart() {
   }
 
   const points = data.map((value, index) => {
-    const x = padding + ((width - padding * 2) / (data.length - 1)) * index;
-    const y = height - padding - ((value - min) / (max - min)) * (height - padding * 2);
+    let x;
+    if (data.length === 1) {
+      x = width / 2;
+    } else {
+      x = padding + ((width - padding * 2) / (data.length - 1)) * index;
+    }
+    let y;
+    if (max === min) {
+      y = height / 2;
+    } else {
+      y = height - padding - ((value - min) / (max - min)) * (height - padding * 2);
+    }
     return [x, y, value];
   });
 
   if (points.length > 0) {
-    // 1. Draw and fill the gradient area under the Bezier curve
-    const fillGrad = ctx.createLinearGradient(0, padding, 0, height - padding);
-    fillGrad.addColorStop(0, accent);
-    fillGrad.addColorStop(1, "rgba(0,0,0,0)");
-    
-    ctx.save();
-    ctx.fillStyle = fillGrad;
-    ctx.globalAlpha = 0.25; // beautiful glowing opacity
-    ctx.beginPath();
-    ctx.moveTo(points[0][0], height - padding);
-    ctx.lineTo(points[0][0], points[0][1]);
-    for (let i = 0; i < points.length - 1; i++) {
-      const p0 = points[i];
-      const p1 = points[i + 1];
-      const cpX1 = p0[0] + (p1[0] - p0[0]) / 2;
-      const cpY1 = p0[1];
-      const cpX2 = p0[0] + (p1[0] - p0[0]) / 2;
-      const cpY2 = p1[1];
-      ctx.bezierCurveTo(cpX1, cpY1, cpX2, cpY2, p1[0], p1[1]);
-    }
-    ctx.lineTo(points[points.length - 1][0], height - padding);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
+    // 1. Draw and fill the gradient area under the Bezier curve (only if we have more than 1 point)
+    if (points.length > 1) {
+      const fillGrad = ctx.createLinearGradient(0, padding, 0, height - padding);
+      fillGrad.addColorStop(0, accent);
+      fillGrad.addColorStop(1, "rgba(0,0,0,0)");
+      
+      ctx.save();
+      ctx.fillStyle = fillGrad;
+      ctx.globalAlpha = 0.25;
+      ctx.beginPath();
+      ctx.moveTo(points[0][0], height - padding);
+      ctx.lineTo(points[0][0], points[0][1]);
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[i];
+        const p1 = points[i + 1];
+        const cpX1 = p0[0] + (p1[0] - p0[0]) / 2;
+        const cpY1 = p0[1];
+        const cpX2 = p0[0] + (p1[0] - p0[0]) / 2;
+        const cpY2 = p1[1];
+        ctx.bezierCurveTo(cpX1, cpY1, cpX2, cpY2, p1[0], p1[1]);
+      }
+      ctx.lineTo(points[points.length - 1][0], height - padding);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
 
-    // 2. Draw the smooth stroke on top
-    ctx.beginPath();
-    ctx.moveTo(points[0][0], points[0][1]);
-    for (let i = 0; i < points.length - 1; i++) {
-      const p0 = points[i];
-      const p1 = points[i + 1];
-      const cpX1 = p0[0] + (p1[0] - p0[0]) / 2;
-      const cpY1 = p0[1];
-      const cpX2 = p0[0] + (p1[0] - p0[0]) / 2;
-      const cpY2 = p1[1];
-      ctx.bezierCurveTo(cpX1, cpY1, cpX2, cpY2, p1[0], p1[1]);
+      // 2. Draw the smooth stroke on top
+      ctx.beginPath();
+      ctx.moveTo(points[0][0], points[0][1]);
+      for (let i = 0; i < points.length - 1; i++) {
+        const p0 = points[i];
+        const p1 = points[i + 1];
+        const cpX1 = p0[0] + (p1[0] - p0[0]) / 2;
+        const cpY1 = p0[1];
+        const cpX2 = p0[0] + (p1[0] - p0[0]) / 2;
+        const cpY2 = p1[1];
+        ctx.bezierCurveTo(cpX1, cpY1, cpX2, cpY2, p1[0], p1[1]);
+      }
+      ctx.strokeStyle = accent;
+      ctx.lineWidth = 5;
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = accent;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    } else {
+      // Just draw a single thick dot if there is only 1 data point
+      ctx.fillStyle = accent;
+      ctx.beginPath();
+      ctx.arc(points[0][0], points[0][1], 10, 0, Math.PI * 2);
+      ctx.fill();
     }
-    ctx.strokeStyle = accent;
-    ctx.lineWidth = 5;
-    ctx.shadowBlur = 12;
-    ctx.shadowColor = accent;
-    ctx.stroke();
-    ctx.shadowBlur = 0; // Reset shadow
   }
 
   points.forEach(([x, y, value], index) => {
@@ -1913,9 +1988,17 @@ function drawProgressChart() {
 
   ctx.fillStyle = muted;
   ctx.font = "700 14px system-ui, sans-serif";
-  ["S1", "S2", "S3", "S4", "S5", "S6", "S7"].forEach((label, index) => {
-    ctx.fillText(label, points[index][0] - 10, height - 22);
+  labels.forEach((label, index) => {
+    if (points[index]) {
+      ctx.fillText(label, points[index][0] - 18, height - 22);
+    }
   });
+
+  if (chartInfo.isDemo) {
+    ctx.fillStyle = accent;
+    ctx.font = "600 12px system-ui, sans-serif";
+    ctx.fillText("Modo Demo - Registra entrenamientos para ver tu progreso real", padding, padding - 15);
+  }
 }
 
 function formatMetric(value, mode) {
@@ -3107,51 +3190,193 @@ function renderWeeklyRoutineBoard() {
   renderRoutineDayDetail();
 }
 
+function openAddRoutineExerciseDialog(blockIndex) {
+  let dialog = $("#add-routine-exercise-dialog");
+  if (!dialog) {
+    document.body.insertAdjacentHTML("beforeend", `
+      <dialog id="add-routine-exercise-dialog" style="border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); padding: 24px; max-width: 400px; box-shadow: var(--shadow-lg); width: 90%;">
+        <h3 style="margin-top: 0; margin-bottom: 16px; font-family: 'Outfit', sans-serif;">Añadir ejercicio</h3>
+        <label style="display: block; margin-bottom: 20px;">
+          Selecciona el ejercicio:
+          <select id="routine-add-select" style="width: 100%; padding: 10px; margin-top: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-strong); color: var(--ink);">
+            ${exercises.map(e => `<option value="${escapeHtml(e.name)}">${escapeHtml(e.name)} (${e.muscle})</option>`).join("")}
+          </select>
+        </label>
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button class="ghost-button" id="routine-add-cancel">Cancelar</button>
+          <button class="primary-button" id="routine-add-confirm">Añadir</button>
+        </div>
+      </dialog>
+    `);
+    dialog = $("#add-routine-exercise-dialog");
+    $("#routine-add-cancel").addEventListener("click", () => dialog.close());
+  }
+  
+  const confirmBtn = $("#routine-add-confirm");
+  const newConfirmBtn = confirmBtn.cloneNode(true);
+  confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+  
+  newConfirmBtn.addEventListener("click", () => {
+    const select = $("#routine-add-select");
+    const name = select.value;
+    if (name) {
+      const day = weeklyRoutinePlan[appData.selectedWeekDay] || weeklyRoutinePlan[0];
+      day.blocks[blockIndex].exercises.push(name);
+      saveAppData();
+      pushApi("/api/routines", weeklyRoutinePlan).catch(() => {});
+      renderRoutineDayDetail();
+      showToast(`Ejercicio "${name}" añadido.`);
+    }
+    dialog.close();
+  });
+  
+  dialog.showModal();
+}
+
+function openEditRoutineMetaDialog() {
+  let dialog = $("#edit-routine-meta-dialog");
+  const day = weeklyRoutinePlan[appData.selectedWeekDay] || weeklyRoutinePlan[0];
+  
+  if (!dialog) {
+    document.body.insertAdjacentHTML("beforeend", `
+      <dialog id="edit-routine-meta-dialog" style="border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); padding: 24px; max-width: 400px; box-shadow: var(--shadow-lg); width: 90%;">
+        <h3 style="margin-top: 0; margin-bottom: 16px; font-family: 'Outfit', sans-serif;">Editar detalles del día</h3>
+        <label style="display: block; margin-bottom: 12px;">
+          Título de la rutina:
+          <input id="routine-meta-title" type="text" style="width: 100%; padding: 10px; margin-top: 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-strong); color: var(--ink);" />
+        </label>
+        <label style="display: block; margin-bottom: 12px;">
+          Duración estimada:
+          <input id="routine-meta-duration" type="text" placeholder="Ej. 45 min" style="width: 100%; padding: 10px; margin-top: 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-strong); color: var(--ink);" />
+        </label>
+        <label style="display: block; margin-bottom: 20px;">
+          Dificultad:
+          <select id="routine-meta-difficulty" style="width: 100%; padding: 10px; margin-top: 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-strong); color: var(--ink);">
+            <option>Fácil</option>
+            <option>Media</option>
+            <option>Avanzada</option>
+          </select>
+        </label>
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button class="ghost-button" id="routine-meta-cancel">Cancelar</button>
+          <button class="primary-button" id="routine-meta-confirm">Guardar</button>
+        </div>
+      </dialog>
+    `);
+    dialog = $("#edit-routine-meta-dialog");
+    $("#routine-meta-cancel").addEventListener("click", () => dialog.close());
+  }
+  
+  $("#routine-meta-title").value = day.title;
+  $("#routine-meta-duration").value = day.duration;
+  $("#routine-meta-difficulty").value = day.difficulty;
+
+  const confirmBtn = $("#routine-meta-confirm");
+  const newConfirmBtn = confirmBtn.cloneNode(true);
+  confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+  newConfirmBtn.addEventListener("click", () => {
+    const titleVal = $("#routine-meta-title").value.trim();
+    const durationVal = $("#routine-meta-duration").value.trim() || "45 min";
+    const difficultyVal = $("#routine-meta-difficulty").value;
+    
+    if (titleVal) {
+      day.title = titleVal;
+      day.duration = durationVal;
+      day.difficulty = difficultyVal;
+      saveAppData();
+      pushApi("/api/routines", weeklyRoutinePlan).catch(() => {});
+      renderWeeklyRoutineBoard();
+      showToast("Detalles de rutina actualizados.");
+    }
+    dialog.close();
+  });
+
+  dialog.showModal();
+}
+
 function renderRoutineDayDetail() {
   const day = weeklyRoutinePlan[appData.selectedWeekDay] || weeklyRoutinePlan[0];
   if (!$("#routine-day-detail")) return;
-  $("#routine-detail-title").textContent = `${day.day}: ${day.title}`;
+  
+  $("#routine-detail-title").innerHTML = `${escapeHtml(day.day)}: ${escapeHtml(day.title)} <button class="icon-button" id="edit-routine-meta-btn" title="Editar detalles" style="display: inline-flex; vertical-align: middle; margin-left: 8px; padding: 4px; color: var(--accent); background: none; border: none; cursor: pointer;" aria-label="Editar detalles del día"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button>`;
   $("#routine-detail-subtitle").textContent = `${day.duration} · ${day.difficulty} · ${day.muscles.join(", ")}`;
   const allExercises = day.blocks.flatMap((block) => block.exercises);
+  
   $("#routine-day-detail").innerHTML = `
     <div class="routine-day-summary">
       <div><span>Estado</span><strong>${day.status}</strong></div>
       <div><span>Ejercicios</span><strong>${allExercises.length}</strong></div>
       <div><span>Volumen estimado</span><strong>${allExercises.length * 9} series</strong></div>
-      <div><span>Progresion</span><strong>+1 rep o +2,5 kg</strong></div>
+      <div><span>Progresión</span><strong>+1 rep o +2,5 kg</strong></div>
     </div>
     <div class="routine-detail-blocks">
       ${day.blocks
         .map((block, blockIndex) => `
-          <section class="routine-detail-block">
-            <h4>Bloque ${blockIndex + 1}: ${block.name}</h4>
+          <section class="routine-detail-block" style="border-bottom: 1px solid var(--line); padding-bottom: 16px; margin-bottom: 16px;">
+            <h4 style="margin-bottom: 12px; color: var(--accent); font-family: 'Outfit', sans-serif;">Bloque ${blockIndex + 1}: ${escapeHtml(block.name)}</h4>
+            ${block.exercises.length === 0 ? `<p class="subtle" style="font-size: 0.9rem; margin-bottom: 12px;">No hay ejercicios en este bloque.</p>` : ""}
             ${block.exercises
               .map((name, exerciseIndex) => {
                 const exercise = exercises.find((item) => normalizeText(name).includes(normalizeText(item.name))) || exercises[(blockIndex + exerciseIndex) % exercises.length];
                 return `
-                  <article class="routine-detail-exercise">
-                    <img src="${posterSrc(exercise, 1)}" alt="Imagen anatomica de ${exercise.name}">
-                    <div>
-                      <strong>${exercise.name}</strong>
-                      <small>${exercise.muscle} · ${exercise.equipment}</small>
-                      <p>${exercise.cues[0]} ${exercise.cues[1]}</p>
+                  <article class="routine-detail-exercise" style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 10px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                      <img src="${posterSrc(exercise, 1)}" alt="Imagen de ${escapeHtml(exercise.name)}" style="width: 48px; height: 48px; border-radius: 6px; object-fit: cover; border: 1px solid var(--line);">
+                      <div>
+                        <strong>${escapeHtml(exercise.name)}</strong>
+                        <br>
+                        <small class="subtle">${escapeHtml(exercise.muscle)} · ${escapeHtml(exercise.equipment)}</small>
+                      </div>
                     </div>
-                    <div class="routine-prescription">
+                    <div class="routine-prescription" style="display: flex; align-items: center; gap: 12px;">
                       <span>3 series</span>
                       <span>${exerciseIndex === 0 && blockIndex === 1 ? "6-8 reps" : "10-12 reps"}</span>
                       <span>RPE ${exerciseIndex === 0 ? "8" : "7"}</span>
-                      <span>${exerciseIndex === 0 ? "120s" : "75s"}</span>
+                      <button class="icon-button delete-routine-exercise" data-block-index="${blockIndex}" data-exercise-index="${exerciseIndex}" title="Eliminar ejercicio" style="color: #ff3366; background: none; border: none; cursor: pointer; display: flex; align-items: center; padding: 4px;" aria-label="Eliminar ejercicio">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+                      </button>
                     </div>
                   </article>
                 `;
               })
               .join("")}
+            <div style="margin-top: 12px; display: flex; justify-content: flex-start;">
+              <button class="ghost-button add-routine-exercise-btn" data-block-index="${blockIndex}" style="padding: 6px 12px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; border: 1px dashed var(--line); border-radius: 6px; cursor: pointer; background: none; color: var(--ink);">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Añadir ejercicio
+              </button>
+            </div>
           </section>
         `)
         .join("")}
     </div>
-    <div class="coach-note">Coach IA: si duermes mal o Salud marca baja recuperación, baja 1 serie en accesorios. Si una máquina está ocupada, usa la sustitución del día.</div>
+    <div class="coach-note" style="margin-top: 16px;">Coach IA: si duermes mal o Salud marca baja recuperación, baja 1 serie en accesorios. Si una máquina está ocupada, usa la sustitución del día.</div>
   `;
+
+  // Attach event listeners
+  $("#edit-routine-meta-btn")?.addEventListener("click", openEditRoutineMetaDialog);
+
+  $("#routine-day-detail").querySelectorAll(".delete-routine-exercise").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const blockIndex = Number(btn.dataset.blockIndex);
+      const exerciseIndex = Number(btn.dataset.exerciseIndex);
+      const day = weeklyRoutinePlan[appData.selectedWeekDay] || weeklyRoutinePlan[0];
+      const removed = day.blocks[blockIndex].exercises.splice(exerciseIndex, 1)[0];
+      saveAppData();
+      pushApi("/api/routines", weeklyRoutinePlan).catch(() => {});
+      renderRoutineDayDetail();
+      renderWeeklyRoutineBoard(); // Refresh summary board
+      showToast(`Ejercicio "${removed}" eliminado.`);
+    });
+  });
+
+  $("#routine-day-detail").querySelectorAll(".add-routine-exercise-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const blockIndex = Number(btn.dataset.blockIndex);
+      openAddRoutineExerciseDialog(blockIndex);
+    });
+  });
 }
 
 function selectWeekDay(index) {
@@ -3612,6 +3837,34 @@ function renderAllAppData() {
   runSafe("renderMilestones", renderMilestones);
 }
 
+function playBeep(frequency = 880, duration = 0.3) {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    
+    oscillator.type = "sine";
+    oscillator.frequency.value = frequency;
+    
+    gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.03);
+    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
+    
+    oscillator.start(audioCtx.currentTime);
+    oscillator.stop(audioCtx.currentTime + duration);
+  } catch (err) {
+    console.warn("Audio Context block or unsupported:", err);
+  }
+}
+
+function playTimerFinishedSound() {
+  playBeep(880, 0.15);
+  setTimeout(() => playBeep(880, 0.25), 250);
+}
+
 function startTimer(seconds = 90) {
   clearInterval(state.timer.handle);
   state.timer.total = seconds;
@@ -3625,6 +3878,7 @@ function startTimer(seconds = 90) {
       clearInterval(state.timer.handle);
       state.timer.running = false;
       showToast("Descanso completado.");
+      playTimerFinishedSound();
     }
   }, 1000);
 }
@@ -3811,7 +4065,21 @@ function bindEvents() {
     }
   });
 
-  $("#timer-btn")?.addEventListener("click", () => startTimer(90));
+  $("#timer-btn")?.addEventListener("click", () => {
+    if (state.timer.running) {
+      clearInterval(state.timer.handle);
+      state.timer.running = false;
+      state.timer.remaining = 0;
+      updateTimerText();
+      showToast("Temporizador detenido.");
+      return;
+    }
+    const val = prompt("¿Cuántos segundos quieres descansar?", "90");
+    const secs = parseInt(val, 10);
+    if (!isNaN(secs) && secs > 0) {
+      startTimer(secs);
+    }
+  });
   $$(".account-shortcut").forEach((button) => button.addEventListener("click", openAccountPanel));
   $("#finish-workout-btn")?.addEventListener("click", () => {
     const completed = state.activeWorkout.exercises.flatMap((item) => item.sets).filter((set) => set.done).length;
