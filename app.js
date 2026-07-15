@@ -1415,13 +1415,166 @@ function posterSrc(exercise, frame = 0) {
 }
 
 function motionSrc(exercise) {
-  return exercise?.gifUrl || posterSrc(exercise, 0);
+  return exercise?.gifUrl || posterSrc(exercise, "gif");
 }
 
 function exerciseAttribution(exercise) {
-  return exercise?.source
-    ? `${exercise.source}${exercise.attribution ? ` · ${exercise.attribution}` : ""}`
-    : "LiftLab";
+  if (!exercise?.source) return "LiftLab";
+  return [exercise.source, exercise.attribution].filter(Boolean).join(" · ");
+}
+
+const exerciseNamePatterns = [
+  [/3\/4 sit-up/i, "Abdominal parcial 3/4"],
+  [/ab roller/i, "Rueda abdominal"],
+  [/air bike/i, "Bicicleta abdominal"],
+  [/alternate heel touch/i, "Toque alterno de talones"],
+  [/archer push.?up/i, "Flexión arquero"],
+  [/arnold press/i, "Press Arnold"],
+  [/back extension/i, "Extensión lumbar"],
+  [/barbell bench press/i, "Press banca con barra"],
+  [/bench press/i, "Press banca"],
+  [/barbell curl/i, "Curl de bíceps con barra"],
+  [/barbell deadlift/i, "Peso muerto con barra"],
+  [/deadlift/i, "Peso muerto"],
+  [/barbell row/i, "Remo con barra"],
+  [/barbell squat/i, "Sentadilla con barra"],
+  [/bulgarian split squat/i, "Sentadilla búlgara"],
+  [/cable crossover/i, "Cruce de poleas"],
+  [/cable curl/i, "Curl en polea"],
+  [/cable fly/i, "Apertura en polea"],
+  [/cable kickback/i, "Patada de glúteo en polea"],
+  [/cable lateral raise/i, "Elevación lateral en polea"],
+  [/cable pushdown/i, "Extensión de tríceps en polea"],
+  [/calf raise/i, "Elevación de gemelos"],
+  [/chest dip/i, "Fondos para pecho"],
+  [/chin.?up/i, "Dominada supina"],
+  [/concentration curl/i, "Curl concentrado"],
+  [/crunch/i, "Crunch abdominal"],
+  [/decline bench press/i, "Press banca declinado"],
+  [/dumbbell bench press/i, "Press banca con mancuernas"],
+  [/dumbbell curl/i, "Curl de bíceps con mancuernas"],
+  [/dumbbell fly/i, "Aperturas con mancuernas"],
+  [/dumbbell lateral raise/i, "Elevación lateral con mancuernas"],
+  [/front raise/i, "Elevación frontal"],
+  [/glute bridge/i, "Puente de glúteo"],
+  [/hammer curl/i, "Curl martillo"],
+  [/hip thrust/i, "Hip thrust"],
+  [/incline bench press/i, "Press banca inclinado"],
+  [/incline dumbbell press/i, "Press inclinado con mancuernas"],
+  [/jump squat/i, "Sentadilla con salto"],
+  [/lat pulldown/i, "Jalón al pecho"],
+  [/leg curl/i, "Curl femoral"],
+  [/leg extension/i, "Extensión de cuádriceps"],
+  [/leg press/i, "Prensa de piernas"],
+  [/alternate lateral pulldown/i, "Jalón lateral alterno"],
+  [/lateral pulldown/i, "Jalón lateral"],
+  [/lunge/i, "Zancada"],
+  [/mountain climber/i, "Escalador"],
+  [/overhead press/i, "Press militar"],
+  [/pec deck/i, "Contractora de pecho"],
+  [/plank/i, "Plancha"],
+  [/pull.?up/i, "Dominada"],
+  [/push.?up/i, "Flexión"],
+  [/romanian deadlift/i, "Peso muerto rumano"],
+  [/russian twist/i, "Giro ruso"],
+  [/shoulder press/i, "Press de hombro"],
+  [/shrug/i, "Encogimiento de trapecio"],
+  [/sit.?up/i, "Abdominal sit-up"],
+  [/skull crusher/i, "Rompecráneos"],
+  [/triceps extension/i, "Extensión de tríceps"],
+  [/triceps dip/i, "Fondos de tríceps"],
+  [/upright row/i, "Remo al mentón"],
+];
+
+const exerciseWordTranslations = [
+  ["body weight", "peso corporal"],
+  ["barbell", "barra"],
+  ["dumbbell", "mancuerna"],
+  ["cable", "polea"],
+  ["lever", "máquina"],
+  ["smith", "smith"],
+  ["weighted", "con lastre"],
+  ["assisted", "asistido"],
+  ["standing", "de pie"],
+  ["seated", "sentado"],
+  ["lying", "tumbado"],
+  ["incline", "inclinado"],
+  ["decline", "declinado"],
+  ["reverse", "inverso"],
+  ["single arm", "a una mano"],
+  ["one arm", "a una mano"],
+  ["single leg", "a una pierna"],
+  ["wide grip", "agarre amplio"],
+  ["close grip", "agarre cerrado"],
+  ["front", "frontal"],
+  ["rear", "posterior"],
+  ["side", "lateral"],
+  ["raise", "elevación"],
+  ["row", "remo"],
+  ["squat", "sentadilla"],
+  ["extension", "extensión"],
+  ["rotation", "rotación"],
+  ["stretch", "estiramiento"],
+  ["alternate", "alterno"],
+  ["alternating", "alterno"],
+  ["pulldown", "jalón"],
+  ["press", "press"],
+  ["fly", "apertura"],
+  ["kickback", "patada"],
+  ["twist", "giro"],
+  ["split", "dividida"],
+  ["bench", "banco"],
+  ["machine", "máquina"],
+  ["kneeling", "de rodillas"],
+  ["knee", "rodilla"],
+  ["arm", "brazo"],
+  ["leg", "pierna"],
+  ["hip", "cadera"],
+  ["chest", "pecho"],
+  ["shoulder", "hombro"],
+  ["biceps", "bíceps"],
+  ["triceps", "tríceps"],
+  ["calf", "gemelo"],
+  ["glute", "glúteo"],
+  ["abdominal", "abdominal"],
+  ["with", "con"],
+  ["on", "en"],
+];
+
+function titleCaseSpanish(value) {
+  return String(value)
+    .split(" ")
+    .filter(Boolean)
+    .map((word, index) => (index === 0 ? word.charAt(0).toUpperCase() + word.slice(1) : word))
+    .join(" ");
+}
+
+function translateExerciseName(name = "") {
+  const clean = String(name).replace(/\s+/g, " ").trim();
+  const exact = exerciseNamePatterns.find(([pattern]) => pattern.test(clean));
+  if (exact) return exact[1];
+  let translated = ` ${clean.toLowerCase()} `;
+  exerciseWordTranslations
+    .sort((a, b) => b[0].length - a[0].length)
+    .forEach(([from, to]) => {
+      translated = translated.replace(new RegExp(`\\b${from}\\b`, "g"), to);
+    });
+  return titleCaseSpanish(translated.replace(/\s+/g, " ").trim() || clean);
+}
+
+function translateSecondaryMuscle(value = "") {
+  const text = normalizeText(value);
+  if (/(pector|chest)/.test(text)) return "Pecho";
+  if (/(lat|back|trap|dorsal)/.test(text)) return "Espalda";
+  if (/tricep/.test(text)) return "Tríceps";
+  if (/bicep|brachialis/.test(text)) return "Bíceps";
+  if (/deltoid|shoulder/.test(text)) return "Hombro";
+  if (/glute/.test(text)) return "Glúteo";
+  if (/hamstring/.test(text)) return "Femoral";
+  if (/quad/.test(text)) return "Cuádriceps";
+  if (/calf|soleus|gastrocnemius/.test(text)) return "Gemelo";
+  if (/abs|abdom|core|waist/.test(text)) return "Core";
+  return titleCaseSpanish(String(value).replaceAll("_", " "));
 }
 
 function mapDatasetMuscle(item) {
@@ -1467,17 +1620,18 @@ function normalizeDatasetExercise(item) {
   return {
     id: `dataset-${item.id}`,
     datasetId: item.id,
-    name: item.name,
+    name: translateExerciseName(item.name),
+    originalName: item.name,
     muscle,
     equipment: mapDatasetEquipment(item.equipment),
     type,
     cues: steps.slice(0, 5),
     description: item.instructions?.es || item.instructions?.en || `${item.name}: guía técnica disponible en el dataset.`,
-    target: item.target,
-    secondaryMuscles: item.secondary_muscles || [],
+    target: translateSecondaryMuscle(item.target || item.muscle_group || item.category),
+    secondaryMuscles: (item.secondary_muscles || []).map(translateSecondaryMuscle),
     imageUrl: datasetPath(item.image),
     gifUrl: datasetPath(item.gif_url),
-    source: "Exercises Dataset",
+    source: "Dataset de ejercicios",
     attribution: item.attribution || "© Gym visual",
   };
 }
@@ -1493,13 +1647,21 @@ async function loadExerciseDataset() {
     if (!Array.isArray(dataset)) throw new Error("Formato de dataset no válido");
     const normalized = dataset.map(normalizeDatasetExercise).filter((item) => item.name && item.muscle);
     const localByName = new Set(exercises.map((item) => normalizeText(item.name)));
-    const uniqueDataset = normalized.filter((item) => !localByName.has(normalizeText(item.name)));
+    const seenDatasetKeys = new Set();
+    const uniqueDataset = normalized.filter((item) => {
+      const translatedName = normalizeText(item.name);
+      const originalName = normalizeText(item.originalName);
+      const compoundKey = normalizeText(`${item.name} ${item.muscle} ${item.equipment}`);
+      if (localByName.has(translatedName) || localByName.has(originalName) || seenDatasetKeys.has(compoundKey)) return false;
+      seenDatasetKeys.add(compoundKey);
+      return true;
+    });
     exercises = [...exercises, ...uniqueDataset];
     exerciseDatasetState = {
       loaded: true,
       loading: false,
       source: "hasaneyldrm/exercises-dataset",
-      total: normalized.length,
+      total: uniqueDataset.length,
       error: "",
     };
     renderFilters();
@@ -1816,9 +1978,14 @@ function renderRoutines() {
 function renderFilters() {
   const container = $("#muscle-filter");
   if (!container) return;
-  const muscles = ["Todos", ...new Set(exercises.map((item) => item.muscle))];
+  const preferredOrder = ["Pecho", "Espalda", "Hombro", "Bíceps", "Tríceps", "Pierna", "Femoral", "Glúteo", "Gemelo", "Core"];
+  const available = new Set(exercises.map((item) => item.muscle).filter(Boolean));
+  const extras = [...available].filter((muscle) => !preferredOrder.includes(muscle)).sort((a, b) => a.localeCompare(b, "es"));
+  const muscles = ["Todos", ...preferredOrder.filter((muscle) => available.has(muscle)), ...extras];
+  const totalCount = exercises.length;
+  const countFor = (muscle) => muscle === "Todos" ? totalCount : exercises.filter((item) => item.muscle === muscle).length;
   container.innerHTML = muscles
-    .map((muscle) => `<button class="${state.libraryFilter === muscle ? "active" : ""}" data-muscle="${muscle}">${muscle}</button>`)
+    .map((muscle) => `<button class="${state.libraryFilter === muscle ? "active" : ""}" data-muscle="${muscle}">${muscle} (${countFor(muscle)})</button>`)
     .join("");
 }
 
@@ -1826,21 +1993,21 @@ function renderLibrary() {
   const countLabel = $("#exercise-count-label");
   const libraryContainer = $("#exercise-library");
   if (!countLabel || !libraryContainer) return;
-  const query = $("#exercise-search")?.value?.trim().toLowerCase() || "";
+  const query = normalizeText($("#exercise-search")?.value || "");
   const filtered = exercises.filter((exercise) => {
     const matchesFilter = state.libraryFilter === "Todos" || exercise.muscle === state.libraryFilter;
-    const haystack = `${exercise.name} ${exercise.muscle} ${exercise.equipment} ${exercise.target || ""} ${(exercise.secondaryMuscles || []).join(" ")}`.toLowerCase();
+    const haystack = normalizeText(`${exercise.name} ${exercise.originalName || ""} ${exercise.muscle} ${exercise.equipment} ${exercise.target || ""} ${(exercise.secondaryMuscles || []).join(" ")}`);
     return matchesFilter && haystack.includes(query);
   });
   const visible = filtered.slice(0, EXERCISE_RENDER_LIMIT);
   const datasetLabel = exerciseDatasetState.loaded
-    ? ` ? dataset ${exerciseDatasetState.total}`
+    ? ` · ${exerciseDatasetState.total} del dataset`
     : exerciseDatasetState.loading
-      ? " ? cargando dataset"
+      ? " · cargando dataset"
       : exerciseDatasetState.error
-        ? " ? dataset no cargado"
+        ? " · dataset no cargado"
         : "";
-  countLabel.textContent = `${filtered.length} ejercicios${filtered.length > visible.length ? ` ? mostrando ${visible.length}` : ""}${datasetLabel}`;
+  countLabel.textContent = `${filtered.length} ejercicios${filtered.length > visible.length ? ` · mostrando ${visible.length}` : ""}${datasetLabel}`;
   libraryContainer.innerHTML = visible
     .map((exercise) => `
       <article class="exercise-card">
@@ -1879,8 +2046,8 @@ function renderCues() {
   }
   if ($("#dialog-muscles")) {
     $("#dialog-muscles").innerHTML = `
-    <img src="${muscleDataUri(state.selectedExercise.muscle, "front")}" alt="Musculos frontales trabajados por ${state.selectedExercise.name}">
-    <img src="${muscleDataUri(state.selectedExercise.muscle, "back")}" alt="Musculos posteriores trabajados por ${state.selectedExercise.name}">
+    <img src="${muscleDataUri(state.selectedExercise.muscle, "front")}" alt="Músculos frontales trabajados por ${state.selectedExercise.name}">
+    <img src="${muscleDataUri(state.selectedExercise.muscle, "back")}" alt="Músculos posteriores trabajados por ${state.selectedExercise.name}">
   `;
   }
   $("#cue-list").innerHTML = [
@@ -3635,7 +3802,8 @@ function openExercise(id) {
   renderCues();
   
   const hasPremium = !!premiumGifs[exercise.id];
-  if (!hasPremium) {
+  const hasMotion = hasPremium || !!exercise.gifUrl;
+  if (!hasMotion) {
     startDialogAnimation();
   } else {
     stopDialogAnimation();
@@ -3908,7 +4076,7 @@ async function loginWithGoogle() {
   try {
     await detectApi();
     if (!firebaseOnline || !firebaseBackend?.signinWithGoogle) {
-      showToast("Google Sign-In solo disponible con Firebase activo.");
+      showToast("Inicio con Google solo disponible con Firebase activo.");
       setAuthUiState(false);
       return;
     }
@@ -3934,7 +4102,7 @@ async function loginWithApple() {
   try {
     await detectApi();
     if (!firebaseOnline || !firebaseBackend?.signinWithApple) {
-      showToast("Apple Sign-In solo disponible con Firebase activo.");
+      showToast("Inicio con Apple solo disponible con Firebase activo.");
       setAuthUiState(false);
       return;
     }
