@@ -2471,7 +2471,7 @@ dialog canvas {
   font-size: 1.25rem;
 }
 
-/* Premium Macro Ring Cards */
+/* Macro ring cards */
 .macro-ring-card {
   display: flex;
   flex-direction: column;

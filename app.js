@@ -612,7 +612,6 @@ async function loadApiUserData() {
       const currentSig = getRoutineSignature(weeklyRoutinePlan);
       const targetSig = getRoutineSignature(defaultRoutinePlan);
       if (currentSig !== targetSig) {
-        console.log("Auto-updating routine for pacogn4@gmail.com to match CSV exactly.");
         weeklyRoutinePlan.splice(0, weeklyRoutinePlan.length, ...cloneData(defaultRoutinePlan));
         pushApi("/api/routines", weeklyRoutinePlan).catch(console.error);
         localStorage.setItem("liftlab-routines", JSON.stringify(weeklyRoutinePlan));
@@ -686,11 +685,11 @@ function hasFirebaseConfig() {
 }
 
 function hasRealBackend() {
-  return firebaseOnline || (apiOnline && Boolean(apiToken)) || Boolean(appData.account?.isGuest);
+  return firebaseOnline || (apiOnline && Boolean(apiToken));
 }
 
 function isSignedIn() {
-  return Boolean(appData.account?.id && (hasRealBackend() || appData.account?.isGuest));
+  return Boolean(appData.account?.id && hasRealBackend());
 }
 
 function setAuthUiState(loading = false) {
@@ -1330,7 +1329,7 @@ function renderFeed(target = "#recent-feed") {
   }
 }
 
-const premiumGifs = {
+const exerciseGifs = {
   bench: "videos/0025-EIeI8Vf.gif",
   "incline-db": "videos/0314-ns0SIbU.gif",
   dip: "videos/0251-9WTm7dq.gif",
@@ -1403,12 +1402,12 @@ function findExercise(id) {
 function posterSrc(exercise, frame = 0) {
   if (exercise?.gifUrl && (frame === "gif" || frame === "video")) return exercise.gifUrl;
   if (exercise?.imageUrl) return exercise.imageUrl;
-  const premiumPath = premiumGifs[exercise.id];
-  if (premiumPath) {
+  const exerciseGifPath = exerciseGifs[exercise.id];
+  if (exerciseGifPath) {
     if (frame === "gif" || frame === "video") {
-      return `https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/${premiumPath}`;
+      return `https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/${exerciseGifPath}`;
     }
-    const jpgPath = premiumPath.replace("videos/", "images/").replace(".gif", ".jpg");
+    const jpgPath = exerciseGifPath.replace("videos/", "images/").replace(".gif", ".jpg");
     return `https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/${jpgPath}`;
   }
   return `assets/exercises/${exercise.id}-${frame}.svg`;
@@ -1910,7 +1909,7 @@ function renderWorkoutLog() {
               <small>${exercise.muscle} - ${exercise.equipment}</small>
             </div>
             <div style="display: flex; gap: 8px;">
-              <button class="text-button" data-demo="${exercise.id}">Ver técnica</button>
+              <button class="text-button" data-technique-exercise="${exercise.id}">Ver técnica</button>
               <button class="text-button" data-swap-workout-exercise="${exerciseIndex}">Sustituir</button>
               <button class="text-button" data-remove-exercise="${exerciseIndex}" style="color: var(--coral);">Eliminar</button>
             </div>
@@ -2032,7 +2031,7 @@ function renderCues() {
   if ($("#dialog-muscle")) $("#dialog-muscle").textContent = state.selectedExercise.muscle;
   if ($("#dialog-description")) $("#dialog-description").textContent = state.selectedExercise.description;
   
-  const hasPremium = !!premiumGifs[state.selectedExercise.id];
+  const hasExerciseGif = !!exerciseGifs[state.selectedExercise.id];
   if ($("#dialog-video-frame")) {
     $("#dialog-video-frame").src = motionSrc(state.selectedExercise);
     $("#dialog-video-frame").alt = `Video animado de ${state.selectedExercise.name}`;
@@ -2040,7 +2039,7 @@ function renderCues() {
   if ($("#dialog-photos")) {
     const photos = state.selectedExercise.imageUrl
       ? [state.selectedExercise.imageUrl, state.selectedExercise.gifUrl || state.selectedExercise.imageUrl]
-      : [0, 1, 2].map((frame) => posterSrc(state.selectedExercise, hasPremium && frame === 0 ? 1 : frame));
+      : [0, 1, 2].map((frame) => posterSrc(state.selectedExercise, hasExerciseGif && frame === 0 ? 1 : frame));
     $("#dialog-photos").style.display = "";
     $("#dialog-photos").innerHTML = photos.map((src, index) => `<img src="${src}" alt="Foto ${index + 1} de ${escapeHtml(state.selectedExercise.name)}">`).join("");
   }
@@ -2163,8 +2162,8 @@ function animateExercise() {
   const gifImg = $("#coach-exercise-gif");
   
   if (state.selectedExercise) {
-    const hasPremium = !!premiumGifs[state.selectedExercise.id];
-    if (hasPremium) {
+    const hasExerciseGif = !!exerciseGifs[state.selectedExercise.id];
+    if (hasExerciseGif) {
       if (canvas) canvas.style.display = "none";
       if (gifImg) {
         gifImg.style.display = "block";
@@ -2205,7 +2204,7 @@ function stopDialogAnimation() {
 
 function startDialogAnimation() {
   stopDialogAnimation();
-  if (state.selectedExercise?.gifUrl || (state.selectedExercise && premiumGifs[state.selectedExercise.id])) return;
+  if (state.selectedExercise?.gifUrl || (state.selectedExercise && exerciseGifs[state.selectedExercise.id])) return;
   let frame = 0;
   dialogFrameTimer = setInterval(() => {
     const dialog = $("#exercise-dialog");
@@ -2224,7 +2223,7 @@ function getChartData(mode) {
   const history = Array.isArray(appData.workoutHistory) ? appData.workoutHistory : [];
   if (history.length === 0) {
     return {
-      isDemo: true,
+      isEmptyHistory: true,
       labels: ["S1", "S2", "S3", "S4", "S5", "S6", "S7"],
       values: progressData[mode]
     };
@@ -2254,7 +2253,7 @@ function getChartData(mode) {
   }
 
   return {
-    isDemo: false,
+    isEmptyHistory: false,
     labels,
     values
   };
@@ -2383,10 +2382,10 @@ function drawProgressChart() {
     }
   });
 
-  if (chartInfo.isDemo) {
+  if (chartInfo.isEmptyHistory) {
     ctx.fillStyle = accent;
     ctx.font = "600 12px system-ui, sans-serif";
-    ctx.fillText("Modo Demo - Registra entrenamientos para ver tu progreso real", padding, padding - 15);
+    ctx.fillText("Sin historial - registra entrenamientos para ver tu progreso real", padding, padding - 15);
   }
 }
 
@@ -3801,8 +3800,8 @@ function openExercise(id) {
   state.selectedExercise = exercise;
   renderCues();
   
-  const hasPremium = !!premiumGifs[exercise.id];
-  const hasMotion = hasPremium || !!exercise.gifUrl;
+  const hasExerciseGif = !!exerciseGifs[exercise.id];
+  const hasMotion = hasExerciseGif || !!exercise.gifUrl;
   if (!hasMotion) {
     startDialogAnimation();
   } else {
@@ -4192,24 +4191,6 @@ async function loginLocalAccount(source = "profile") {
   setAuthUiState(false);
 }
 
-function loginAsGuest(email = "invitado@lyfta.app", name = "Invitado Demo") {
-  appData.account = {
-    email: email,
-    id: "guest_" + Math.random().toString(36).substring(2, 11),
-    mode: "guest",
-    isGuest: true
-  };
-  appData.profile.name = name;
-  appData.profile.email = email;
-  saveAppData();
-  
-  renderAllAppData();
-  renderAuthStatus();
-  setAuthUiState(false);
-  setView("dashboard");
-  showToast(`Acceso concedido como ${name}. ¡Disfruta de la demo!`);
-}
-
 async function deleteLocalAccount() {
   if (firebaseOnline || (apiToken && apiOnline)) await apiRequest("/api/account", { method: "DELETE" }).catch(() => {});
   localStorage.removeItem("liftlab-app-data");
@@ -4380,9 +4361,9 @@ function bindEvents() {
       showToast(`Filtrando ${state.libraryFilter}.`);
     }
 
-    const demoButton = event.target.closest("[data-demo]");
-    if (demoButton) {
-      state.selectedExercise = findExercise(demoButton.dataset.demo);
+    const techniqueButton = event.target.closest("[data-technique-exercise]");
+    if (techniqueButton) {
+      state.selectedExercise = findExercise(techniqueButton.dataset.techniqueExercise);
       renderCues();
       showToast(`${state.selectedExercise.name}: guía cargada.`);
     }
@@ -4704,7 +4685,6 @@ function bindEvents() {
   $("#account-login")?.addEventListener("click", () => loginLocalAccount("profile"));
   $("#gate-register")?.addEventListener("click", () => registerLocalAccount("gate"));
   $("#gate-login")?.addEventListener("click", () => loginLocalAccount("gate"));
-  $("#gate-guest")?.addEventListener("click", () => loginAsGuest("invitado@lyfta.app", "Invitado Demo"));
   $("#gate-social-google")?.addEventListener("click", loginWithGoogle);
   $("#gate-social-apple")?.addEventListener("click", loginWithApple);
   ["#auth-email", "#auth-password", "#gate-auth-email", "#gate-auth-password"].forEach((selector) => {
@@ -5052,6 +5032,10 @@ async function bootstrapAuth() {
 }
 
 function init() {
+  if (appData.account?.isGuest) {
+    localStorage.removeItem("liftlab-app-data");
+    appData = cloneData(defaultAppData);
+  }
   applyPreferredDeviceMode();
   setAuthUiState(true);
   
@@ -5123,7 +5107,6 @@ init();
 // Sincronización en segundo plano: asegurar que los datos estén frescos al volver a la app
 document.addEventListener("visibilitychange", async () => {
   if (document.visibilityState === "visible") {
-    console.log("App visible. Sincronizando con el servidor...");
     try {
       await loadApiUserData();
     } catch (e) {
@@ -5133,7 +5116,6 @@ document.addEventListener("visibilitychange", async () => {
 });
 
 window.addEventListener("focus", async () => {
-  console.log("Ventana enfocada. Sincronizando con el servidor...");
   try {
     await loadApiUserData();
   } catch (e) {
