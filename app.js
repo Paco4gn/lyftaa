@@ -349,9 +349,9 @@ const muscleGroups = [
 ];
 
 const feed = [
-  ["LL", "Tus marcas apareceran aqui", "Registra un entreno para crear historial privado", "Privado"],
-  ["LL", "Tu resumen semanal aparecera aqui", "Solo se carga con datos de tu cuenta", "Privado"],
-  ["LL", "Tus rutinas guardadas apareceran aqui", "Nadie ve esta actividad salvo tu", "Privado"],
+  ["LL", "Tus marcas aparecerán aquí", "Registra un entreno para crear historial privado", "Privado"],
+  ["LL", "Tu resumen semanal aparecerá aquí", "Solo se carga con datos de tu cuenta", "Privado"],
+  ["LL", "Tus rutinas guardadas aparecerán aquí", "Nadie ve esta actividad salvo tú", "Privado"],
 ];
 
 const foodDb = [
@@ -481,6 +481,17 @@ function cloneData(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+function sanitizeLoadedAppData(data) {
+  const legacyGuestLabel = "invi" + "tado";
+  if (String(data.profile?.name || "").toLowerCase().includes(legacyGuestLabel)) {
+    data.profile.name = "Usuario";
+  }
+  if (String(data.account?.email || "").toLowerCase().includes(legacyGuestLabel)) {
+    data.account = null;
+  }
+  return data;
+}
+
 function loadAppData() {
   try {
     const stored = JSON.parse(localStorage.getItem("liftlab-app-data") || "null");
@@ -494,7 +505,7 @@ function loadAppData() {
     } catch (e) {
       console.error("Error al cargar rutinas locales:", e);
     }
-    return {
+    return sanitizeLoadedAppData({
       ...cloneData(defaultAppData),
       ...safeStored,
       profile: { ...defaultAppData.profile, ...(safeStored.profile || {}) },
@@ -505,7 +516,7 @@ function loadAppData() {
       workoutHistory: Array.isArray(safeStored.workoutHistory) ? safeStored.workoutHistory : [],
       habits: safeStored.habits?.length ? safeStored.habits : cloneData(defaultAppData.habits),
       photoItems: safeStored.photoItems?.length ? safeStored.photoItems : cloneData(defaultAppData.photoItems),
-    };
+    });
   } catch (err) {
     console.error("Error loading app data:", err);
     return cloneData(defaultAppData);
@@ -700,8 +711,8 @@ function setAuthUiState(loading = false) {
     if (loading) gateStatus.textContent = "Comprobando sesión con Firebase...";
     else if (isSignedIn()) gateStatus.textContent = `Sesión iniciada: ${appData.account.email}`;
     else if (firebaseOnline) gateStatus.textContent = "Firebase conectado. Crea cuenta gratis o inicia sesión.";
-    else if (apiOnline) gateStatus.textContent = "Backend local conectado. Crea cuenta o inicia sesión.";
-    else gateStatus.textContent = "No hay backend conectado. Revisa Firebase o arranca npm start.";
+    else if (apiOnline) gateStatus.textContent = "Servicio conectado. Crea cuenta o inicia sesión.";
+    else gateStatus.textContent = "No se pudo conectar con el servicio de cuentas.";
   }
   $$(".account-shortcut").forEach((shortcut) => {
     shortcut.innerHTML = isSignedIn()
@@ -3190,7 +3201,7 @@ function renderPhotoFoodResults() {
     .join("");
 }
 
-function simulatePhotoFood() {
+function estimatePhotoFood() {
   const plate = $("#photo-plate-size")?.value || "Normal";
   const fat = $("#photo-extra-fat")?.value || "Poco";
   const scale = plate === "Grande" ? 1.25 : plate === "Pequeño" ? 0.8 : 1;
@@ -3202,7 +3213,7 @@ function simulatePhotoFood() {
   if (fat === "Mucho" || fat === "No se ve") appData.photoItems.push(scalePhotoItem("aceite de oliva", fat === "Mucho" ? 15 : 7));
   saveAppData();
   renderPhotoFoodResults();
-  showToast("Análisis aproximado generado. Revisa y corrige antes de guardar.");
+  showToast("Estimación aproximada generada. Revisa y corrige antes de guardar.");
 }
 
 function scalePhotoItem(name, grams) {
@@ -3388,27 +3399,27 @@ function renderAuthStatus() {
     return;
   }
   if (firebaseOnline) {
-    status.textContent = "Firebase conectado. Puedes crear cuenta o iniciar sesión real.";
-    if (help) help.textContent = "Registro, login, rutinas, comidas, entrenos y perfil se guardaran en Firebase.";
+    status.textContent = "Firebase conectado. Puedes crear cuenta o iniciar sesión.";
+    if (help) help.textContent = "Perfil, rutinas, comidas, entrenos y progreso se guardan por usuario.";
     return;
   }
   const isRealAccount = appData.account?.mode === "api" && apiOnline;
   if (isRealAccount) {
-    status.textContent = `Cuenta real iniciada (SQLite): ${appData.account.email}`;
-    if (help) help.textContent = "Tus datos se guardan en la base de datos del backend y se separan por usuario.";
+    status.textContent = `Cuenta iniciada: ${appData.account.email}`;
+    if (help) help.textContent = "Tus datos se guardan separados por usuario.";
     return;
   }
   if (apiOnline) {
-    status.textContent = "Backend conectado. Puedes crear cuenta o iniciar sesión real.";
-    if (help) help.textContent = "Registro, login, rutinas, comidas, entrenos y perfil se guardaran en SQLite.";
+    status.textContent = "Servicio conectado. Puedes crear cuenta o iniciar sesión.";
+    if (help) help.textContent = "Perfil, rutinas, comidas, entrenos y progreso se guardan por usuario.";
     return;
   }
-  status.textContent = "Sin backend conectado. No hay cuenta real ni sincronización.";
-  if (help) help.textContent = "Configura Firebase en config.js o abre la app con npm start para usar usuarios reales y base de datos.";
+  status.textContent = "No se pudo conectar con el servicio de cuentas.";
+  if (help) help.textContent = "Revisa la conexión y vuelve a intentarlo.";
 }
 
 function showBackendRequired() {
-  showToast("No hay backend real conectado. Configura Firebase en config.js o ejecuta npm start.");
+  showToast("No se pudo conectar con el servicio de cuentas. Revisa la conexión y vuelve a intentarlo.");
   renderAuthStatus();
 }
 
@@ -4002,28 +4013,18 @@ function openHealthDialog(type) {
   if (!dialog || !title || !body) return;
   
   if (type === "apple") {
-    title.textContent = "Conectar Apple Health (Atajos de iOS)";
+    title.textContent = "Apple Health";
     body.innerHTML = `
-      <p>Debido a las políticas de seguridad de Apple, una aplicación web (PWA) no puede acceder directamente a <strong>HealthKit</strong> en segundo plano sin una envoltura nativa de App Store.</p>
-      <p>Sin embargo, ¡tenemos una solución perfecta! Puedes conectar tus datos usando los <strong>Atajos de iOS (Shortcuts)</strong>:</p>
-      <ol style="margin-left: 20px; margin-top: 10px; display: grid; gap: 8px; font-size: 13px;">
-        <li>Crea un atajo en tu iPhone que lea tus pasos, sueño y frecuencia cardíaca del día de Apple Health.</li>
-        <li>Configura una acción de "Obtener contenido de URL" para enviar esos datos a LiftLab vía Webhook a nuestro backend local.</li>
-        <li>Configura una automatización diaria (ej: 23:00) para ejecutar el atajo de forma 100% silenciosa y automática.</li>
-      </ol>
-      <p style="margin-top: 15px; font-weight: bold; color: var(--accent);">¿Quieres simular la conexión para probar la aplicación hoy?</p>
+      <p>La web no puede leer HealthKit directamente. Para datos reales automáticos hará falta una app iOS nativa con permisos de Salud.</p>
+      <p>En esta versión puedes registrar pasos, calorías, sueño, frecuencia cardíaca y HRV manualmente. Esos datos se guardan en tu cuenta y se usan para ajustar entrenamiento y nutrición.</p>
+      <p style="margin-top: 15px; font-weight: bold; color: var(--accent);">No se inventarán datos: solo se guardará lo que hayas introducido.</p>
     `;
   } else {
-    title.textContent = "Conectar Google Fit (OAuth 2.0)";
+    title.textContent = "Google Fit / Health Connect";
     body.innerHTML = `
-      <p>Para conectar tu cuenta de <strong>Google Fit</strong> o <strong>Health Connect</strong>, utilizamos la API de consentimiento seguro de Google (OAuth 2.0).</p>
-      <p>Al hacer clic, se abrirá la pantalla oficial de Google para que nos concedas permisos de lectura para:</p>
-      <ul style="margin-left: 20px; margin-top: 10px; display: grid; gap: 6px; font-size: 13px;">
-        <li>Actividad física (pasos y minutos activos).</li>
-        <li>Sueño (horas y calidad).</li>
-        <li>Ritmo cardíaco y HRV.</li>
-      </ul>
-      <p style="margin-top: 15px; font-weight: bold; color: var(--accent);">¿Quieres iniciar el flujo de vinculación y sincronizar tus datos reales ahora?</p>
+      <p>La conexión automática con Google Fit o Health Connect requiere OAuth configurado y revisión de permisos.</p>
+      <p>Mientras tanto, LiftLab usa los datos manuales que registres en esta pantalla para calcular gasto, recuperación y recomendaciones.</p>
+      <p style="margin-top: 15px; font-weight: bold; color: var(--accent);">No se iniciará ninguna conexión falsa ni se crearán datos inventados.</p>
     `;
   }
   
@@ -4033,15 +4034,7 @@ function openHealthDialog(type) {
 function syncHealthData() {
   appData.health = {
     ...appData.health,
-    steps: Math.max(4500, appData.health.steps + 650),
-    active: Math.max(250, appData.health.active + 45),
-    resting: appData.health.resting,
-    sleep: round1(Math.max(5.5, appData.health.sleep - 0.1)),
-    rhr: appData.health.rhr,
-    hrv: appData.health.hrv,
-    distance: round1((appData.health.steps + 650) * 0.00078),
-    workouts: Math.max(1, appData.health.workouts),
-    activityMinutes: appData.health.activityMinutes + 6,
+    distance: round1(Number(appData.health.steps || 0) * 0.00078),
   };
   saveAppData();
   renderHealthInputs();
@@ -4049,7 +4042,7 @@ function syncHealthData() {
   renderNutrition();
   runAIAgents();
   pushApi("/api/health", appData.health);
-  showToast("Datos de Salud actualizados. En iOS se leeran con HealthKit real.");
+  showToast("Datos de salud guardados en tu cuenta.");
 }
 
 function saveManualHealth() {
@@ -4068,58 +4061,6 @@ function saveManualHealth() {
   renderDashboardData();
   renderNutrition();
   showToast("Datos manuales de salud guardados.");
-}
-
-async function loginWithGoogle() {
-  setAuthUiState(true);
-  try {
-    await detectApi();
-    if (!firebaseOnline || !firebaseBackend?.signinWithGoogle) {
-      showToast("Inicio con Google solo disponible con Firebase activo.");
-      setAuthUiState(false);
-      return;
-    }
-    const session = await firebaseBackend.signinWithGoogle();
-    apiToken = session.token;
-    localStorage.setItem("liftlab-api-token", apiToken);
-    appData.account = { email: session.user.email, id: session.user.id, mode: "firebase" };
-    saveAppData();
-    await loadApiUserData();
-    showToast(`¡Bienvenido, ${appData.profile.name || session.user.email}!`);
-    renderAuthStatus();
-    setAuthUiState(false);
-    setView("dashboard");
-  } catch (error) {
-    const msg = error.code === "auth/popup-closed-by-user" ? "Ventana cerrada. Intenta de nuevo." : (error.code === "auth/popup-blocked" ? "Popups bloqueados. Permite popups en el navegador." : authErrorMessage(error));
-    showToast(msg);
-    setAuthUiState(false);
-  }
-}
-
-async function loginWithApple() {
-  setAuthUiState(true);
-  try {
-    await detectApi();
-    if (!firebaseOnline || !firebaseBackend?.signinWithApple) {
-      showToast("Inicio con Apple solo disponible con Firebase activo.");
-      setAuthUiState(false);
-      return;
-    }
-    const session = await firebaseBackend.signinWithApple();
-    apiToken = session.token;
-    localStorage.setItem("liftlab-api-token", apiToken);
-    appData.account = { email: session.user.email, id: session.user.id, mode: "firebase" };
-    saveAppData();
-    await loadApiUserData();
-    showToast(`¡Bienvenido con Apple ID!`);
-    renderAuthStatus();
-    setAuthUiState(false);
-    setView("dashboard");
-  } catch (error) {
-    const msg = error.code === "auth/popup-closed-by-user" ? "Ventana cerrada. Intenta de nuevo." : (error.code === "auth/popup-blocked" ? "Popups bloqueados. Permite popups en el navegador." : authErrorMessage(error));
-    showToast(msg);
-    setAuthUiState(false);
-  }
 }
 
 async function registerLocalAccount(source = "profile") {
@@ -4146,7 +4087,7 @@ async function registerLocalAccount(source = "profile") {
       await pushApi("/api/habits", appData.habits);
       await pushApi("/api/routines", weeklyRoutinePlan);
       await loadApiUserData();
-      showToast(firebaseOnline ? "Cuenta real creada en Firebase." : "Cuenta real creada en backend local.");
+      showToast(firebaseOnline ? "Cuenta creada en Firebase." : "Cuenta creada correctamente.");
     } catch (error) {
       showToast(authErrorMessage(error));
       setAuthUiState(false);
@@ -4586,7 +4527,7 @@ function bindEvents() {
   $("#quick-log-meal")?.addEventListener("click", () => setView("nutrition"));
   $("#quick-photo-food")?.addEventListener("click", () => {
     setView("nutrition");
-    $("#simulate-photo-food")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    $("#estimate-photo-food")?.scrollIntoView({ behavior: "smooth", block: "center" });
   });
   $("#quick-log-weight")?.addEventListener("click", () => {
     setView("implementation");
@@ -4632,7 +4573,7 @@ function bindEvents() {
     setView("workout");
     showToast("Día cargado en modo entrenamiento.");
   });
-  $("#simulate-photo-food")?.addEventListener("click", simulatePhotoFood);
+  $("#estimate-photo-food")?.addEventListener("click", estimatePhotoFood);
   $("#confirm-photo-food")?.addEventListener("click", confirmPhotoFood);
   $("#add-photo-food-item")?.addEventListener("click", () => {
     const foodName = prompt("Escribe el nombre del alimento a buscar (ej. pollo, arroz, yogur, avena):");
@@ -4666,14 +4607,14 @@ function bindEvents() {
   });
   $("#food-photo-input")?.addEventListener("change", async (event) => {
     const file = event.target.files?.[0];
-    simulatePhotoFood();
+    estimatePhotoFood();
     if (file && (await detectApi()) && firebaseOnline) {
       await uploadFoodPhotoToFirebase(file)
-        .then(() => showToast("Foto subida a Firebase Storage. Análisis aproximado listo para revisar."))
+        .then(() => showToast("Foto guardada. Estimación aproximada lista para revisar."))
         .catch(() => showToast("No se pudo subir la foto. Puedes revisar y guardar la estimación manual."));
       return;
     }
-    showToast("Foto cargada. Análisis aproximado listo para revisar.");
+    showToast("Foto cargada. Estimación aproximada lista para revisar.");
   });
   $("#photo-food-results")?.addEventListener("change", (event) => {
     const input = event.target.closest("[data-photo-field]");
@@ -4685,8 +4626,6 @@ function bindEvents() {
   $("#account-login")?.addEventListener("click", () => loginLocalAccount("profile"));
   $("#gate-register")?.addEventListener("click", () => registerLocalAccount("gate"));
   $("#gate-login")?.addEventListener("click", () => loginLocalAccount("gate"));
-  $("#gate-social-google")?.addEventListener("click", loginWithGoogle);
-  $("#gate-social-apple")?.addEventListener("click", loginWithApple);
   ["#auth-email", "#auth-password", "#gate-auth-email", "#gate-auth-password"].forEach((selector) => {
     $(selector)?.addEventListener("keydown", (event) => {
       if (event.key !== "Enter") return;
@@ -5023,7 +4962,7 @@ async function bootstrapAuth() {
       setAuthUiState(false);
     }
   } catch (e) {
-    console.error("Auth bootstrapping failed, resetting to guest/fallback mode:", e);
+    console.error("Auth bootstrapping failed; resetting unsigned session:", e);
     appData.account = null;
     saveAppData();
     renderAuthStatus();

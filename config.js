@@ -14,7 +14,6 @@ window.LIFTLAB_CONFIG = {
     appId: "1:378122603344:web:e4756d448259d37394ba55",
   },
 
-  // Optional local/API fallback. Empty means "same origin", useful when `npm start`
-  // serves frontend and API together.
+  // Optional API fallback. Empty means "same origin".
   apiBaseUrl: "",
 };

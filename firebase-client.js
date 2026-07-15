@@ -1,7 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
 import {
-  GoogleAuthProvider,
-  OAuthProvider,
   createUserWithEmailAndPassword,
   deleteUser,
   getAuth,
@@ -9,7 +7,6 @@ import {
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
-  signInWithPopup,
   signOut,
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 import {
@@ -91,22 +88,6 @@ export async function createFirebaseBackend() {
         requestFirebase({ auth, db }, path, options),
         timeoutPromise
       ]);
-    },
-    async signinWithGoogle() {
-      const provider = new GoogleAuthProvider();
-      provider.addScope("email");
-      provider.addScope("profile");
-      const credential = await signInWithPopup(auth, provider);
-      await ensureUserDefaults(db, credential.user, {});
-      return sessionPayload(db, credential.user);
-    },
-    async signinWithApple() {
-      const provider = new OAuthProvider("apple.com");
-      provider.addScope("email");
-      provider.addScope("name");
-      const credential = await signInWithPopup(auth, provider);
-      await ensureUserDefaults(db, credential.user, {});
-      return sessionPayload(db, credential.user);
     },
     async uploadFoodPhoto(file) {
       const user = requireFirebaseUser(auth);
