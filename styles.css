@@ -1269,6 +1269,18 @@ h1 {
   color: var(--muted);
 }
 
+.exercise-source {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 8px;
+  padding: 4px 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
 .workout-layout {
   grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
   align-items: start;

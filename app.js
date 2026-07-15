@@ -1,7 +1,19 @@
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 
-const exercises = [
+const EXERCISE_DATASET_URL = "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/data/exercises.json";
+const EXERCISE_DATASET_MEDIA_BASE = "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/";
+const EXERCISE_RENDER_LIMIT = 120;
+
+let exerciseDatasetState = {
+  loaded: false,
+  loading: false,
+  source: "LiftLab local",
+  total: 0,
+  error: "",
+};
+
+let exercises = [
   {
     id: "bench",
     name: "Press banca",
@@ -1389,16 +1401,115 @@ function findExercise(id) {
 }
 
 function posterSrc(exercise, frame = 0) {
+  if (exercise?.gifUrl && (frame === "gif" || frame === "video")) return exercise.gifUrl;
+  if (exercise?.imageUrl) return exercise.imageUrl;
   const premiumPath = premiumGifs[exercise.id];
   if (premiumPath) {
     if (frame === "gif" || frame === "video") {
       return `https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/${premiumPath}`;
-    } else {
-      const jpgPath = premiumPath.replace("videos/", "images/").replace(".gif", ".jpg");
-      return `https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/${jpgPath}`;
     }
+    const jpgPath = premiumPath.replace("videos/", "images/").replace(".gif", ".jpg");
+    return `https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/${jpgPath}`;
   }
   return `assets/exercises/${exercise.id}-${frame}.svg`;
+}
+
+function motionSrc(exercise) {
+  return exercise?.gifUrl || posterSrc(exercise, 0);
+}
+
+function exerciseAttribution(exercise) {
+  return exercise?.source
+    ? `${exercise.source}${exercise.attribution ? ` · ${exercise.attribution}` : ""}`
+    : "LiftLab";
+}
+
+function mapDatasetMuscle(item) {
+  const text = normalizeText(`${item.name || ""} ${item.category || ""} ${item.body_part || ""} ${item.target || ""} ${item.muscle_group || ""}`);
+  if (/(chest|pector|pecho)/.test(text)) return "Pecho";
+  if (/(back|lat|trap|dorsal|espalda)/.test(text)) return "Espalda";
+  if (/(triceps|tricep)/.test(text)) return "Tríceps";
+  if (/(biceps|upper arms|brachialis|bicep|curl)/.test(text)) return "Bíceps";
+  if (/(shoulder|deltoid|hombro|delts)/.test(text)) return "Hombro";
+  if (/(glute|gluteo|glúteo|hip)/.test(text)) return "Glúteo";
+  if (/(hamstring|femoral)/.test(text)) return "Femoral";
+  if (/(calf|lower legs|gemelo|soleus)/.test(text)) return "Gemelo";
+  if (/(waist|abs|core|abdominal)/.test(text)) return "Core";
+  if (/(upper legs|quads|quadriceps|thigh|leg|pierna)/.test(text)) return "Pierna";
+  return "Core";
+}
+
+function mapDatasetEquipment(value = "") {
+  const text = normalizeText(value);
+  if (text.includes("body weight")) return "Peso corporal";
+  if (text.includes("dumbbell")) return "Mancuernas";
+  if (text.includes("barbell")) return "Barra";
+  if (text.includes("cable")) return "Polea";
+  if (text.includes("machine") || text.includes("leverage") || text.includes("smith")) return "Máquina";
+  if (text.includes("band")) return "Banda";
+  if (text.includes("kettlebell")) return "Kettlebell";
+  if (text.includes("ez")) return "Barra EZ";
+  if (text.includes("weighted")) return "Lastre";
+  if (text.includes("stability ball")) return "Fitball";
+  return value || "Sin equipo";
+}
+
+function datasetPath(path) {
+  return path ? `${EXERCISE_DATASET_MEDIA_BASE}${path}` : "";
+}
+
+function normalizeDatasetExercise(item) {
+  const steps = Array.isArray(item.instruction_steps?.es) && item.instruction_steps.es.length
+    ? item.instruction_steps.es
+    : String(item.instructions?.es || item.instructions?.en || "Ejercicio sin instrucciones disponibles.").split(/(?<=\.)\s+/).filter(Boolean);
+  const muscle = mapDatasetMuscle(item);
+  const type = muscle === "Espalda" || muscle === "Bíceps" ? "pull" : ["Pierna", "Femoral", "Glúteo", "Gemelo", "Core"].includes(muscle) ? "legs" : "push";
+  return {
+    id: `dataset-${item.id}`,
+    datasetId: item.id,
+    name: item.name,
+    muscle,
+    equipment: mapDatasetEquipment(item.equipment),
+    type,
+    cues: steps.slice(0, 5),
+    description: item.instructions?.es || item.instructions?.en || `${item.name}: guía técnica disponible en el dataset.`,
+    target: item.target,
+    secondaryMuscles: item.secondary_muscles || [],
+    imageUrl: datasetPath(item.image),
+    gifUrl: datasetPath(item.gif_url),
+    source: "Exercises Dataset",
+    attribution: item.attribution || "© Gym visual",
+  };
+}
+
+async function loadExerciseDataset() {
+  if (exerciseDatasetState.loading || exerciseDatasetState.loaded) return;
+  exerciseDatasetState.loading = true;
+  exerciseDatasetState.error = "";
+  try {
+    const response = await fetch(EXERCISE_DATASET_URL, { cache: "force-cache" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const dataset = await response.json();
+    if (!Array.isArray(dataset)) throw new Error("Formato de dataset no válido");
+    const normalized = dataset.map(normalizeDatasetExercise).filter((item) => item.name && item.muscle);
+    const localByName = new Set(exercises.map((item) => normalizeText(item.name)));
+    const uniqueDataset = normalized.filter((item) => !localByName.has(normalizeText(item.name)));
+    exercises = [...exercises, ...uniqueDataset];
+    exerciseDatasetState = {
+      loaded: true,
+      loading: false,
+      source: "hasaneyldrm/exercises-dataset",
+      total: normalized.length,
+      error: "",
+    };
+    renderFilters();
+    renderMuscleAtlas();
+    renderLibrary();
+  } catch (error) {
+    exerciseDatasetState.loading = false;
+    exerciseDatasetState.error = "No se pudo cargar el dataset externo. Se mantiene la biblioteca local.";
+    renderLibrary();
+  }
 }
 
 function posterDataUri(exercise, frame = 0) {
@@ -1718,20 +1829,29 @@ function renderLibrary() {
   const query = $("#exercise-search")?.value?.trim().toLowerCase() || "";
   const filtered = exercises.filter((exercise) => {
     const matchesFilter = state.libraryFilter === "Todos" || exercise.muscle === state.libraryFilter;
-    const haystack = `${exercise.name} ${exercise.muscle} ${exercise.equipment}`.toLowerCase();
+    const haystack = `${exercise.name} ${exercise.muscle} ${exercise.equipment} ${exercise.target || ""} ${(exercise.secondaryMuscles || []).join(" ")}`.toLowerCase();
     return matchesFilter && haystack.includes(query);
   });
-  countLabel.textContent = `${filtered.length} ejercicios`;
-  libraryContainer.innerHTML = filtered
+  const visible = filtered.slice(0, EXERCISE_RENDER_LIMIT);
+  const datasetLabel = exerciseDatasetState.loaded
+    ? ` ? dataset ${exerciseDatasetState.total}`
+    : exerciseDatasetState.loading
+      ? " ? cargando dataset"
+      : exerciseDatasetState.error
+        ? " ? dataset no cargado"
+        : "";
+  countLabel.textContent = `${filtered.length} ejercicios${filtered.length > visible.length ? ` ? mostrando ${visible.length}` : ""}${datasetLabel}`;
+  libraryContainer.innerHTML = visible
     .map((exercise) => `
       <article class="exercise-card">
         <button class="exercise-visual media-card" data-open-exercise="${exercise.id}" aria-label="Abrir guía de ${exercise.name}">
-          <img src="${posterSrc(exercise, 1)}" alt="Foto de ${exercise.name}" loading="lazy">
+          <img src="${posterSrc(exercise, 1)}" alt="Foto de ${escapeHtml(exercise.name)}" loading="lazy">
           <span class="play-dot"><svg viewBox="0 0 24 24"><path d="m8 5 11 7-11 7V5Z"/></svg></span>
         </button>
         <div>
-          <strong>${exercise.name}</strong>
-          <small>${exercise.muscle} - ${exercise.equipment}</small>
+          <strong>${escapeHtml(exercise.name)}</strong>
+          <small>${escapeHtml(exercise.muscle)} - ${escapeHtml(exercise.equipment)}</small>
+          ${exercise.source ? `<span class="exercise-source">${escapeHtml(exercise.source)}</span>` : ""}
         </div>
         <button class="ghost-button" data-open-exercise-button="${exercise.id}">Abrir guía</button>
       </article>
@@ -1747,18 +1867,15 @@ function renderCues() {
   
   const hasPremium = !!premiumGifs[state.selectedExercise.id];
   if ($("#dialog-video-frame")) {
-    $("#dialog-video-frame").src = posterSrc(state.selectedExercise, hasPremium ? "gif" : 0);
+    $("#dialog-video-frame").src = motionSrc(state.selectedExercise);
     $("#dialog-video-frame").alt = `Video animado de ${state.selectedExercise.name}`;
   }
   if ($("#dialog-photos")) {
-    if (hasPremium) {
-      $("#dialog-photos").style.display = "none";
-    } else {
-      $("#dialog-photos").style.display = "";
-      $("#dialog-photos").innerHTML = [0, 1, 2]
-        .map((frame) => `<img src="${posterSrc(state.selectedExercise, frame)}" alt="Foto ${frame + 1} de ${state.selectedExercise.name}">`)
-        .join("");
-    }
+    const photos = state.selectedExercise.imageUrl
+      ? [state.selectedExercise.imageUrl, state.selectedExercise.gifUrl || state.selectedExercise.imageUrl]
+      : [0, 1, 2].map((frame) => posterSrc(state.selectedExercise, hasPremium && frame === 0 ? 1 : frame));
+    $("#dialog-photos").style.display = "";
+    $("#dialog-photos").innerHTML = photos.map((src, index) => `<img src="${src}" alt="Foto ${index + 1} de ${escapeHtml(state.selectedExercise.name)}">`).join("");
   }
   if ($("#dialog-muscles")) {
     $("#dialog-muscles").innerHTML = `
@@ -1766,7 +1883,10 @@ function renderCues() {
     <img src="${muscleDataUri(state.selectedExercise.muscle, "back")}" alt="Musculos posteriores trabajados por ${state.selectedExercise.name}">
   `;
   }
-  $("#cue-list").innerHTML = state.selectedExercise.cues.map((cue) => `<div class="cue">${cue}</div>`).join("");
+  $("#cue-list").innerHTML = [
+    ...state.selectedExercise.cues.map((cue) => `<div class="cue">${escapeHtml(cue)}</div>`),
+    `<div class="cue source-cue">${escapeHtml(exerciseAttribution(state.selectedExercise))}</div>`,
+  ].join("");
 }
 
 function drawExercise(canvas, exercise, phase) {
@@ -1918,7 +2038,7 @@ function stopDialogAnimation() {
 
 function startDialogAnimation() {
   stopDialogAnimation();
-  if (state.selectedExercise && premiumGifs[state.selectedExercise.id]) return;
+  if (state.selectedExercise?.gifUrl || (state.selectedExercise && premiumGifs[state.selectedExercise.id])) return;
   let frame = 0;
   dialogFrameTimer = setInterval(() => {
     const dialog = $("#exercise-dialog");
@@ -4786,6 +4906,7 @@ function init() {
   runSafe("renderMuscleAtlas", renderMuscleAtlas);
   runSafe("renderLibrary", renderLibrary);
   runSafe("renderCues", renderCues);
+  runSafe("loadExerciseDataset", loadExerciseDataset);
   runSafe("drawProgressChart", drawProgressChart);
   runSafe("renderCalculator", renderCalculator);
   runSafe("renderMilestones", renderMilestones);
