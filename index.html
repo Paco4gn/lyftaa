@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -276,12 +276,12 @@
             <article class="implementation-card ready">
               <span>Ya visible</span>
               <h3>Interfaz completa</h3>
-              <p>Dashboard, entreno, IA, nutricion, rutinas, ejercicios, progreso, comunidad, perfil y onboarding.</p>
+              <p>Dashboard, entreno, IA, nutrición, rutinas, ejercicios, progreso, comunidad, perfil y onboarding.</p>
             </article>
             <article class="implementation-card next">
               <span>Fase 1</span>
               <h3>Usuarios reales</h3>
-              <p>Registro, login, recuperacion de contraseña, perfil privado, datos separados por usuario y borrado completo.</p>
+              <p>Registro, login, recuperación de contraseña, perfil privado, datos separados por usuario y borrado completo.</p>
             </article>
             <article class="implementation-card next">
               <span>Fase 2</span>
@@ -295,13 +295,13 @@
             </article>
             <article class="implementation-card next">
               <span>Fase 4</span>
-              <h3>Nutricion y foto IA</h3>
-              <p>Registro manual, calorias, macros, agua, recetas y analisis de foto siempre aproximado, editable y confirmado.</p>
+              <h3>Nutrición y foto IA</h3>
+              <p>Registro manual, calorías, macros, agua, recetas y análisis de foto siempre aproximado, editable y confirmado.</p>
             </article>
             <article class="implementation-card blocked">
               <span>Requiere iOS</span>
               <h3>Apple Health</h3>
-              <p>HealthKit no funciona desde una web normal. Hace falta app iOS para leer pasos, calorias, sueño y entrenamientos.</p>
+              <p>HealthKit no funciona desde una web normal. Hace falta app iOS para leer pasos, calorías, sueño y entrenamientos.</p>
             </article>
           </div>
 
@@ -313,7 +313,7 @@
               <div class="mvp-list">
                 <div><strong>1</strong><span>Auth real: registro, login, reset y eliminar cuenta.</span></div>
                 <div><strong>2</strong><span>Onboarding persistente con perfil, objetivos, lesiones, disponibilidad y preferencias.</span></div>
-                <div><strong>3</strong><span>Base de datos por usuario para rutinas, entrenos, comidas, peso, medidas y habitos.</span></div>
+                <div><strong>3</strong><span>Base de datos por usuario para rutinas, entrenos, comidas, peso, medidas y hábitos.</span></div>
                 <div><strong>4</strong><span>Rutina semanal generada por objetivo, nivel, días, tiempo y material.</span></div>
                 <div><strong>5</strong><span>Modo entreno con historial real y progresión automática.</span></div>
               </div>
@@ -328,7 +328,7 @@
                 <span>Firestore por usuario</span>
                 <span>Storage privado para fotos</span>
                 <span>React Native o SwiftUI para HealthKit</span>
-                <span>IA de comida con revision manual obligatoria</span>
+                <span>IA de comida con revisión manual obligatoria</span>
               </div>
             </section>
           </div>
@@ -353,14 +353,14 @@
               <label>Dias disponibles<input id="profile-days-input" type="number" value="3" min="1" max="7"></label>
               <label>Tiempo por sesión<input id="profile-session-time-input" type="number" value="60"></label>
               <label>Lugar<select id="profile-place-input"><option>Gimnasio</option><option>Casa</option><option>Exterior</option></select></label>
-              <label>Material<input id="profile-equipment-input" placeholder="Barra, mancuernas, polea, maquinas"></label>
+              <label>Material<input id="profile-equipment-input" placeholder="Barra, mancuernas, polea, máquinas"></label>
               <label>Lesiones o molestias<input id="profile-injuries-input" placeholder="Hombro, rodilla, espalda..."></label>
               <label>Enfermedades relevantes<input id="profile-medical-input" placeholder="Opcional"></label>
               <label>Sueño<select id="profile-sleep-input"><option>Malo</option><option selected>Normal</option><option>Bueno</option></select></label>
               <label>Estrés<select id="profile-stress-input"><option>Bajo</option><option selected>Medio</option><option>Alto</option></select></label>
               <label>Trabajo<select id="profile-work-input"><option>Sedentario</option><option selected>Mixto</option><option>Activo</option></select></label>
               <label>Pasos diarios<input id="profile-steps-input" type="number" value="8000"></label>
-              <label>Preferencia alimentaria<input id="profile-diet-input" placeholder="Alta en proteina, vegetariana, sin lactosa..."></label>
+              <label>Preferencia alimentaria<input id="profile-diet-input" placeholder="Alta en proteína, vegetariana, sin lactosa..."></label>
               <label>Alergias<input id="profile-allergies-input" placeholder="Sin alergias"></label>
               <label>Intolerancias<input id="profile-intolerances-input" placeholder="Sin intolerancias"></label>
               <label>No me gusta<input id="profile-dislikes-input" placeholder="Alimentos a evitar"></label>
@@ -619,7 +619,7 @@
                   <svg viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>
                 </button>
               </div>
-              <canvas id="exercise-canvas" width="520" height="360" aria-label="Animacion tecnica"></canvas>
+              <canvas id="exercise-canvas" width="520" height="360" aria-label="Animación técnica"></canvas>
               <img id="coach-exercise-gif" src="" alt="Demostración técnica" style="display: none;">
               <div class="cue-list" id="cue-list"></div>
             </aside>
@@ -785,15 +785,15 @@
               </div>
               <div class="health-permission-list">
                 <span>Pasos</span>
-                <span>Calorias activas</span>
+                <span>Calorías activas</span>
                 <span>Sueño</span>
                 <span>Entrenamientos</span>
                 <span>Frecuencia cardíaca</span>
               </div>
               <div class="manual-health-grid">
                 <label>Pasos<input id="health-steps-input" type="number" value="8200"></label>
-                <label>Calorias activas<input id="health-active-input" type="number" value="640"></label>
-                <label>Calorias reposo<input id="health-resting-input" type="number" value="1840"></label>
+                <label>Calorías activas<input id="health-active-input" type="number" value="640"></label>
+                <label>Calorías reposo<input id="health-resting-input" type="number" value="1840"></label>
                 <label>Sueño horas<input id="health-sleep-input" type="number" value="7.1" step="0.1"></label>
                 <label>FC reposo<input id="health-rhr-input" type="number" value="58"></label>
                 <label>HRV<input id="health-hrv-input" type="number" value="62"></label>

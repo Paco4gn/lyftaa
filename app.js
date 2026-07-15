@@ -1,4 +1,4 @@
-const $ = (selector) => document.querySelector(selector);
+﻿const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 
 const EXERCISE_DATASET_URL = "https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/data/exercises.json";
@@ -43,12 +43,12 @@ let exercises = [
   },
   {
     id: "lat-pulldown",
-    name: "Jalon al pecho",
+    name: "Jalón al pecho",
     muscle: "Espalda",
     equipment: "Polea",
     type: "pull",
     cues: ["Inicia con depresion escapular.", "Lleva la barra al pecho alto.", "Evita tirar con la zona lumbar."],
-    description: "Patron vertical para dorsales, redondo mayor y biceps.",
+    description: "Patron vertical para dorsales, redondo mayor y bíceps.",
   },
   {
     id: "row",
@@ -66,7 +66,7 @@ let exercises = [
     equipment: "Barra",
     type: "pull",
     cues: ["Codos quietos.", "Sube sin balanceo.", "Controla la bajada completa."],
-    description: "Aislamiento clasico de biceps con buena carga progresiva.",
+    description: "Aislamiento clasico de bíceps con buena carga progresiva.",
   },
   {
     id: "squat",
@@ -84,20 +84,20 @@ let exercises = [
     equipment: "Barra",
     type: "legs",
     cues: ["Cadera atras.", "Barra pegada al cuerpo.", "Espalda neutra durante todo el recorrido."],
-    description: "Bisagra de cadera para isquios, gluteo y erectores.",
+    description: "Bisagra de cadera para isquios, glúteo y erectores.",
   },
   {
     id: "leg-ext",
-    name: "Extension de cuadriceps",
+    name: "Extensión de cuádriceps",
     muscle: "Pierna",
-    equipment: "Maquina",
+    equipment: "Máquina",
     type: "legs",
     cues: ["Ajusta el eje a la rodilla.", "Pausa arriba.", "No rebotes abajo."],
-    description: "Aislamiento de cuadriceps ideal para controlar volumen sin fatiga sistemica alta.",
+    description: "Aislamiento de cuádriceps ideal para controlar volumen sin fatiga sistemica alta.",
   },
   {
     id: "lateral-raise",
-    name: "Elevacion lateral",
+    name: "Elevación lateral",
     muscle: "Hombro",
     equipment: "Mancuernas",
     type: "push",
@@ -110,7 +110,7 @@ let exercises = [
     muscle: "Espalda",
     equipment: "Barra fija",
     type: "pull",
-    cues: ["Cuerpo firme.", "Barbilla sobre la barra.", "Baja hasta extension controlada."],
+    cues: ["Cuerpo firme.", "Barbilla sobre la barra.", "Baja hasta extensión controlada."],
     description: "Movimiento vertical de alto valor para fuerza relativa.",
   },
   {
@@ -120,55 +120,55 @@ let exercises = [
     equipment: "Barra",
     type: "legs",
     cues: ["Menton ligeramente recogido.", "Pausa arriba.", "Costillas abajo al bloquear."],
-    description: "Extension de cadera enfocada en gluteo con gran potencial de carga.",
+    description: "Extensión de cadera enfocada en glúteo con gran potencial de carga.",
   },
 ];
 
 exercises.push(
   { id: "overhead-press", name: "Press militar", muscle: "Hombro", equipment: "Barra", type: "push", cues: ["Glúteos apretados.", "Barra cerca de la cara.", "Bloquea arriba sin arquear."], description: "Empuje vertical básico para hombros y tríceps." },
-  { id: "pec-deck", name: "Contractora", muscle: "Pecho", equipment: "Maquina", type: "push", cues: ["Antebrazos firmes.", "Pausa al cerrar.", "No adelantes la cabeza."], description: "Aislamiento estable para pecho con tension constante." },
+  { id: "pec-deck", name: "Contractora", muscle: "Pecho", equipment: "Máquina", type: "push", cues: ["Antebrazos firmes.", "Pausa al cerrar.", "No adelantes la cabeza."], description: "Aislamiento estable para pecho con tensión constante." },
   { id: "triceps-pushdown", name: "Extensión tríceps polea", muscle: "Tríceps", equipment: "Polea", type: "push", cues: ["Codos pegados.", "Extiende hasta bloquear suave.", "Sube controlado."], description: "Aislamiento de tríceps fácil de dosificar." },
   { id: "face-pull", name: "Face pull", muscle: "Hombro", equipment: "Polea", type: "pull", cues: ["Tira hacia la frente.", "Abre codos.", "Pausa atras."], description: "Trabajo de deltoide posterior y rotadores externos." },
   { id: "deadlift", name: "Peso muerto", muscle: "Espalda", equipment: "Barra", type: "pull", cues: ["Barra sobre medio pie.", "Dorsales tensos.", "Empuja el suelo."], description: "Bisagra pesada para fuerza total." },
-  { id: "tbar-row", name: "Remo T", muscle: "Espalda", equipment: "Maquina", type: "pull", cues: ["Pecho apoyado si es posible.", "Codos atras.", "No rebotes."], description: "Remo pesado para densidad de espalda." },
+  { id: "tbar-row", name: "Remo T", muscle: "Espalda", equipment: "Máquina", type: "pull", cues: ["Pecho apoyado si es posible.", "Codos atrás.", "No rebotes."], description: "Remo pesado para densidad de espalda." },
   { id: "hammer-curl", name: "Curl martillo", muscle: "Bíceps", equipment: "Mancuernas", type: "pull", cues: ["Muñeca neutra.", "Codos estables.", "Bajada lenta."], description: "Bíceps y braquial con agarre neutro." },
-  { id: "leg-press", name: "Prensa", muscle: "Pierna", equipment: "Maquina", type: "legs", cues: ["Espalda pegada.", "Rodillas siguen pies.", "No bloquees agresivo."], description: "Dominante de rodilla con carga alta y buena estabilidad." },
-  { id: "lunge", name: "Zancada", muscle: "Pierna", equipment: "Mancuernas", type: "legs", cues: ["Paso firme.", "Torso alto.", "Empuja con la pierna delantera."], description: "Unilateral para cuadriceps, gluteo y estabilidad." },
-  { id: "leg-curl", name: "Curl femoral", muscle: "Femoral", equipment: "Maquina", type: "legs", cues: ["Cadera pegada.", "Pausa al flexionar.", "Controla la extension."], description: "Aislamiento directo de isquiosurales." },
-  { id: "calf-raise", name: "Elevacion gemelo", muscle: "Gemelo", equipment: "Maquina", type: "legs", cues: ["Estira abajo.", "Sube completo.", "Pausa arriba."], description: "Trabajo de gemelo con recorrido completo." },
+  { id: "leg-press", name: "Prensa", muscle: "Pierna", equipment: "Máquina", type: "legs", cues: ["Espalda pegada.", "Rodillas siguen pies.", "No bloquees agresivo."], description: "Dominante de rodilla con carga alta y buena estabilidad." },
+  { id: "lunge", name: "Zancada", muscle: "Pierna", equipment: "Mancuernas", type: "legs", cues: ["Paso firme.", "Torso alto.", "Empuja con la pierna delantera."], description: "Unilateral para cuádriceps, glúteo y estabilidad." },
+  { id: "leg-curl", name: "Curl femoral", muscle: "Femoral", equipment: "Máquina", type: "legs", cues: ["Cadera pegada.", "Pausa al flexionar.", "Controla la extensión."], description: "Aislamiento directo de isquiosurales." },
+  { id: "calf-raise", name: "Elevación gemelo", muscle: "Gemelo", equipment: "Máquina", type: "legs", cues: ["Estira abajo.", "Sube completo.", "Pausa arriba."], description: "Trabajo de gemelo con recorrido completo." },
   { id: "plank", name: "Plancha", muscle: "Core", equipment: "Peso corporal", type: "legs", cues: ["Costillas abajo.", "Glúteos activos.", "Respira sin perder posición."], description: "Anti-extensión básica para core." },
   { id: "push-up", name: "Flexion", muscle: "Pecho", equipment: "Peso corporal", type: "push", cues: ["Cuerpo en bloque.", "Pecho al suelo.", "Codos a 45 grados."], description: "Empuje horizontal de peso corporal." },
-  { id: "cable-fly", name: "Cruce poleas", muscle: "Pecho", equipment: "Polea", type: "push", cues: ["Paso stable.", "Abrazo amplio.", "Pausa al cerrar."], description: "Aislamiento de pecho con tension continua." },
+  { id: "cable-fly", name: "Cruce poleas", muscle: "Pecho", equipment: "Polea", type: "push", cues: ["Paso stable.", "Abrazo amplio.", "Pausa al cerrar."], description: "Aislamiento de pecho con tensión continua." },
   { id: "seated-db-press", name: "Press hombro mancuernas", muscle: "Hombro", equipment: "Mancuernas", type: "push", cues: ["Banco firme.", "Mancuernas sobre codos.", "Recorrido controlado."], description: "Empuje vertical con libertad escapular." },
-  { id: "wide-pulldown", name: "Jalon agarre amplio", muscle: "Espalda", equipment: "Polea", type: "pull", cues: ["Pecho alto.", "Codos hacia costillas.", "No tires tras nuca."], description: "Variante para dorsales con agarre amplio." },
+  { id: "wide-pulldown", name: "Jalón agarre amplio", muscle: "Espalda", equipment: "Polea", type: "pull", cues: ["Pecho alto.", "Codos hacia costillas.", "No tires tras nuca."], description: "Variante para dorsales con agarre amplio." },
   { id: "single-row", name: "Remo una mano", muscle: "Espalda", equipment: "Mancuerna", type: "pull", cues: ["Apoyo estable.", "Codo hacia cadera.", "No gires el tronco."], description: "Remo unilateral para equilibrar lados." },
   { id: "glute-bridge", name: "Puente glúteo", muscle: "Glúteo", equipment: "Peso corporal", type: "legs", cues: ["Pies cerca de glúteos.", "Pausa arriba.", "Pelvis neutra."], description: "Extensión de cadera accesible y progresable." },
   
   // Custom CSV exercises added for pacogn4@gmail.com
   { id: "press-inclinado-csv", name: "Press inclinado", muscle: "Pecho", equipment: "Barra o mancuernas", type: "push", cues: ["Banco a 30-45 grados.", "Baja controlado al pecho superior."], description: "Pectoral superior, deltoides anterior, tríceps." },
-  { id: "apertura-maquina-csv", name: "Apertura en máquina", muscle: "Pecho", equipment: "Maquina", type: "push", cues: ["Sentado erguido.", "Junta los brazos al frente de forma controlada."], description: "Aislamiento de pectoral mayor (pec deck)." },
+  { id: "apertura-maquina-csv", name: "Apertura en máquina", muscle: "Pecho", equipment: "Máquina", type: "push", cues: ["Sentado erguido.", "Junta los brazos al frente de forma controlada."], description: "Aislamiento de pectoral mayor (pec deck)." },
   { id: "elevaciones-laterales-mancuernas-csv", name: "Elevaciones laterales mancuernas", muscle: "Hombro", equipment: "Mancuernas", type: "push", cues: ["De pie, mancuernas a los costados.", "Eleva en lateral hasta la altura de hombros."], description: "Deltoides lateral." },
   { id: "elevaciones-laterales-polea-csv", name: "Elevaciones laterales polea", muscle: "Hombro", equipment: "Polea", type: "push", cues: ["Polea baja.", "Tensión continua al elevar."], description: "Aislamiento de deltoides lateral." },
   { id: "triceps-polea-alta-csv", name: "Tríceps en polea alta", muscle: "Tríceps", equipment: "Polea", type: "push", cues: ["Polea alta con cuerda.", "Empuja hacia abajo extendiendo codos."], description: "Aislamiento de tríceps." },
-  { id: "fondos-maquina-csv", name: "Fondos en máquina", muscle: "Tríceps", equipment: "Maquina", type: "push", cues: ["Flexiona codos a 90 grados.", "Empuja extendiendo brazos."], description: "Tríceps, pectoral inferior, deltoides anterior." },
+  { id: "fondos-maquina-csv", name: "Fondos en máquina", muscle: "Tríceps", equipment: "Máquina", type: "push", cues: ["Flexiona codos a 90 grados.", "Empuja extendiendo brazos."], description: "Tríceps, pectoral inferior, deltoides anterior." },
   { id: "dominadas-elasticos-csv", name: "Dominadas con elásticos o asistida", muscle: "Espalda", equipment: "Barra fija", type: "pull", cues: ["Banda elástica de soporte.", "Baja controlado y sube barbilla sobre barra."], description: "Dorsal ancho, trapecio inferior, bíceps." },
   { id: "jalones-pecho-abierto-csv", name: "Jalones al pecho abierto", muscle: "Espalda", equipment: "Polea", type: "pull", cues: ["Agarre ancho.", "Llevar la barra al pecho superior."], description: "Dorsales, trapecio medio, deltoides posterior." },
-  { id: "remo-gironda-unilateral-csv", name: "Remo girándola unilateral", muscle: "Espalda", equipment: "Maquina", type: "pull", cues: ["Inclinado.", "Tira la mancuerna o agarre hacia el torso."], description: "Dorsal ancho, trapecio medio, romboides, bíceps." },
+  { id: "remo-gironda-unilateral-csv", name: "Remo girándola unilateral", muscle: "Espalda", equipment: "Máquina", type: "pull", cues: ["Inclinado.", "Tira la mancuerna o agarre hacia el torso."], description: "Dorsal ancho, trapecio medio, romboides, bíceps." },
   { id: "jalones-cerrados-csv", name: "Jalones cerrados", muscle: "Espalda", equipment: "Polea", type: "pull", cues: ["Agarre estrecho en V.", "Lleva al pecho inclinando ligeramente el torso."], description: "Dorsales, romboides, bíceps." },
   { id: "pull-over-csv", name: "Pull over", muscle: "Espalda", equipment: "Mancuerna o polea", type: "pull", cues: ["Brazos extendidos.", "Lleva hacia atrás y vuelve al frente."], description: "Dorsal ancho, pectoral mayor." },
-  { id: "deltoides-posterior-apertura-csv", name: "Deltoides posterior en máquina de apertura", muscle: "Hombro", equipment: "Maquina", type: "pull", cues: ["Máquina reverse pec deck.", "Abre los brazos hacia atrás."], description: "Deltoides posterior, trapecio medio, romboides." },
+  { id: "deltoides-posterior-apertura-csv", name: "Deltoides posterior en máquina de apertura", muscle: "Hombro", equipment: "Máquina", type: "pull", cues: ["Máquina reverse pec deck.", "Abre los brazos hacia atrás."], description: "Deltoides posterior, trapecio medio, romboides." },
   { id: "curl-scott-csv", name: "Curl scott", muscle: "Bíceps", equipment: "Banco scott", type: "pull", cues: ["Apoya brazos completamente.", "Flexiona codos sin levantar hombros."], description: "Aislamiento de bíceps braquial." },
-  { id: "curl-biceps-mancuerna-csv", name: "Curl biceps mancuerna", muscle: "Bíceps", equipment: "Mancuernas", type: "pull", cues: ["De pie.", "Flexiona codos rotando muñecas al subir."], description: "Bíceps braquial, braquial, braquiorradial." },
+  { id: "curl-biceps-mancuerna-csv", name: "Curl bíceps mancuerna", muscle: "Bíceps", equipment: "Mancuernas", type: "pull", cues: ["De pie.", "Flexiona codos rotando muñecas al subir."], description: "Bíceps braquial, braquial, braquiorradial." },
   { id: "curl-braquial-antebrazo-csv", name: "Curl braquial antebrazo", muscle: "Bíceps", equipment: "Mancuernas", type: "pull", cues: ["Agarre neutro (martillo).", "Manten codos pegados."], description: "Braquial, braquiorradial." },
-  { id: "extensiones-csv", name: "Extensiones", muscle: "Pierna", equipment: "Maquina", type: "legs", cues: ["Extiende piernas hasta arriba.", "Sostén un segundo arriba."], description: "Aislamiento de cuádriceps." },
-  { id: "abductores-csv", name: "Abductores", muscle: "Glúteo", equipment: "Maquina", type: "legs", cues: ["Abre las piernas contra resistencia."], description: "Glúteo medio y menor." },
-  { id: "adductores-csv", name: "Adductores", muscle: "Glúteo", equipment: "Maquina", type: "legs", cues: ["Cierra las piernas contra resistencia."], description: "Aductores de cadera." },
-  { id: "sentado-peso-arriba-csv", name: "Sentado peso arriba", muscle: "Gemelo", equipment: "Maquina", type: "legs", cues: ["Eleva talones hasta contracción máxima.", "Baja lento sintiendo el estiramiento."], description: "Gastrocnemio y sóleo." },
+  { id: "extensiones-csv", name: "Extensiones", muscle: "Pierna", equipment: "Máquina", type: "legs", cues: ["Extiende piernas hasta arriba.", "Sostén un segundo arriba."], description: "Aislamiento de cuádriceps." },
+  { id: "abductores-csv", name: "Abductores", muscle: "Glúteo", equipment: "Máquina", type: "legs", cues: ["Abre las piernas contra resistencia."], description: "Glúteo medio y menor." },
+  { id: "adductores-csv", name: "Adductores", muscle: "Glúteo", equipment: "Máquina", type: "legs", cues: ["Cierra las piernas contra resistencia."], description: "Aductores de cadera." },
+  { id: "sentado-peso-arriba-csv", name: "Sentado peso arriba", muscle: "Gemelo", equipment: "Máquina", type: "legs", cues: ["Eleva talones hasta contracción máxima.", "Baja lento sintiendo el estiramiento."], description: "Gastrocnemio y sóleo." },
   { id: "press-inclinado-barra-csv", name: "Press inclinado barra", muscle: "Pecho", equipment: "Barra", type: "push", cues: ["Baja la barra al pecho superior.", "Empuja verticalmente."], description: "Pectoral superior, deltoides anterior, tríceps." },
   { id: "face-full-csv", name: "Face full", muscle: "Hombro", equipment: "Polea", type: "pull", cues: ["Tira de la cuerda hacia los ojos.", "Abre codos hacia afuera."], description: "Deltoides posterior, trapecio, romboides." },
   { id: "jalon-abierto-csv", name: "Jalón abierto", muscle: "Espalda", equipment: "Polea", type: "pull", cues: ["Agarre amplio.", "Tira hacia la parte superior del pecho."], description: "Dorsales, trapecio, deltoides posterior." },
   { id: "remo-barra-polea-csv", name: "Remo con barra en polea", muscle: "Espalda", equipment: "Polea", type: "pull", cues: ["Tira de la barra hacia el abdomen.", "Espalda recta."], description: "Dorsales, trapecio medio, romboides, bíceps." },
-  { id: "curl-de-biceps-csv", name: "Curl de biceps", muscle: "Bíceps", equipment: "Barra", type: "pull", cues: ["Método 21s (7 inferiores, 7 superiores, 7 completas).", "Sin descanso entre tramos."], description: "Bíceps braquial, braquial, braquiorradial de forma intensa." },
+  { id: "curl-de-biceps-csv", name: "Curl de bíceps", muscle: "Bíceps", equipment: "Barra", type: "pull", cues: ["Método 21s (7 inferiores, 7 superiores, 7 completas).", "Sin descanso entre tramos."], description: "Bíceps braquial, braquial, braquiorradial de forma intensa." },
   { id: "triceps-con-cuerda-csv", name: "Tríceps con cuerda", muscle: "Tríceps", equipment: "Polea", type: "push", cues: ["Polea alta con cuerda.", "Abre la cuerda al final del recorrido."], description: "Tríceps (enfasis cabeza lateral)." },
   { id: "curl-con-barra-csv", name: "Curl con Barra", muscle: "Bíceps", equipment: "Barra", type: "pull", cues: ["Codos fijos a los lados.", "Flexiona sin balancear el cuerpo."], description: "Bíceps braquial." },
   { id: "curl-con-mancuernas-csv", name: "Curl con Mancuernas", muscle: "Bíceps", equipment: "Mancuernas", type: "pull", cues: ["De pie o sentado.", "Sube de forma alterna o simultánea."], description: "Bíceps braquial." },
@@ -191,7 +191,7 @@ const routineTemplates = [
   {
     id: "pull",
     name: "Tiron A",
-    focus: "Espalda y biceps",
+    focus: "Espalda y bíceps",
     days: "2 días por semana",
     difficulty: "Intermedio",
     bars: [72, 82, 55],
@@ -259,11 +259,11 @@ const weeklyRoutinePlan = [
     blocks: [
       { name: "Espalda", exercises: ["Dominadas con elásticos o asistida", "Jalones al pecho abierto", "Remo girándola unilateral", "Jalones cerrados", "Pull over"] },
       { name: "Hombro Posterior", exercises: ["Deltoides posterior en máquina de apertura"] },
-      { name: "Bíceps", exercises: ["Curl scott", "Curl biceps mancuerna", "Curl braquial antebrazo"] },
+      { name: "Bíceps", exercises: ["Curl scott", "Curl bíceps mancuerna", "Curl braquial antebrazo"] },
     ],
   },
   {
-    day: "Miercoles",
+    day: "Miércoles",
     title: "Descanso activo y movilidad",
     status: "Recuperación",
     duration: "20 min",
@@ -299,11 +299,11 @@ const weeklyRoutinePlan = [
       { name: "Pecho", exercises: ["Press inclinado barra", "Press inclinado mancuernas"] },
       { name: "Hombro", exercises: ["Press militar", "Elevaciones laterales mancuernas", "Face full"] },
       { name: "Espalda", exercises: ["Jalón abierto", "Remo con barra en polea"] },
-      { name: "Brazos", exercises: ["Curl de biceps", "Tríceps con cuerda"] },
+      { name: "Brazos", exercises: ["Curl de bíceps", "Tríceps con cuerda"] },
     ],
   },
   {
-    day: "Sabado",
+    day: "Sábado",
     title: "Bíceps y Abdominales",
     status: "Pendiente",
     duration: "45 min",
@@ -363,7 +363,7 @@ const foodDb = [
   ["🥚 huevo", ["huevos", "egg"], 143, 12.6, 0.7, 9.5, 50],
   ["🥛 leche semidesnatada", ["leche", "milk"], 47, 3.4, 4.8, 1.6],
   ["🍧 yogur griego", ["yogur", "yogurt griego"], 97, 9, 3.9, 5],
-  ["🥛 proteina whey", ["whey", "proteina", "proteina en polvo"], 400, 80, 8, 6, 30],
+  ["🥛 Proteína whey", ["whey", "proteina", "proteína en polvo"], 400, 80, 8, 6, 30],
   ["🍌 platano", ["platano", "banana"], 89, 1.1, 23, 0.3, 120],
   ["🍎 manzana", ["apple"], 52, 0.3, 14, 0.2, 180],
   ["🥑 aguacate", ["avocado"], 160, 2, 8.5, 14.7],
@@ -822,7 +822,7 @@ function generateWeeklyRoutinePlan() {
     } else if (equipment === "Pesas rusas") {
       equipmentFilter = candidates.filter((ex) => ex.equipment === "Peso corporal" || ex.equipment === "Mancuernas" || ex.equipment === "Mancuerna");
     } else if (equipment === "Máquinas") {
-      equipmentFilter = candidates.filter((ex) => ex.equipment === "Maquina" || ex.equipment === "Polea" || ex.equipment === "Peso corporal");
+      equipmentFilter = candidates.filter((ex) => ex.equipment === "Máquina" || ex.equipment === "Polea" || ex.equipment === "Peso corporal");
     }
 
     if (equipmentFilter.length > 0) {
@@ -849,7 +849,7 @@ function generateWeeklyRoutinePlan() {
       difficulty: "Media",
       muscles: ["Pecho", "Espalda", "Pierna", "Hombro"],
       blocks: [
-        { name: "Calentamiento", exercises: ["Movilidad global", ex1.name + " aproximacion"] },
+        { name: "Calentamiento", exercises: ["Movilidad global", ex1.name + " aproximación"] },
         { name: "Principal", exercises: [ex1.name, ex2.name] },
         { name: "Accesorios", exercises: [ex3.name, ex4.name, ex5.name] }
       ]
@@ -914,7 +914,7 @@ function generateWeeklyRoutinePlan() {
       blocks: [
         { name: "Calentamiento", exercises: ["Movilidad hombro", push1.name + " suave"] },
         { name: "Principal", exercises: [push1.name, push2.name] },
-        { name: "Accesorios", exercises: [push3.name, "Elevacion lateral"] }
+        { name: "Accesorios", exercises: [push3.name, "Elevación lateral"] }
       ]
     });
     plan.push({
@@ -963,7 +963,7 @@ function generateWeeklyRoutinePlan() {
       muscles: ["Pecho", "Espalda", "Hombro"],
       blocks: [
         { name: "Principal", exercises: [pushA.name, pullA.name] },
-        { name: "Accesorios", exercises: ["Elevacion lateral", "Curl biceps"] }
+        { name: "Accesorios", exercises: ["Elevación lateral", "Curl bíceps"] }
       ]
     });
     plan.push({
@@ -975,7 +975,7 @@ function generateWeeklyRoutinePlan() {
       muscles: ["Pierna", "Femoral"],
       blocks: [
         { name: "Principal", exercises: [legsA1.name, legsA2.name] },
-        { name: "Accesorios", exercises: ["Extension de cuadriceps", "Plancha"] }
+        { name: "Accesorios", exercises: ["Extensión de cuádriceps", "Plancha"] }
       ]
     });
     plan.push({
@@ -999,7 +999,7 @@ function generateWeeklyRoutinePlan() {
       muscles: ["Pierna", "Glúteo", "Femoral"],
       blocks: [
         { name: "Principal", exercises: [legsB2.name, legsB1.name] },
-        { name: "Accesorios", exercises: ["Curl femoral", "Elevacion gemelo"] }
+        { name: "Accesorios", exercises: ["Curl femoral", "Elevación gemelo"] }
       ]
     });
   } else {
@@ -1019,7 +1019,7 @@ function generateWeeklyRoutinePlan() {
       muscles: ["Pecho", "Hombro"],
       blocks: [
         { name: "Principal", exercises: [push1.name, push2.name] },
-        { name: "Accesorios", exercises: ["Fondos", "Elevacion lateral"] }
+        { name: "Accesorios", exercises: ["Fondos", "Elevación lateral"] }
       ]
     });
     plan.push({
@@ -1067,7 +1067,7 @@ function generateWeeklyRoutinePlan() {
       muscles: ["Pierna", "Core"],
       blocks: [
         { name: "Principal", exercises: ["Prensa", "Zancada"] },
-        { name: "Accesorios", exercises: ["Extension de cuadriceps", "Plancha"] }
+        { name: "Accesorios", exercises: ["Extensión de cuádriceps", "Plancha"] }
       ]
     });
     if (daysCount === 6) {
@@ -1440,7 +1440,7 @@ const exerciseNamePatterns = [
   [/alternate heel touch/i, "Toque alterno de talones"],
   [/archer push.?up/i, "Flexión arquero"],
   [/arnold press/i, "Press Arnold"],
-  [/back extension/i, "Extensión lumbar"],
+  [/back extensión/i, "Extensión lumbar"],
   [/barbell bench press/i, "Press banca con barra"],
   [/bench press/i, "Press banca"],
   [/barbell curl/i, "Curl de bíceps con barra"],
@@ -1542,7 +1542,7 @@ const exerciseWordTranslations = [
   ["hip", "cadera"],
   ["chest", "pecho"],
   ["shoulder", "hombro"],
-  ["biceps", "bíceps"],
+  ["bíceps", "bíceps"],
   ["triceps", "tríceps"],
   ["calf", "gemelo"],
   ["glute", "glúteo"],
@@ -1594,7 +1594,7 @@ function mapDatasetMuscle(item) {
   if (/(triceps|tricep)/.test(text)) return "Tríceps";
   if (/(biceps|upper arms|brachialis|bicep|curl)/.test(text)) return "Bíceps";
   if (/(shoulder|deltoid|hombro|delts)/.test(text)) return "Hombro";
-  if (/(glute|gluteo|glúteo|hip)/.test(text)) return "Glúteo";
+  if (/(glute|gluteo|hip)/.test(text)) return "Glúteo";
   if (/(hamstring|femoral)/.test(text)) return "Femoral";
   if (/(calf|lower legs|gemelo|soleus)/.test(text)) return "Gemelo";
   if (/(waist|abs|core|abdominal)/.test(text)) return "Core";
@@ -2571,7 +2571,7 @@ function runAIAgents() {
   const sorenessMap = {
     none: "sin restricciones",
     shoulder: "evitar presses pesados y priorizar rangos sin dolor",
-    back: "evitar bisagras pesadas y usar maquinas o apoyos",
+    back: "evitar bisagras pesadas y usar máquinas o apoyos",
     knee: "evitar flexion profunda cargada y priorizar control",
   };
 
@@ -2631,7 +2631,7 @@ function runAIAgents() {
     .join("");
   renderAIPlan(ctx, deload);
   renderAINutritionFromTraining(ctx);
-  addAIMessage("Entrenador", agents[0].text);
+  addAIIntroMessage(agents[0].text);
 }
 
 function renderAINutritionFromTraining(ctx) {
@@ -2703,8 +2703,14 @@ function applyAIPlan() {
 function addAIMessage(author, text) {
   const chat = $("#ai-chat");
   if (!chat) return;
-  chat.insertAdjacentHTML("beforeend", `<div class="ai-message ${author === "Tu" ? "user" : ""}"><strong>${author}</strong><p>${text}</p></div>`);
+  chat.insertAdjacentHTML("beforeend", `<div class="ai-message ${author === "Tu" ? "user" : ""}"><strong>${escapeHtml(author)}</strong><p>${escapeHtml(text)}</p></div>`);
   chat.scrollTop = chat.scrollHeight;
+}
+
+function addAIIntroMessage(text) {
+  const chat = $("#ai-chat");
+  if (!chat || chat.querySelector(".ai-message")) return;
+  addAIMessage("Entrenador", text);
 }
 
 function showAITypingIndicator() {
@@ -3246,14 +3252,40 @@ function updatePhotoFoodItem(index, field, value) {
 }
 
 async function confirmPhotoFood() {
-  const text = appData.photoItems.map((item) => `${Math.round(item.grams)}g ${item.name}`).join(", ");
-  $("#meal-input").value = text;
-  const parsed = previewMeal();
-  if (!parsed.items.length) {
-    showToast("No hay alimentos detectados para guardar.");
+  const reviewedItems = appData.photoItems
+    .filter((item) => String(item.name || "").trim() && Number(item.grams || 0) > 0)
+    .map((item) => ({
+      raw: item.name,
+      name: String(item.name).trim(),
+      grams: Math.max(0, Math.round(Number(item.grams || 0))),
+      kcal: Math.max(0, Math.round(Number(item.kcal || 0))),
+      protein: round1(item.protein),
+      carbs: round1(item.carbs),
+      fat: round1(item.fat),
+      matched: true,
+    }));
+  if (!reviewedItems.length) {
+    showToast("No hay alimentos revisados para guardar.");
     return;
   }
-  await addMeal();
+  const meal = {
+    date: new Date().toISOString().slice(0, 10),
+    slot: $("#meal-slot")?.value || "Comida",
+    text: reviewedItems.map((item) => `${item.grams}g ${item.name}`).join(", "),
+    items: reviewedItems,
+    totals: sumNutrition(reviewedItems),
+    source: "photo-review",
+  };
+  mealLog.push(meal);
+  saveMealLog();
+  if (hasRealBackend()) {
+    const savedMeal = await apiRequest("/api/meals", { method: "POST", body: meal }).catch(() => null);
+    if (savedMeal?.id) {
+      meal.id = savedMeal.id;
+      saveMealLog();
+    }
+  }
+  renderNutrition();
   if (hasRealBackend()) {
     await apiRequest("/api/food-photo/analyze", {
       method: "POST",
@@ -3426,7 +3458,7 @@ function showBackendRequired() {
 function authErrorMessage(error) {
   const message = String(error?.message || error || "");
   if (message.includes("auth/configuration-not-found") || message.includes("CONFIGURATION_NOT_FOUND")) {
-    return "Firebase Auth aun no esta activado. En Firebase Console activa Authentication > Email/Password.";
+    return "Firebase Auth aún no está activado. En Firebase Console activa Authentication > Email/Password.";
   }
   if (message.includes("auth/operation-not-allowed")) {
     return "Activa el proveedor Email/Password en Firebase Authentication.";
@@ -3843,14 +3875,14 @@ function muscleDataUri(muscle, side = "front") {
     if (!name) return "";
     const n = name.toLowerCase().trim();
     if (n === "pecho") return "pecho";
-    if (n === "biceps" || n === "bíceps") return "biceps";
+    if (n === "bíceps" || n === "bíceps") return "bíceps";
     if (n === "triceps" || n === "tríceps") return "triceps";
     if (n === "espalda") return "espalda";
     if (n === "hombros" || n === "hombro") return "hombros";
     if (n === "abdominales" || n === "core") return "abdominales";
-    if (n === "cuádriceps" || n === "cuadriceps" || n === "pierna") return "cuadriceps";
+    if (n === "cuádriceps" || n === "cuádriceps" || n === "pierna") return "cuádriceps";
     if (n === "isquiotibiales" || n === "femoral") return "isquiotibiales";
-    if (n === "glúteos" || n === "gluteos" || n === "glúteo" || n === "gluteo") return "gluteos";
+    if (n === "glúteos" || n === "glúteos" || n === "glúteo" || n === "glúteo") return "glúteos";
     if (n === "gemelos" || n === "gemelo") return "gemelos";
     return n;
   }
@@ -4237,7 +4269,7 @@ function bindEvents() {
     const target = button.dataset.viewShortcut;
     if (target === "workout") {
       // Load today's plan before switching to workout view
-      const today = ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"][new Date().getDay()];
+      const today = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"][new Date().getDay()];
       const dayIndex = weeklyRoutinePlan.findIndex((d) => d.day === today);
       const planDay = weeklyRoutinePlan[dayIndex >= 0 ? dayIndex : (appData.selectedWeekDay || 0)];
       if (planDay && planDay.status !== "Recuperación") {
@@ -4264,7 +4296,7 @@ function bindEvents() {
     const swapWeekDay = event.target.closest("[data-swap-week-day]");
     if (swapWeekDay) {
       const day = weeklyRoutinePlan[Number(swapWeekDay.dataset.swapWeekDay)];
-      day.blocks[day.blocks.length - 1].exercises = day.blocks[day.blocks.length - 1].exercises.map((name) => (name.includes("Plancha") ? "Elevacion lateral" : name));
+      day.blocks[day.blocks.length - 1].exercises = day.blocks[day.blocks.length - 1].exercises.map((name) => (name.includes("Plancha") ? "Elevación lateral" : name));
       selectWeekDay(swapWeekDay.dataset.swapWeekDay);
       pushApi("/api/routines", weeklyRoutinePlan);
       showToast("Ejercicio sustituido según disponibilidad y molestias.");

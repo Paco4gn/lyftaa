@@ -1,4 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+﻿import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
 import {
   createUserWithEmailAndPassword,
   deleteUser,
@@ -171,7 +171,7 @@ async function requestFirebase(ctx, path, options = {}) {
     const email = String(body.email || ctx.auth.currentUser?.email || "").trim();
     if (!email) throw new Error("Email requerido para recuperar contraseña");
     await sendPasswordResetEmail(ctx.auth, email);
-    return { ok: true, email, message: `Email de recuperacion solicitado para ${email}.` };
+    return { ok: true, email, message: `Email de recuperación solicitado para ${email}.` };
   }
 
   if (method === "POST" && path === "/api/auth/verify-email") {
@@ -249,7 +249,7 @@ async function ensureUserDefaults(db, user, seed) {
     habits: seed.habits || [
       { id: "water", label: "Beber agua", done: false },
       { id: "steps", label: "Cumplir pasos", done: false },
-      { id: "protein", label: "Cumplir proteina", done: false },
+      { id: "protein", label: "Cumplir proteína", done: false },
     ],
     routines: seed.routines || [],
     activeWorkout: seed.activeWorkout || {},
