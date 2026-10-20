@@ -60,6 +60,20 @@ if(!localStorage.getItem(hallRevision)){
  for(const [id,name] of [['hall-montaje-22','Montar equipo de sonido del Hall el 22 de octubre'],['hall-decidir-micro','Confirmar 1 o 2 micrófonos para el atril del Hall y su procedencia']])if(!db.tasks.some(x=>x.id===id))db.tasks.push({id,name,status:'Pendiente',space:'Hall',notes:''});
  localStorage.setItem('ficon26-data',JSON.stringify(db));localStorage.setItem(hallRevision,'1');
 }
+
+const audRevision='auditorio-2026-10-20-v1';
+if(!localStorage.getItem(audRevision)){
+ const u={
+ m15:{status:'Sin verificar',notes:'Atril de madera ubicado en el espacio de la Junta. Verificar si debe trasladarse al Auditorio y coordinar uso compartido.'},
+ m16:{status:'Sin verificar',notes:'Proyector habitual de FEVAL para Auditorio. Montaje y revisión comienzan el 21 de octubre.'},
+ m17:{qty:2,status:'Solicitado',notes:'Dos micrófonos disponibles en FEVAL pendientes de entregar a Solo Música. Tipo exacto por verificar.'},
+ m18:{owner:'FEVAL',status:'Solicitado',notes:'Pasador de diapositivas disponible en FEVAL, pendiente de entregar a Solo Música.'}
+ };
+ for(const o of db.equipment){if(u[o.id]){const v=u[o.id];if(o.status==='Sin verificar')o.status=v.status;if(v.qty)o.qty=v.qty;if(v.owner)o.owner=v.owner;o.notes=o.notes?o.notes+' | '+v.notes:v.notes}}
+ if(!db.equipment.some(x=>x.id==='aud-ordenador'))db.equipment.push({id:'aud-ordenador',space:'Auditorio',name:'Ordenador FEVAL para Auditorio',owner:'FEVAL',qty:1,status:'Solicitado',notes:'Disponible en FEVAL; pendiente de entregar a Solo Música.'});
+ for(const [id,name] of [['aud-montaje-21','Comenzar montaje y revisión del Auditorio el 21 de octubre'],['aud-entrega','Entregar a Solo Música 2 micrófonos, ordenador y pasador para Auditorio'],['aud-atril','Verificar traslado o disponibilidad compartida del atril entre Junta y Auditorio'],['aud-conexiones','Revisar cables HDMI, alimentación y adaptadores del Auditorio']])if(!db.tasks.some(x=>x.id===id))db.tasks.push({id,name,status:'Pendiente',space:'Auditorio',notes:''});
+ localStorage.setItem('ficon26-data',JSON.stringify(db));localStorage.setItem(audRevision,'1');
+}
 let tab='Resumen',day='Todos',search='';
 const states=['Sin verificar','Solicitado','Confirmado','Recibido','Instalado','Probado','Finalizado','No disponible'],taskStates=['Pendiente','En curso','Bloqueado','Finalizado'];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
