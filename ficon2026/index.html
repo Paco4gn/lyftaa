@@ -74,6 +74,16 @@ if(!localStorage.getItem(audRevision)){
  for(const [id,name] of [['aud-montaje-21','Comenzar montaje y revisión del Auditorio el 21 de octubre'],['aud-entrega','Entregar a Solo Música 2 micrófonos, ordenador y pasador para Auditorio'],['aud-atril','Verificar traslado o disponibilidad compartida del atril entre Junta y Auditorio'],['aud-conexiones','Revisar cables HDMI, alimentación y adaptadores del Auditorio']])if(!db.tasks.some(x=>x.id===id))db.tasks.push({id,name,status:'Pendiente',space:'Auditorio',notes:''});
  localStorage.setItem('ficon26-data',JSON.stringify(db));localStorage.setItem(audRevision,'1');
 }
+
+const atrilRevision='atril-compartido-2026-10-20-v1';
+if(!localStorage.getItem(atrilRevision)){
+ const junta=db.equipment.find(x=>x.id==='m7'),aud=db.equipment.find(x=>x.id==='m15');
+ const msg='CONFIRMADO: es el MISMO atril físico de madera para el espacio Junta y Auditorio. Ubicación actual comunicada: Junta. Coordinar traslado y horarios; no contar como dos unidades.';
+ if(junta){junta.notes=(junta.notes?junta.notes+' | ':'')+msg}
+ if(aud){aud.notes=(aud.notes?aud.notes+' | ':'')+msg;aud.qty=0;aud.name='Uso compartido del atril de madera de Junta (no es otro equipo)'}
+ const task=db.tasks.find(x=>x.id==='aud-atril');if(task){task.notes='Confirmado: un solo atril compartido; comprobar horas y traslado antes de usarlo en Auditorio.'}
+ localStorage.setItem('ficon26-data',JSON.stringify(db));localStorage.setItem(atrilRevision,'1');
+}
 let tab='Resumen',day='Todos',search='';
 const states=['Sin verificar','Solicitado','Confirmado','Recibido','Instalado','Probado','Finalizado','No disponible'],taskStates=['Pendiente','En curso','Bloqueado','Finalizado'];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
