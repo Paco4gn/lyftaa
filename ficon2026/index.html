@@ -8,7 +8,25 @@ const equipment=[
 ['Auditorio','Atril madera','FEVAL',1],['Auditorio','Proyector','FEVAL',1],['Auditorio','Micrófonos diadema','FEVAL',1],['Auditorio','Pasador diapositivas','Solo Música',1]];
 const tasks=['Solicitar y confirmar presupuesto Solo Música','Confirmar número de técnicos y horas por espacio','Verificar recepción y montaje de material','Probar sonido y micrófonos por espacio','Probar imagen, pantallas y proyectores','Recibir presentaciones de cada ponencia','Probar presentaciones y pasadores','Confirmar necesidades de inauguración','Verificar simultaneidad de sesiones','Revisar desmontaje y devoluciones'];
 const base={events:events.map((a,i)=>({id:'e'+i,day:a[0],time:a[1],space:a[2],name:a[3],status:'Sin verificar',slides:'Sin verificar',notes:''})),equipment:equipment.map((a,i)=>({id:'m'+i,space:a[0],name:a[1],owner:a[2],qty:a[3],status:'Sin verificar',notes:''})),tasks:tasks.map((name,i)=>({id:'t'+i,name,status:'Pendiente',space:'General',notes:''})),incidents:[]};
-let db;try{db=JSON.parse(localStorage.getItem('ficon26-data'))||structuredClone(base)}catch{db=structuredClone(base)}let tab='Resumen',day='Todos',search='';
+let db;try{db=JSON.parse(localStorage.getItem('ficon26-data'))||structuredClone(base)}catch{db=structuredClone(base)}
+// Actualización operativa del 20/10/2026: confirmaciones de Sala de Conferencias.
+// Solo se aplica automáticamente a registros que aún estén sin verificar.
+const revision='conferencias-2026-10-20-v1';
+if(!localStorage.getItem(revision)){
+ const updates={
+ 'm0':{status:'Instalado',notes:'Atril montado en principio; pendiente de confirmación de Solo Música.'},
+ 'm1':{qty:4,status:'Instalado',notes:'Cambio de 6 a 4 JBL. Montaje a cargo de Solo Música; aparentemente montados, sin confirmación técnica.'},
+ 'm2':{status:'Recibido',notes:'Los 2 micrófonos de mano se han entregado a Solo Música. No consta montaje ni prueba.'},
+ 'm3':{status:'Confirmado',notes:'Opción de pantalla LED elegida: aproximadamente 3,5 × 2 m; dimensiones por confirmar. No consta entrega, montaje ni prueba.'},
+ 'm4':{status:'Sin verificar',notes:'Los 5 micrófonos de diadema corresponden a Solo Música; entrega y montaje pendientes de confirmar.'},
+ 'm5':{status:'Instalado',notes:'Equipo de sonido e imagen montado; pruebas y funcionamiento sin confirmar.'},
+ 'm6':{status:'Recibido',notes:'Pasador de diapositivas entregado; montaje/prueba no confirmados.'}
+ };
+ for(const o of db.equipment){const u=updates[o.id];if(u){if(o.status==='Sin verificar'){o.status=u.status;if(u.qty)o.qty=u.qty}if(!o.notes)o.notes=u.notes}}
+ localStorage.setItem('ficon26-data',JSON.stringify(db));
+ localStorage.setItem(revision,'1');
+}
+let tab='Resumen',day='Todos',search='';
 const states=['Sin verificar','Solicitado','Confirmado','Recibido','Instalado','Probado','Finalizado','No disponible'],taskStates=['Pendiente','En curso','Bloqueado','Finalizado'];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function save(){localStorage.setItem('ficon26-data',JSON.stringify(db));render()}
