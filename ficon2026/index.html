@@ -48,6 +48,18 @@ if(!localStorage.getItem(juntaRevision)){
  for(let i=0;i<additions.length;i++){const id='junta-extra-'+i;if(!db.equipment.some(x=>x.id===id))db.equipment.push({id,space:'Junta',name:additions[i][0],owner:'FEVAL',qty:1,status:i===4?'Sin verificar':'Solicitado',notes:additions[i][1]})}
  localStorage.setItem('ficon26-data',JSON.stringify(db));localStorage.setItem(juntaRevision,'1');
 }
+
+const hallRevision='hall-2026-10-20-v1';
+if(!localStorage.getItem(hallRevision)){
+ const u={
+ m13:{status:'Recibido',notes:'Atril cedido por Ayuntamiento disponible en Hall; montaje no confirmado.'},
+ m14:{status:'Recibido',notes:'Equipo de sonido disponible. Pendiente de montaje previsto para el 22 de octubre.'}
+ };
+ for(const o of db.equipment){if(u[o.id]){if(o.status==='Sin verificar')o.status=u[o.id].status;o.notes=o.notes?o.notes+' | '+u[o.id].notes:u[o.id].notes}}
+ if(!db.equipment.some(x=>x.id==='hall-microfonos'))db.equipment.push({id:'hall-microfonos',space:'Hall',name:'1 o 2 micrófonos para atril',owner:'FEVAL',qty:2,status:'Solicitado',notes:'Pendiente determinar si se necesita uno o dos. Alternativa: tomar micrófono de recepción o sala de prensa; comprobar disponibilidad y traslado.'});
+ for(const [id,name] of [['hall-montaje-22','Montar equipo de sonido del Hall el 22 de octubre'],['hall-decidir-micro','Confirmar 1 o 2 micrófonos para el atril del Hall y su procedencia']])if(!db.tasks.some(x=>x.id===id))db.tasks.push({id,name,status:'Pendiente',space:'Hall',notes:''});
+ localStorage.setItem('ficon26-data',JSON.stringify(db));localStorage.setItem(hallRevision,'1');
+}
 let tab='Resumen',day='Todos',search='';
 const states=['Sin verificar','Solicitado','Confirmado','Recibido','Instalado','Probado','Finalizado','No disponible'],taskStates=['Pendiente','En curso','Bloqueado','Finalizado'];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
