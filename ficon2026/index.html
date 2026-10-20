@@ -91,6 +91,14 @@ if(!localStorage.getItem(micRevision)){
  if(o){o.name='2 micrófonos de diadema FEVAL para Auditorio';o.qty=2;o.owner='FEVAL';o.notes=(o.notes?o.notes+' | ':'')+'Confirmado: ambos son de diadema. Disponibles en FEVAL y pendientes de entregar a Solo Música; entrega, montaje y prueba no confirmados.';if(o.status==='Sin verificar')o.status='Solicitado'}
  localStorage.setItem('ficon26-data',JSON.stringify(db));localStorage.setItem(micRevision,'1');
 }
+
+const ordenadorRevision='auditorio-ordenador-kit-2026-10-20-v1';
+if(!localStorage.getItem(ordenadorRevision)){
+ const o=db.equipment.find(x=>x.id==='aud-ordenador');
+ if(o){o.name='Ordenador FEVAL con cargador, HDMI y ratón';o.notes=(o.notes?o.notes+' | ':'')+'Confirmado: ordenador preparado con cargador, cable HDMI y ratón. Todo disponible, todavía pendiente de entregar a Solo Música. No consta instalación ni prueba.';if(o.status==='Sin verificar')o.status='Solicitado'}
+ const t=db.tasks.find(x=>x.id==='aud-entrega');if(t)t.notes=(t.notes?t.notes+' | ':'')+'El kit del ordenador está completo (cargador, HDMI y ratón); falta entrega a Solo Música.';
+ localStorage.setItem('ficon26-data',JSON.stringify(db));localStorage.setItem(ordenadorRevision,'1');
+}
 let tab='Resumen',day='Todos',search='';
 const states=['Sin verificar','Solicitado','Confirmado','Recibido','Instalado','Probado','Finalizado','No disponible'],taskStates=['Pendiente','En curso','Bloqueado','Finalizado'];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
