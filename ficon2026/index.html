@@ -26,6 +26,28 @@ if(!localStorage.getItem(revision)){
  localStorage.setItem('ficon26-data',JSON.stringify(db));
  localStorage.setItem(revision,'1');
 }
+
+const juntaRevision='junta-2026-10-20-v1';
+if(!localStorage.getItem(juntaRevision)){
+ const u={
+ m7:{status:'Sin verificar',notes:'Atril de madera para día 23. No se sabe si está montado ni si dispone de micrófono.'},
+ m8:{name:'Televisor de 100 pulgadas (sustituye pantalla desplegable)',status:'Instalado',notes:'Televisor de 100 pulgadas montado. Sustituye pantalla desplegable.'},
+ m9:{name:'Proyector (cancelado por televisor de 100 pulgadas)',status:'No disponible',notes:'No es necesario; se utiliza televisor de 100 pulgadas. No es una falta de entrega.'},
+ m10:{status:'Sin verificar',notes:'4 micrófonos de diadema de Solo Música. Se cree que están, sin confirmación.'},
+ m11:{status:'Sin verificar',notes:'Equipo de sonido e imagen de Solo Música. Se cree que está, sin confirmación.'},
+ m12:{status:'Solicitado',notes:'Pasador de diapositivas FEVAL pendiente de entregar a Solo Música / espacio Junta.'}
+ };
+ for(const o of db.equipment){if(u[o.id]){const v=u[o.id];if(o.status==='Sin verificar')o.status=v.status;if(v.name)o.name=v.name;o.notes=o.notes?o.notes+' | '+v.notes:v.notes}}
+ const additions=[
+ ['Ordenador FEVAL','Pendiente de entregar ordenador con HDMI, alimentación y ratón'],
+ ['Cable HDMI para ordenador','Pendiente de entregar junto con ordenador'],
+ ['Alimentación del ordenador','Pendiente de entregar junto con ordenador'],
+ ['Ratón para ordenador','Pendiente de entregar junto con ordenador'],
+ ['Micrófono del atril','Se desconoce si el atril dispone de micrófono; verificar necesidad']
+ ];
+ for(let i=0;i<additions.length;i++){const id='junta-extra-'+i;if(!db.equipment.some(x=>x.id===id))db.equipment.push({id,space:'Junta',name:additions[i][0],owner:'FEVAL',qty:1,status:i===4?'Sin verificar':'Solicitado',notes:additions[i][1]})}
+ localStorage.setItem('ficon26-data',JSON.stringify(db));localStorage.setItem(juntaRevision,'1');
+}
 let tab='Resumen',day='Todos',search='';
 const states=['Sin verificar','Solicitado','Confirmado','Recibido','Instalado','Probado','Finalizado','No disponible'],taskStates=['Pendiente','En curso','Bloqueado','Finalizado'];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
