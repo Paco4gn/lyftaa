@@ -84,6 +84,13 @@ if(!localStorage.getItem(atrilRevision)){
  const task=db.tasks.find(x=>x.id==='aud-atril');if(task){task.notes='Confirmado: un solo atril compartido; comprobar horas y traslado antes de usarlo en Auditorio.'}
  localStorage.setItem('ficon26-data',JSON.stringify(db));localStorage.setItem(atrilRevision,'1');
 }
+
+const micRevision='auditorio-diadema-2026-10-20-v1';
+if(!localStorage.getItem(micRevision)){
+ const o=db.equipment.find(x=>x.id==='m17');
+ if(o){o.name='2 micrófonos de diadema FEVAL para Auditorio';o.qty=2;o.owner='FEVAL';o.notes=(o.notes?o.notes+' | ':'')+'Confirmado: ambos son de diadema. Disponibles en FEVAL y pendientes de entregar a Solo Música; entrega, montaje y prueba no confirmados.';if(o.status==='Sin verificar')o.status='Solicitado'}
+ localStorage.setItem('ficon26-data',JSON.stringify(db));localStorage.setItem(micRevision,'1');
+}
 let tab='Resumen',day='Todos',search='';
 const states=['Sin verificar','Solicitado','Confirmado','Recibido','Instalado','Probado','Finalizado','No disponible'],taskStates=['Pendiente','En curso','Bloqueado','Finalizado'];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
