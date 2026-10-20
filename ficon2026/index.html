@@ -110,6 +110,22 @@ if(!localStorage.getItem(juntaKitRevision)){
  if(pc)pc.name='Ordenador FEVAL preparado (cargador, HDMI y ratón)';
  localStorage.setItem('ficon26-data',JSON.stringify(db));localStorage.setItem(juntaKitRevision,'1');
 }
+
+const extraDevicesRevision='devices-ficon-fevalmotor-2026-10-20-v1';
+if(!localStorage.getItem(extraDevicesRevision)){
+ const aud=db.equipment.find(x=>x.id==='aud-ordenador'),junta=db.equipment.find(x=>x.id==='junta-extra-0');
+ if(aud)aud.notes=(aud.notes?aud.notes+' | ':'')+'Confirmado: ordenador físico distinto del ordenador de Junta.';
+ if(junta)junta.notes=(junta.notes?junta.notes+' | ':'')+'Confirmado: ordenador físico distinto del ordenador de Auditorio.';
+ const additions=[
+ ['ficon-moviles','FICON','2 dispositivos móviles preparados',2,'Preparados para FICON; ubicación, asignación, entrega y función por confirmar.'],
+ ['motor-moviles','FEVAL Motor','2 dispositivos móviles preparados',2,'Preparados para FEVAL Motor; ubicación, asignación, entrega y función por confirmar.'],
+ ['ficon-pc-extra','FICON','Ordenador adicional preparado para FICON',1,'Adicional a los ordenadores de Auditorio y Junta. Destino, entrega y función por confirmar.'],
+ ['motor-pc-extra','FEVAL Motor','Ordenador preparado para FEVAL Motor',1,'Destino, entrega y función por confirmar.']
+ ];
+ for(const [id,space,name,qty,notes] of additions){if(!db.equipment.some(x=>x.id===id))db.equipment.push({id,space,name,owner:'FEVAL',qty,status:'Confirmado',notes})}
+ for(const [id,name,space] of [['devices-ficon-assignment','Confirmar destino, responsable y entrega de 2 móviles y ordenador adicional de FICON','FICON'],['devices-motor-assignment','Confirmar destino, responsable y entrega de 2 móviles y ordenador de FEVAL Motor','FEVAL Motor']])if(!db.tasks.some(x=>x.id===id))db.tasks.push({id,name,status:'Pendiente',space,notes:'Equipos preparados, no consta entrega.'});
+ localStorage.setItem('ficon26-data',JSON.stringify(db));localStorage.setItem(extraDevicesRevision,'1');
+}
 let tab='Resumen',day='Todos',search='';
 const states=['Sin verificar','Solicitado','Confirmado','Recibido','Instalado','Probado','Finalizado','No disponible'],taskStates=['Pendiente','En curso','Bloqueado','Finalizado'];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
