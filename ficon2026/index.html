@@ -99,6 +99,17 @@ if(!localStorage.getItem(ordenadorRevision)){
  const t=db.tasks.find(x=>x.id==='aud-entrega');if(t)t.notes=(t.notes?t.notes+' | ':'')+'El kit del ordenador está completo (cargador, HDMI y ratón); falta entrega a Solo Música.';
  localStorage.setItem('ficon26-data',JSON.stringify(db));localStorage.setItem(ordenadorRevision,'1');
 }
+
+const juntaKitRevision='junta-ordenador-kit-2026-10-20-v1';
+if(!localStorage.getItem(juntaKitRevision)){
+ for(const id of ['junta-extra-0','junta-extra-1','junta-extra-2','junta-extra-3']){
+ const o=db.equipment.find(x=>x.id===id);
+ if(o){o.notes=(o.notes?o.notes+' | ':'')+'Confirmado: preparado y disponible en FEVAL; aún no consta entrega a Solo Música, montaje ni prueba.';if(o.status==='Sin verificar')o.status='Solicitado'}
+ }
+ const pc=db.equipment.find(x=>x.id==='junta-extra-0');
+ if(pc)pc.name='Ordenador FEVAL preparado (cargador, HDMI y ratón)';
+ localStorage.setItem('ficon26-data',JSON.stringify(db));localStorage.setItem(juntaKitRevision,'1');
+}
 let tab='Resumen',day='Todos',search='';
 const states=['Sin verificar','Solicitado','Confirmado','Recibido','Instalado','Probado','Finalizado','No disponible'],taskStates=['Pendiente','En curso','Bloqueado','Finalizado'];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
